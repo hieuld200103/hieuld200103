@@ -136,9 +136,31 @@ public class DonHangServices {
         }
         return danhSach;
     }
-    //Sửa trạng thái đơn
-    public static void suaTrangThai (){
+    
+    // Sửa trạng thái đơn
+    public static DonHang suaTrangThai(Scanner scanner){
+        xemDSDonHang();
+        System.out.println("Nhập ID đơn hàng cần sửa: ");
+        if(!scanner.hasNextInt()){
+            System.out.println("Lỗi: ID không hợp lệ!");
+            scanner.next();
+            return null;
+        }
+        int idDH = scanner.nextInt();
+        scanner.nextLine();
 
+        String sqlUpdate = "UPDATE donhang SET TrangThai = 'DA_HOAN_THANH' WHERE ID_DonHang = ?";
+        try(Connection conn =DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sqlUpdate)){
+                stmt.setInt(1,idDH);
+                stmt.executeUpdate();
+                System.out.println("Cập hật thành công!");
+                
+            }catch (SQLException e){
+                System.out.println("Lỗi kết nối cơ sở dữ liệu!");
+                e.printStackTrace();
+            }
+            return null;
     }
  
 }
