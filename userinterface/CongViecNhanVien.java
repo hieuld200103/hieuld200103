@@ -32,7 +32,7 @@ public class CongViecNhanVien {
                 System.out.println(menuOptions[i]);
             }
             
-            System.out.print("Chọn chức năng: ");
+            System.out.println("Chọn chức năng: ");
             if (!scanner.hasNextInt()) {
                 System.out.println(" Lỗi: Vui lòng nhập số hợp lệ!");
                 scanner.next(); 

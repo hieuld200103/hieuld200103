@@ -33,13 +33,13 @@ public class DatBanServices {
         while (true) {
             System.out.println("ID Chi nhánh: " + idChiNhanh);
             
-            int soGhe = -1;
-            while (soGhe <= 0) {
+            int soNg = -1;
+            while (soNg <= 0) {
                 System.out.print("Bạn muốn đặt bàn với bao nhiêu người: ");
                 if (scanner.hasNextInt()) {
-                    soGhe = scanner.nextInt();
-                    if (soGhe <= 0) {
-                        System.out.println("Số ghế phải lớn hơn 0.");
+                    soNg = scanner.nextInt();
+                    if (soNg <= 0) {
+                        System.out.println("Số người phải lớn hơn 0.");
                     }
                 } else {
                     System.out.println("Lỗi: Vui lòng nhập số nguyên hợp lệ!");
@@ -48,7 +48,7 @@ public class DatBanServices {
             }
             scanner.nextLine();
         
-            List<BanAn> danhSachBan = BanAnServices.locDatBan(idChiNhanh, soGhe);
+            List<BanAn> danhSachBan = BanAnServices.locDatBan(idChiNhanh, soNg);
             if (danhSachBan.isEmpty()) {
                 System.out.println("Không có bàn phù hợp. Vui lòng chọn số ghế khác.");
                 return null;
@@ -230,7 +230,7 @@ public class DatBanServices {
     //Danh sách để checker
     public static List<DatBan> xemDanhSach() {
         List<DatBan> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM datban WHERE TrangThai = 'DA_XAC_NHAN'";
+        String sql = "SELECT * FROM datban";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -257,8 +257,6 @@ public class DatBanServices {
         return danhSach;
     }
     
-    
-  
     //Lọc danh sách đặt bàn
     public static void locDanhSachDatBan(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         while (true) {
@@ -398,7 +396,8 @@ public class DatBanServices {
             e.printStackTrace();
         }
     }
-   
+    
+    //Lấy bàn đã đặt
     public static DatBan layDatBan(int idUser) {
         String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN'";
         
@@ -431,18 +430,18 @@ public class DatBanServices {
 
 
     
-    public static boolean daNhanBan(int idUser) {
-        String sql = "SELECT * FROM khachhang WHERE ID_User = ? AND TrangThai = 'DA_NHAN_BAN'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            System.out.println("Lỗi kiểm tra trạng thái nhận bàn!");
-            e.printStackTrace();
-        }
-        return false;
-    }
+    // public static boolean daNhanBan(int idUser) {
+    //     String sql = "SELECT * FROM khachhang WHERE ID_User = ? AND TrangThai = 'DA_NHAN_BAN'";
+    //     try (Connection conn = DatabaseConnection.getConnection();
+    //          PreparedStatement stmt = conn.prepareStatement(sql)) {
+    //         stmt.setInt(1, idUser);
+    //         ResultSet rs = stmt.executeQuery();
+    //         return rs.next();
+    //     } catch (SQLException e) {
+    //         System.out.println("Lỗi kiểm tra trạng thái nhận bàn!");
+    //         e.printStackTrace();
+    //     }
+    //     return false;
+    // }
 
 }

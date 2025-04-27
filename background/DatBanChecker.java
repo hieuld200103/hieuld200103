@@ -22,6 +22,8 @@ public class DatBanChecker implements Runnable {
                 continue;
             }
 
+            boolean coDonChoXacNhan = false;
+
             List<DatBan> danhSachDatBan = DatBanServices.xemDanhSach();
             LocalDateTime now = LocalDateTime.now();
 
@@ -32,6 +34,11 @@ public class DatBanChecker implements Runnable {
                 LocalDateTime gioDat = datBan.getNgayDat();
                 if (gioDat == null) continue;
 
+                if (datBan.getTrangThai() == DatBan.TrangThai.CHO_XAC_NHAN) {
+                    coDonChoXacNhan = true;
+                    break; 
+                }
+        
                 long tgBooking = Duration.between(now, gioDat).toMinutes();
                 long tgCho = Duration.between(gioDat, now).toMinutes();
 
@@ -47,6 +54,10 @@ public class DatBanChecker implements Runnable {
                     BanAnServices.capNhatTrangThai(datBan.getID_BanAn(), "TRONG");
                     banBiHuy.add(datBan);
                 }
+            }
+
+            if (coDonChoXacNhan) {
+                DatBanServices.thongBao(currentNV);
             }
 
             if (!banDuocXacNhan.isEmpty()) {

@@ -31,13 +31,13 @@ public class QuanLyDatBan {
 
             switch (choice) {
                 case 1:
-                DatBanServices.xacNhanDatBan(scanner, currentNV, idChiNhanh);
+                    DatBanServices.xacNhanDatBan(scanner, currentNV, idChiNhanh);
                     break;
                 case 2:
-                DatBanServices.huyDatBan(scanner, currentNV, idChiNhanh);
+                    DatBanServices.huyDatBan(scanner, currentNV, idChiNhanh);
                     break;
                 case 3:
-                DatBanServices.locDanhSachDatBan(currentNV, idChiNhanh, scanner);
+                    DatBanServices.locDanhSachDatBan(currentNV, idChiNhanh, scanner);
                     break;
                 case 0:
                     CongViecNhanVien.congViec(currentNV, idChiNhanh);                    
