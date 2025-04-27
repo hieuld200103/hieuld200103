@@ -16,35 +16,29 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `datban`
+-- Table structure for table `khuyenmai`
 --
 
-DROP TABLE IF EXISTS `datban`;
+DROP TABLE IF EXISTS `khuyenmai`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `datban` (
-  `ID_DatBan` int unsigned NOT NULL AUTO_INCREMENT,
-  `ID_ChiNhanh` int unsigned NOT NULL,
-  `ID_User` int unsigned DEFAULT NULL,
-  `List_BanAn` varchar(50) NOT NULL,
-  `NgayDat` datetime NOT NULL,
-  `TrangThai` enum('CHO_XAC_NHAN','DA_XAC_NHAN','DA_HUY') NOT NULL DEFAULT 'CHO_XAC_NHAN',
-  PRIMARY KEY (`ID_DatBan`),
-  KEY `ID_ChiNhanh` (`ID_ChiNhanh`),
-  KEY `ID_User` (`ID_User`),
-  CONSTRAINT `datban_ibfk_1` FOREIGN KEY (`ID_ChiNhanh`) REFERENCES `chinhanh` (`ID_ChiNhanh`) ON DELETE CASCADE,
-  CONSTRAINT `datban_ibfk_3` FOREIGN KEY (`ID_User`) REFERENCES `user` (`ID_User`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `khuyenmai` (
+  `ID_KhuyenMai` int NOT NULL AUTO_INCREMENT,
+  `TenChuongTrinhKM` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PhanTramKM` decimal(5,2) NOT NULL,
+  `NgayBatDau` date NOT NULL,
+  `NgayKetThuc` date NOT NULL,
+  PRIMARY KEY (`ID_KhuyenMai`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `datban`
+-- Dumping data for table `khuyenmai`
 --
 
-LOCK TABLES `datban` WRITE;
-/*!40000 ALTER TABLE `datban` DISABLE KEYS */;
-INSERT INTO `datban` VALUES (1,1,12,'1,5','2025-04-28 20:00:00','DA_XAC_NHAN'),(2,1,12,'1,2','2025-04-27 23:00:00','DA_HUY'),(3,1,12,'1,2','2025-04-28 01:00:00','CHO_XAC_NHAN'),(4,1,12,'3,4','2025-04-28 13:00:00','CHO_XAC_NHAN'),(5,2,12,'13,14','2025-04-28 13:00:00','CHO_XAC_NHAN');
-/*!40000 ALTER TABLE `datban` ENABLE KEYS */;
+LOCK TABLES `khuyenmai` WRITE;
+/*!40000 ALTER TABLE `khuyenmai` DISABLE KEYS */;
+/*!40000 ALTER TABLE `khuyenmai` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
