@@ -69,11 +69,10 @@ public class NhanVienServices {
                     int idNV = rs.getInt("ID_NhanVien");
                     int idChiNhanh = rs.getInt("ID_ChiNhanh");
                     String tenNV = rs.getString("TenNV"); 
-                    String chucVu = rs.getString("ChucVu"); 
                     String email = rs.getString("Email");
 
                     System.out.println(" Đăng nhập thành công! Chào " + tenNV);
-                    System.out.println(" Vai trò của bạn: " + chucVu);
+                    System.out.println(" Nhân viên ở chi nhánh " + idChiNhanh);
                     
                     currentNV = new NhanVien(idNV, idChiNhanh, tenNV, "NHAN_VIEN", sdt, email, hashedPassword); 
                     return currentNV;
@@ -144,8 +143,8 @@ public class NhanVienServices {
 
 
     //Check bàn
-     public static void checkBan(int idChiNhanh){
-        Scanner scanner = new Scanner(System.in);
+     public static void checkBan(NhanVien currentNV, Scanner scanner){
+        int idChiNhanh = currentNV.getID_ChiNhanh();
         while (true) {
             System.out.println("\n=== CHECK BÀN ===");
             System.out.println("1. Lọc danh sách bàn");
@@ -163,14 +162,13 @@ public class NhanVienServices {
 
             switch (choice) {
                 case 1:
-                    BanAnServices.locBanAn(scanner,idChiNhanh);
+                    BanAnServices.locBanAn(currentNV, scanner);
                     break;
                 case 2:
-                    BanAnServices.xemBan();
+                    BanAnServices.xemBan(idChiNhanh);
                     break;
                 case 0:
                     QuanLyBanAn.quanLy(currentNV, idChiNhanh);            
-                    scanner.close();
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

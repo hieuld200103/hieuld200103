@@ -9,21 +9,19 @@ public class DatBan {
     private int id_DatBan;
     private int id_ChiNhanh;
     private int id_User;
-    private int id_BanAn;
+    private String listID_BanAn;
     private LocalDateTime ngayDat;
     private TrangThai trangThai;
 
-    public DatBan(int id_DatBan, int id_ChiNhanh, int id_User,int id_BanAn, LocalDateTime ngayDat, TrangThai trangThai){
+    public DatBan(int id_DatBan, int id_ChiNhanh, int id_User,String listID_BanAn, LocalDateTime ngayDat, TrangThai trangThai){
         this.id_DatBan = id_DatBan;
         this.id_ChiNhanh = id_ChiNhanh;
         this.id_User = id_User;
-        this.id_BanAn  = id_BanAn;
+        this.listID_BanAn  = listID_BanAn;
         this.ngayDat = ngayDat;
         this.trangThai = trangThai;
     }
    
-
-
     public DatBan(int id_DatBan, int id_User){
         this.id_DatBan = id_DatBan;      
         this.id_User = id_User;
@@ -38,8 +36,8 @@ public class DatBan {
     public int getID_User(){return id_User;}
     public void setID_User(int id_User){this.id_User = id_User;};
 
-    public int getID_BanAn(){return id_BanAn;}
-    public void setID_BanAn(int id_BanAn){this.id_BanAn = id_BanAn;}
+    public String getListID_BanAn(){return listID_BanAn;}
+    public void setListID_BanAn(String listID_BanAn){this.listID_BanAn = listID_BanAn;}
 
     public LocalDateTime getNgayDat(){return ngayDat;}
     public void setNgayDat(LocalDateTime ngayDat){this.ngayDat = ngayDat;}

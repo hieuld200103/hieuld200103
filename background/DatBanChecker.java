@@ -9,7 +9,9 @@ import service.NhanVienServices;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DatBanChecker implements Runnable {
     @Override
@@ -41,19 +43,23 @@ public class DatBanChecker implements Runnable {
         
                 long tgBooking = Duration.between(now, gioDat).toMinutes();
                 long tgCho = Duration.between(gioDat, now).toMinutes();
-
-                if (tgBooking <= 90 && tgCho <= 30) {
+                String listBan =  datBan.getListID_BanAn();
+                String[] idBan = listBan.split(",");
+        
+                for (String list : idBan){
+                    int id = Integer.parseInt(list.trim());
                     if (datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
-                        BanAnServices.capNhatTrangThai(datBan.getID_BanAn(), "DA_DAT");
-                        banDuocXacNhan.add(datBan);
+                        if (tgBooking <= 90 && tgCho <= 30) {
+                            BanAnServices.capNhatTrangThai(id, "DA_DAT");
+                            banDuocXacNhan.add(datBan);
+                        } else if (tgCho > 30) {
+                            DatBanServices.capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
+                            BanAnServices.capNhatTrangThai(id, "TRONG");
+                            banBiHuy.add(datBan);
+                        }
                     }
                 }
-
-                if (tgCho > 30 && datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
-                    DatBanServices.capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
-                    BanAnServices.capNhatTrangThai(datBan.getID_BanAn(), "TRONG");
-                    banBiHuy.add(datBan);
-                }
+               
             }
 
             if (coDonChoXacNhan) {
@@ -80,12 +86,16 @@ public class DatBanChecker implements Runnable {
         }
     }
 
-    private String inDanhSach(List<DatBan> danhSach) {
-        StringBuilder sb = new StringBuilder();
-        for (DatBan datBan : danhSach) {
-            sb.append(datBan.getID_BanAn()).append(" ");
+   private String inDanhSach(List<DatBan> danhSach) {
+    Set<String> idSet = new LinkedHashSet<>(); 
+    for (DatBan datBan : danhSach) {
+        String[] idBans = datBan.getListID_BanAn().split(",");
+        for (String id : idBans) {
+            idSet.add(id.trim());
         }
-        return sb.toString().trim();
     }
+    return String.join(" ", idSet);
+}
+    
 
 }

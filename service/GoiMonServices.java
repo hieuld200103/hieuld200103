@@ -13,49 +13,54 @@ public class GoiMonServices {
     public static void goiMon(User currentUser, DonHang donHang, Scanner scanner) {
         List<ChiTietDonHang> danhSachChiTiet = new ArrayList<>();
 
-        while (true) {
-            System.out.println("\n=== GỌI MÓN ===");
-            System.out.println("1. Xem menu");
-            System.out.println("2. Tìm món ăn");
-            System.out.println("3. Gọi món trực tiếp");
-            System.out.println("0. Thoát");
-            System.out.print("Chọn chức năng: ");
-
-            if (!scanner.hasNextInt()) {
-                System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
-                scanner.next();
-                continue;
+        if(DatBanServices.daNhanBan(currentUser.getID_User())){
+            while (true) {
+                System.out.println("\n=== GỌI MÓN ===");
+                System.out.println("1. Xem menu");
+                System.out.println("2. Tìm món ăn");
+                System.out.println("3. Gọi món trực tiếp");
+                System.out.println("0. Thoát");
+                System.out.print("Chọn chức năng: ");
+    
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
+                    scanner.next();
+                    continue;
+                }
+    
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+    
+                switch (choice) {
+                    case 1:
+                        MonAnServices.xemMenu();
+                        goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                        break;
+    
+                    case 2:
+                        MonAnServices.timKiemMonAn(scanner);
+                        goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                        break;
+    
+                    case 3:
+                        goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                        break;
+    
+                    case 0:
+                        if (!danhSachChiTiet.isEmpty()) {
+                            DonHangServices.themChiTietDonHang(danhSachChiTiet);
+                        }
+                        DichVuKhachHang.dichVu(currentUser);
+                        return;
+    
+                    default:
+                        System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
+                }
             }
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    MonAnServices.xemMenu();
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
-                    break;
-
-                case 2:
-                    MonAnServices.timKiemMonAn(scanner);
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
-                    break;
-
-                case 3:
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
-                    break;
-
-                case 0:
-                    if (!danhSachChiTiet.isEmpty()) {
-                        DonHangServices.themChiTietDonHang(danhSachChiTiet);
-                    }
-                    DichVuKhachHang.dichVu(currentUser);
-                    return;
-
-                default:
-                    System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
-            }
+        }else{
+            System.out.println("Bạn chưa có bàn!! Vui lòng nhận bàn để gọi món");
         }
+        
     }
 
     // Gọi món (thao tác thêm món)

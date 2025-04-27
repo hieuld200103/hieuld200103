@@ -21,10 +21,9 @@ public class DonHang {
         this.kieuDonHang = kieuDonHang;
     }
     
-    public DonHang(int id_DonHang, int id_User, Integer id_BanAn, TrangThai trangThai){
+    public DonHang(int id_DonHang, int id_User, TrangThai trangThai){
         this.id_DonHang = id_DonHang;
         this.id_User = id_User;
-        this.id_BanAn = id_BanAn;  
         this.trangThai = trangThai;
     }
 

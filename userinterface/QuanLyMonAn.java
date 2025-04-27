@@ -18,6 +18,7 @@ public class QuanLyMonAn {
             System.out.println("2. Xóa món ăn");
             System.out.println("3. Sửa thông tin món ăn");
             System.out.println("4. Xem danh sách món ăn");
+            System.out.println("5. Tìm món");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -42,6 +43,9 @@ public class QuanLyMonAn {
                     break;
                 case 4:
                     MonAnServices.xemMenu();
+                    break;
+                case 5:
+                    MonAnServices.timKiemMonAn(scanner);
                     break;
                 case 0:
                     CongViecNhanVien.congViec(currentNV, idChiNhanh);                    

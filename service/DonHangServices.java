@@ -15,31 +15,19 @@ import model.User;
 
 public class DonHangServices {
     //Thêm món vào đơn
-    public static DonHang themDonHang(User user, Integer idBanAn, DonHang.KieuDonHang kieuDonHang) {
+    public static DonHang themDonHang(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
         if (user == null || kieuDonHang == null) {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
-    
-        String sql;
-        boolean coBanAn = (idBanAn != null);
-    
-        if (coBanAn) {
-            sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, KieuDonHang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
-        } else {
-            sql = "INSERT INTO donhang (ID_User, TrangThai, KieuDonHang) VALUES (?, 'DANG_CHUAN_BI', ?)";
-        }
-    
+        System.out.print("ID bàn của bạn: ");
+        int idBanAn = scanner.nextInt();
+        String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, KieuDonHang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-    
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {    
             stmt.setInt(1, user.getID_User());
-            if (coBanAn) {
-                stmt.setInt(2, idBanAn);
-                stmt.setString(3, kieuDonHang.name());
-            } else {
-                stmt.setString(2, kieuDonHang.name());
-            }
+            stmt.setInt(2, idBanAn);
+            stmt.setString(3, kieuDonHang.name());
     
             int row = stmt.executeUpdate();
             if (row > 0) {
@@ -63,18 +51,17 @@ public class DonHangServices {
     }
    
     //Lấy đơn hiện tại
-    public static DonHang layDonHangHienTai(int idUser, int idBanAn) {
-        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND ID_BanAn = ? AND TrangThai = 'DANG_CHUAN_BI'";
+    public static DonHang layDonHangHienTai(int idUser) {
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DANG_CHUAN_BI'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
     
             stmt.setInt(1, idUser);
-            stmt.setInt(2, idBanAn);
             ResultSet rs = stmt.executeQuery();
     
             if (rs.next()) {
                 int idDonHang = rs.getInt("ID_DonHang");
-                return new DonHang(idDonHang, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI);
+                return new DonHang(idDonHang, idUser, DonHang.TrangThai.DANG_CHUAN_BI);
             }
         } catch (SQLException e) {
             e.printStackTrace();

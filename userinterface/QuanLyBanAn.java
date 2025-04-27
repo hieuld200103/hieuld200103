@@ -36,13 +36,13 @@ public class QuanLyBanAn {
                     BanAnServices.themBanAn(scanner);
                     break;
                 case 2:
-                    BanAnServices.xoaBanAn(scanner);
+                    BanAnServices.xoaBanAn(currentNV, scanner);
                     break;
                 case 3:
-                    BanAnServices.suaBanAn(scanner);
+                    BanAnServices.suaBanAn(currentNV,scanner);
                     break;
                 case 4:
-                    NhanVienServices.checkBan(idChiNhanh);
+                    NhanVienServices.checkBan(currentNV,scanner);
                     break;
                 case 0:
                     CongViecNhanVien.congViec(currentNV, idChiNhanh);                    

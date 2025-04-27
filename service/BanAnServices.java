@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import model.BanAn;
 import model.BanAn.TrangThai;
+import model.NhanVien;
 import connection.DatabaseConnection;
 
 
@@ -46,8 +47,9 @@ public class BanAnServices {
     }
 
     //Sửa thông tin bàn
-    public static BanAn suaBanAn(Scanner scanner){
-        xemBan();
+    public static BanAn suaBanAn(NhanVien currentNV, Scanner scanner){
+        int idChiNhanh = currentNV.getID_ChiNhanh();
+        xemBan(idChiNhanh);
         System.out.println("Nhập ID bàn ăn cần sửa: ");
         if(!scanner.hasNextInt()){
             System.out.println("Lỗi: ID không hợp lệ!");
@@ -148,8 +150,9 @@ public class BanAnServices {
     }
 
     //Xóa bàn 
-    public static void xoaBanAn(Scanner scanner){
-        xemBan();
+    public static void xoaBanAn(NhanVien currentNV,Scanner scanner){
+        int idChiNhanh = currentNV.getID_ChiNhanh();
+        xemBan(idChiNhanh);
         System.out.println("Nhập ID bàn ăn cần xóa: ");
         if(!scanner.hasNextInt()){
             System.out.println("Lỗi: ID không hợp lệ");
@@ -177,17 +180,20 @@ public class BanAnServices {
     }
 
     //Danh Sách Bàn ăn
-    public static List<BanAn> xemDanhSachBan(String tieuDe, String dieuKienWhere){
+    public static List<BanAn> xemDanhSachBan(int idChiNhanh, String tieuDe, String dieuKienWhere){
         List<BanAn> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM banan";
+        
+        String sql = "SELECT * FROM banan WHERE ID_ChiNhanh = ?";
 
         if(dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()){
-            sql += " WHERE "+ dieuKienWhere;
+            sql += " AND "+ dieuKienWhere;
         }
         
         try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()){
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setInt(1,idChiNhanh);
+            ResultSet rs = stmt.executeQuery();
                 System.out.println("\n======== " +tieuDe.toUpperCase() +" ========");
                 System.out.println("=================================");
                 System.out.printf("| %-5s | %-7s | %-7s | %-10s | \n", "ID", "ID CN", "Số ghế", "Trạng thái");
@@ -212,52 +218,53 @@ public class BanAnServices {
     }
 
     //Xem danh sách bàn
-    public static List<BanAn> xemBan(){
-        return xemDanhSachBan("Danh sách bàn", null);
+    public static List<BanAn> xemBan(int idChiNhanh){
+        return xemDanhSachBan(idChiNhanh, "Danh sách bàn", null);
     }
 
+    public static List<BanAn> xemBanTrong(int idChiNhanh){
+        return xemDanhSachBan(idChiNhanh, "Danh sách bàn trống"," TrangThai = 'TRONG'");
+    }
     
     //LocBanAn
-    public static void locBanAn(Scanner scanner, int idChiNhanh) {    
-        
+    public static void locBanAn(NhanVien currentNV, Scanner scanner) {    
+        int idChiNhanh = currentNV.getID_ChiNhanh();
         System.out.println("Bàn tại chi nhánh ID: " + idChiNhanh);
         while (true) {
-                System.out.println("\n======CHECK======");
-                System.out.println("1. Bàn trống");
-                System.out.println("2. Bàn đã đặt");
-                System.out.println("3. Bàn đang sử dụng");
-                System.out.println("0. Thoát");
-                System.out.print("Chọn: ");
-    
-                int choice;
-                if (scanner.hasNextInt()) {
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
-                } else {
-                    System.out.println("Lỗi: Lựa chọn không hợp lệ!");
-                    scanner.next(); 
-                    continue;
-                }
+            System.out.println("\n======CHECK======");
+            System.out.println("1. Bàn trống");
+            System.out.println("2. Bàn đã đặt");
+            System.out.println("3. Bàn đang sử dụng");
+            System.out.println("0. Thoát");
+            System.out.print("Chọn: ");
 
-                switch(choice){
-                    case 1: 
-                    xemDanhSachBan("Danh sách bàn trống", " TrangThai = 'TRONG'");
-                    break;
-                    case 2:
-                    xemDanhSachBan("Danh sách bàn đã đặt",  "TrangThai = 'DA_DAT'");
-                    break;
-                    case 3:
-                    xemDanhSachBan("Bàn đang sử dụng","TrangThai = 'DANG_SU_DUNG'");
-                    break;
-                    case 0:
-                    NhanVienServices.checkBan(idChiNhanh);
-                    return;
-                    default:
-                    System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại");
-                }
+            int choice;
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+            } else {
+                System.out.println("Lỗi: Lựa chọn không hợp lệ!");
+                scanner.next(); 
+                continue;
             }
 
-      
+            switch(choice){
+                case 1: 
+                xemDanhSachBan(idChiNhanh, "Danh sách bàn trống", " TrangThai = 'TRONG'");
+                break;
+                case 2:
+                xemDanhSachBan(idChiNhanh, "Danh sách bàn đã đặt",  "TrangThai = 'DA_DAT'");
+                break;
+                case 3:
+                xemDanhSachBan(idChiNhanh, "Bàn đang sử dụng","TrangThai = 'DANG_SU_DUNG'");
+                break;
+                case 0:
+                NhanVienServices.checkBan(currentNV, scanner);
+                return;
+                default:
+                System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại");
+            }
+        }     
     }
     
     //Chọn chi nhánh
@@ -296,40 +303,6 @@ public class BanAnServices {
             }
         }
     }
-
-    //Lọc danh sách bàn để đặt bàn
-    public static List<BanAn> locDatBan(int idChiNhanh, int soGheKhachNhap){
-        List<BanAn> danhSach = new ArrayList<>();
-
-        System.out.println("Bàn tại chi nhánh ID: " + idChiNhanh);
-        String sql = "SELECT * FROM banan WHERE ID_ChiNhanh = ? AND Soghe >= ? AND TrangThai =?";
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-                stmt.setInt(1,idChiNhanh);
-                stmt.setInt(2,soGheKhachNhap);
-                stmt.setString(3,"TRONG");
-                try (ResultSet rs = stmt.executeQuery()){
-                    System.out.println("\n===== DANH SÁCH BÀN PHÙ HỢP ======");
-                    System.out.println("============================");
-                    System.out.printf("| %-5s | %-20s | \n", "ID", "Số ghế");
-                    System.out.println("============================");
-
-                    while (rs.next()) {
-                        int id = rs.getInt("ID_BanAn");
-                        int soGheB = rs.getInt("SoGhe");
-                        BanAn banAn = new BanAn(id,soGheB);  
-                        danhSach.add(banAn);
-
-                        System.out.printf("| %-5d | %-20d |\n", id, soGheB);
-                    }
-                    System.out.println("============================");
-                }
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi lấy danh sách bàn!");
-                e.printStackTrace();
-            }
-        return danhSach;
-        }
 
     //Cập nhật theo checker
     public static void capNhatTrangThai(int idBan, String trangThaiMoi) {

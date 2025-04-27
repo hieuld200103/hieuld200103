@@ -44,9 +44,9 @@ public class DichVuKhachHang {
             case 1: 
                 DatBan currentDatBan = DatBanServices.layDatBan(currentUser.getID_User());
                 if (currentDatBan != null) {
-                    DonHang donHang = DonHangServices.layDonHangHienTai(currentUser.getID_User(), currentDatBan.getID_BanAn());
+                    DonHang donHang = DonHangServices.layDonHangHienTai(currentUser.getID_User());
                     if (donHang == null) {
-                        donHang = DonHangServices.themDonHang(currentUser, currentDatBan.getID_BanAn(),DonHang.KieuDonHang.TAI_QUAN );
+                        donHang = DonHangServices.themDonHang(currentUser,DonHang.KieuDonHang.TAI_QUAN, scanner );
                     }
                     if (donHang != null) {
                         donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_QUAN);
