@@ -88,6 +88,7 @@ public class DatBanServices {
 
             boolean coBanBiTrung = false;
             boolean banKhongTrong = false;
+            boolean saiChiNhanh =false;
             for( int idBan : listIDBan){
                 String sqlCheckBan = "SELECT TrangThai FROM banan WHERE ID_BanAn = ?";
                 try (Connection conn = DatabaseConnection.getConnection();
@@ -117,7 +118,6 @@ public class DatBanServices {
                 "AND DATE_ADD(NgayDat, INTERVAL 90 MINUTE) > ?";
                 try (Connection conn = DatabaseConnection.getConnection();
                     PreparedStatement stmt = conn.prepareStatement(sqlCheckDatBan)) {
-            
                     stmt.setInt(1, userID);
                     stmt.setInt(2, idBan);
                     stmt.setTimestamp(3, Timestamp.valueOf(thoiGianAn)); 
@@ -132,8 +132,25 @@ public class DatBanServices {
                     System.out.println("Lỗi khi kiểm tra lịch đặt bàn.");
                     e.printStackTrace();
                 }
+
+                String sqlCheckChiNhanh = "SELECT * FROM banan WHERE ID_BanAn = ? AND ID_ChiNhanh = ?";
+                try (Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(sqlCheckChiNhanh)) {
+                    stmt.setInt(1,idBan);
+                    stmt.setInt(2, idChiNhanh);
+                    ResultSet rs = stmt.executeQuery();
+            
+                    if (!rs.next()) {
+                        System.out.println("Bàn "+ idBan + " không tồn tại. Vui lòng chọn bàn hoặc thời gian khác.");
+                        saiChiNhanh = true;
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Lỗi khi kiểm tra lịch đặt bàn.");
+                    e.printStackTrace();
+                }
+                
             }
-            if (coBanBiTrung || banKhongTrong) {
+            if (coBanBiTrung || banKhongTrong || saiChiNhanh) {
                 return null;
             }
 
@@ -169,16 +186,18 @@ public class DatBanServices {
 
     //Thông báo có đơn chờ xác nhận
     public static void thongBao(NhanVien currentNV){
-        String sql = "SELECT COUNT(*) AS soDon FROM datban WHERE TrangThai = 'CHO_XAC_NHAN'"; 
+        int idChiNhanh = currentNV.getID_ChiNhanh();
+        String sql = "SELECT COUNT(*) AS soDon FROM datban WHERE ID_ChiNhanh = ? AND TrangThai = 'CHO_XAC_NHAN'"; 
         try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()){
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,idChiNhanh);
+                ResultSet rs = stmt.executeQuery();
                 if (rs.next()){
                     int soDon = rs.getInt("soDon");
                     if(soDon>0){
                         System.out.println("!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
                     }else{
-                        System.out.println("Không có đơn đựt bàn nào đang chờ!");
+                        System.out.println("Không có đơn đặt bàn nào đang chờ!");
                     }
                 }
             
@@ -264,7 +283,6 @@ public class DatBanServices {
     
                 DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, thoiGianAn, trangThai);
                 danhSach.add(datBan);
-            
         } 
         rs.close();
         }catch (SQLException e) {

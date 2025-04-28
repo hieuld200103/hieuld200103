@@ -3,7 +3,6 @@ package userinterface;
 import java.util.Scanner;
 
 import Main.Main;
-import background.DatBanChecker;
 import model.NhanVien;
 import service.NhanVienServices;
 
@@ -31,10 +30,6 @@ public class QuanLyNhanVien {
                     currentNV = NhanVienServices.dangNhap(scanner);
                     if (currentNV != null) {
                         int idChiNhanh = currentNV.getID_ChiNhanh();
-                        DatBanChecker datBanChecker = new DatBanChecker();
-                        Thread checker = new Thread(datBanChecker);
-                        checker.setDaemon(true);
-                        checker.start(); 
                         CongViecNhanVien.congViec(currentNV, idChiNhanh);
                         return; 
                     } else {

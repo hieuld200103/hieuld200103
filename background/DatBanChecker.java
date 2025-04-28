@@ -17,13 +17,6 @@ public class DatBanChecker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            NhanVien currentNV = NhanVienServices.getCurrentNV();
-
-            if (currentNV == null) {
-                sleepOneMinute();
-                continue;
-            }
-
             boolean coDonChoXacNhan = false;
 
             List<DatBan> danhSachDatBan = DatBanServices.xemDanhSach();
@@ -63,7 +56,10 @@ public class DatBanChecker implements Runnable {
             }
 
             if (coDonChoXacNhan) {
-                DatBanServices.thongBao(currentNV);
+                NhanVien currentNV = NhanVienServices.getCurrentNV();
+                if(currentNV != null){
+                    DatBanServices.thongBao(currentNV);                }
+                
             }
 
             if (!banDuocXacNhan.isEmpty()) {

@@ -1,5 +1,7 @@
 package Main;
 import java.util.Scanner;
+
+import background.DatBanChecker;
 import userinterface.QuanLyNhanVien;
 import userinterface.TaiKhoanKhachHang;
 
@@ -8,7 +10,10 @@ public class Main {
     
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-              
+        DatBanChecker datBanChecker = new DatBanChecker();
+        Thread checker = new Thread(datBanChecker);
+        checker.setDaemon(true);
+        checker.start();  
         while (true) {
             System.out.println("\n=== Bạn là Khách Hàng hay Nhân Viên? ===");
             System.out.println("1. Khách hàng");

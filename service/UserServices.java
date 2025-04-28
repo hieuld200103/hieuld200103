@@ -238,7 +238,7 @@ public class UserServices {
                 }
             }
     
-            System.out.print("Nhập giá trị mới: ");
+            System.out.print("Nhập mật khẩu mới: ");
             String newValue = scanner.nextLine();
             if (choice == 4) newValue = hashPassword(newValue); 
     

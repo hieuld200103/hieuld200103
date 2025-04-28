@@ -18,11 +18,10 @@ public class CongViecNhanVien {
                 "CÔNG VIỆC NHÂN VIÊN",
                 "1. Check đặt bàn",
                 "2. Quản lý khách hàng",
-                "3. Quản lý user",
-                "4. Quản lý đơn hàng",
-                "5. Quản lý menu",
-                "6. Quản lý bàn ăn",
-                "7. Check hóa đơn",
+                "3. Quản lý đơn hàng",
+                "4. Quản lý menu",
+                "5. Quản lý bàn ăn",
+                "6. Check hóa đơn",
                 "0. Đăng xuất"
             };
             
@@ -49,18 +48,15 @@ public class CongViecNhanVien {
                     QuanLyKhachHang.quanLy(currentNV,idChiNhanh);;
                     break;
                 case 3:
-                    QuanLyUser.quanLy(currentNV, idChiNhanh);
-                    break;
-                case 4:
                     QuanLyDonHang.quanLy(currentNV, idChiNhanh);
                     break;
-                case 5:
+                case 4:
                     QuanLyMonAn.quanLy(currentNV, idChiNhanh);
                     break;
-                case 6:
+                case 5:
                     QuanLyBanAn.quanLy(currentNV, idChiNhanh);                    
                     break;
-                case 7:
+                case 6:
                     System.out.println("Đang phát triển");
                     break;
                 case 0:

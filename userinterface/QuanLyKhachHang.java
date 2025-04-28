@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 import model.NhanVien;
 import service.KhachHangServices;
+import service.NhanVienServices;
 
 public class QuanLyKhachHang {
     public static void quanLy(NhanVien currentNV, int idChiNhanh) {
@@ -15,7 +16,8 @@ public class QuanLyKhachHang {
             System.out.println("\n=== QUẢN LÝ KHÁCH HÀNG ===");
             System.out.println("1. Xác nhận nhận bàn");
             System.out.println("2. Xóa khách hàng");
-            System.out.println("3. Xem danh sách khách hàng");
+            System.out.println("3. Xem danh sách khách hàng ăn tại nhà hàng");
+            System.out.println("4. Xem danh sách user");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -37,6 +39,9 @@ public class QuanLyKhachHang {
                     break;
                 case 3:
                     KhachHangServices.xemDanhSachKhachHang();
+                    break;
+                case 4:
+                    NhanVienServices.xemDanhSachUser();
                     break;
                 case 0:                    
                     CongViecNhanVien.congViec(currentNV, idChiNhanh);
