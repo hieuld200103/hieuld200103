@@ -28,10 +28,12 @@ CREATE TABLE `hoadon` (
   `ID_KhuyenMai` int unsigned DEFAULT NULL,
   `TongTien` int NOT NULL,
   `PTThanhToan` enum('TIEN_MAT','CHUYEN_KHOAN','VNPAY') NOT NULL,
+  `NgayThanhToan` date DEFAULT NULL,
   PRIMARY KEY (`ID_HoaDon`),
   KEY `ID_DonHang` (`ID_DonHang`),
-  KEY `fk_hoadon_khuyenmai` (`ID_KhuyenMai`),
-  CONSTRAINT `hoadon_ibfk_1` FOREIGN KEY (`ID_DonHang`) REFERENCES `donhang` (`ID_DonHang`) ON DELETE CASCADE
+  KEY `ID_KhuyenMai` (`ID_KhuyenMai`),
+  CONSTRAINT `hoadon_ibfk_1` FOREIGN KEY (`ID_DonHang`) REFERENCES `donhang` (`ID_DonHang`) ON DELETE CASCADE,
+  CONSTRAINT `ID_KhuyenMai` FOREIGN KEY (`ID_KhuyenMai`) REFERENCES `khuyenmai` (`ID_KhuyenMai`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -53,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-28  0:57:15
+-- Dump completed on 2025-04-29  0:59:12

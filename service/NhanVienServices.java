@@ -176,7 +176,40 @@ public class NhanVienServices {
         }
     }  
     
-    //Xoa user
+    //Danh sách User
+    public static List<User> xemDanhSachUser(){
+        List<User> danhSach = new ArrayList<>();
+        String sql = "SELECT * FROM user";
+       
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()){
+                System.out.println("========================= DANH SÁCH USER =========================");
+                System.out.println("=====================================================================================");
+                System.out.printf("| %-5s | %-20s | %-12s | %-25s | %-10s |\n",
+                                  "ID", "Tên", "SDT", "Email", "Hạng");
+                System.out.println("=====================================================================================");
+                
+                while (rs.next()) {
+                    int id = rs.getInt("ID_User");
+                    String tenUser = rs.getString("TenUser");
+                    String sdt = rs.getString("SDT");
+                    String email = rs.getString("Email");
+                    Role role = Role.valueOf(rs.getString("Role"));
+        
+                    danhSach.add(new User(id, tenUser, sdt, email, "", role));
+        
+                    System.out.printf("| %-5d | %-20s | %-12s | %-25s | %-10s |\n",id, tenUser, sdt, email, role);
+                }               
+                System.out.println("=====================================================================================");
+            }catch(SQLException e){
+                System.out.println("Lỗi khi lấy danh sách khách hàng!");
+                e.printStackTrace();
+            }
+            return danhSach;
+    }
+
+     //Xoa user
     // public static void xoaUser(Scanner scanner){
     //     System.out.println("Nhập ID user cần xóa: ");
     //     if (!scanner.hasNextInt()){
@@ -273,38 +306,4 @@ public class NhanVienServices {
     //         e.printStackTrace();
     //     }
     // }
-
-
-    //Danh sách User
-    public static List<User> xemDanhSachUser(){
-        List<User> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM user";
-       
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery()){
-                System.out.println("========================= DANH SÁCH USER =========================");
-                System.out.println("=====================================================================================");
-                System.out.printf("| %-5s | %-20s | %-12s | %-25s | %-10s |\n",
-                                  "ID", "Tên", "SDT", "Email", "Hạng");
-                System.out.println("=====================================================================================");
-                
-                while (rs.next()) {
-                    int id = rs.getInt("ID_User");
-                    String tenUser = rs.getString("TenUser");
-                    String sdt = rs.getString("SDT");
-                    String email = rs.getString("Email");
-                    Role role = Role.valueOf(rs.getString("Role"));
-        
-                    danhSach.add(new User(id, tenUser, sdt, email, "", role));
-        
-                    System.out.printf("| %-5d | %-20s | %-12s | %-25s | %-10s |\n",id, tenUser, sdt, email, role);
-                }               
-                System.out.println("=====================================================================================");
-            }catch(SQLException e){
-                System.out.println("Lỗi khi lấy danh sách khách hàng!");
-                e.printStackTrace();
-            }
-            return danhSach;
-    }
 }

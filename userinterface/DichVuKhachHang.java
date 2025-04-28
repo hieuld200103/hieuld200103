@@ -7,6 +7,7 @@ import service.DatBanServices;
 import model.DonHang;
 import service.DonHangServices;
 import service.GoiMonServices;
+import service.KhachHangServices;
 import service.MonAnServices;
 import model.User;
 import service.UserServices;
@@ -24,10 +25,9 @@ public class DichVuKhachHang {
         System.out.println("\n=== DỊCH VỤ KHÁCH HÀNG ===");
         System.out.println("1. Gọi món tại quán");
         System.out.println("2. Đặt món mang về");
-        System.out.println("3. Đặt món online");
-        System.out.println("4. Đặt bàn");
-        System.out.println("5. Xem thực đơn");
-        System.out.println("6. Sửa thông tin cá nhân");
+        System.out.println("3. Đặt bàn");
+        System.out.println("4. Xem thực đơn");
+        System.out.println("5. Sửa thông tin cá nhân");
         System.out.println("0. Đăng xuất");
         System.out.print("Chọn chức năng: ");
 
@@ -42,7 +42,7 @@ public class DichVuKhachHang {
 
         switch (choice) {
             case 1: 
-                DatBan currentDatBan = DatBanServices.layDatBan(currentUser.getID_User());
+                DatBan currentDatBan = DatBanServices.daXacNhanDatBan(currentUser.getID_User());
                 if (currentDatBan != null) {
                     DonHang donHang = DonHangServices.layDonHangHienTai(currentUser.getID_User());
                     if (donHang == null) {
@@ -68,29 +68,23 @@ public class DichVuKhachHang {
                 // break;
 
             case 3: 
-                // DonHang donOnline = DonHangServices.taoDonHangOnline(currentUser); 
-                // if (donOnline != null) {
-                //     donOnline.setKieuDonHang(ChiTietDonHang.KieuDonHang.DAT_ONLINE);
-                //     DonHangServices.goiMon(donOnline, currentUser);
-                // }
-                // break;
-
-            case 4:
-                DatBanServices.datBan(currentUser);
+                DatBan datBan = DatBanServices.daDatBan(currentUser.getID_User());
+                if (datBan != null){                  
+                    System.out.println("Bạn đã đặt bàn rồi!");
+                    KhachHangServices.xemDanhSachDatBan(currentUser);
+                }else{
+                    DatBanServices.datBan(currentUser);
+                }
                 break;
-
-            case 5:
+            case 4:
                 MonAnServices.timMon(currentUser);
                 break;
-
-            case 6:
+            case 5:
                 UserServices.suaThongTinCaNhan(scanner, currentUser.getID_User(), currentUser);
                 break;
-
             case 0:
                 UserServices.dangXuat();
                 TaiKhoanKhachHang.taiKhoanKhachHang();
-                scanner.close();
                 return;
 
             default:

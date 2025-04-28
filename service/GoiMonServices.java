@@ -44,8 +44,7 @@ public class GoiMonServices {
     
                     case 3:
                         goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
-                        break;
-    
+                        break;    
                     case 0:
                         if (!danhSachChiTiet.isEmpty()) {
                             DonHangServices.themChiTietDonHang(danhSachChiTiet);
@@ -96,6 +95,8 @@ public class GoiMonServices {
             danhSachChiTiet.add(ctdh);
 
             System.out.println("Đã thêm món vào đơn tạm!");
+            DonHangServices.themChiTietDonHang(danhSachChiTiet);
+            danhSachChiTiet.clear();
         }
     }
 }

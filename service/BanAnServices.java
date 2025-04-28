@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import model.BanAn;
 import model.BanAn.TrangThai;
@@ -272,29 +274,40 @@ public class BanAnServices {
         while (true) {
             String sqlChiNhanh = "SELECT * FROM chinhanh";
             try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sqlChiNhanh);
-                 ResultSet rs = stmt.executeQuery()) {
-    
+                PreparedStatement stmt = conn.prepareStatement(sqlChiNhanh);
+                ResultSet rs = stmt.executeQuery()) {
+
+                Set<Integer> danhSachID = new HashSet<>();
+
                 System.out.println("\n===== CHỌN CHI NHÁNH =====");
                 System.out.println("=====================================");
-                System.out.println("| ID       | Tên chi nhánh      |");
+                System.out.println("| ID    | Tên chi nhánh             |");
                 System.out.println("=====================================");
-    
+
                 while (rs.next()) {
                     int idChiNhanh = rs.getInt("ID_ChiNhanh");
                     String tenChiNhanh = rs.getString("TenCN");
                     System.out.printf("| %-5d | %-25s |\n", idChiNhanh, tenChiNhanh);
+                    danhSachID.add(idChiNhanh);
                 }
-    
+
                 System.out.println("=====================================");
-                System.out.print("Nhập ID chi nhánh bạn muốn chọn: ");
+                System.out.print("Nhập ID chi nhánh bạn muốn chọn: (0 để thoát): ");
+
                 if (scanner.hasNextInt()) {
                     int id = scanner.nextInt();
                     scanner.nextLine();
-                    return id;
+                    if(id ==0){
+                        return 0;
+                    }
+                    if (danhSachID.contains(id)) {
+                        return id; 
+                    } else {
+                        System.out.println("ID chi nhánh không tồn tại. Vui lòng chọn lại.");
+                    }
                 } else {
                     System.out.println("Vui lòng nhập số hợp lệ.");
-                    scanner.next();
+                    scanner.next(); 
                 }
             } catch (SQLException e) {
                 System.out.println("Lỗi khi lấy danh sách chi nhánh!");
@@ -303,6 +316,7 @@ public class BanAnServices {
             }
         }
     }
+
 
     //Cập nhật theo checker
     public static void capNhatTrangThai(int idBan, String trangThaiMoi) {

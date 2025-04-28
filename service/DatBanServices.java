@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,10 +28,15 @@ public class DatBanServices {
             return null;
         }
         Scanner scanner = new Scanner(System.in);
-        int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
-        System.out.println("\n========= ĐẶT BÀN =========");
-        int userID = currentUser.getID_User();
         while (true) {
+            int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
+            if (idChiNhanh == 0) {
+                return null; 
+            }
+
+            System.out.println("\n========= ĐẶT BÀN =========");
+            int userID = currentUser.getID_User();
+       
             System.out.println("ID Chi nhánh: " + idChiNhanh);
             
             int soNg = -1;
@@ -72,106 +78,125 @@ public class DatBanServices {
                 System.out.println("Không có ID hợp lệ để cập nhật!");
                 return null;
             }
-    
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDateTime thoiGianAn = null;
-            while (thoiGianAn == null) {
+            LocalDateTime ngayDat = LocalDateTime.now(); 
+            DateTimeFormatter dinhDang = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime ngayAn = null;
+            while (ngayAn == null) {
                 try {
-                    System.out.print("Nhập thời gian bạn muốn ăn (định dạng yyyy-MM-dd HH:mm): ");
+                    System.out.print("Nhập thời gian bạn muốn ăn (định dạng yyyy-MM-dd HH:mm),(0 để thoát): ");
                     String thoiGianInput = scanner.nextLine();
-                    thoiGianAn = LocalDateTime.parse(thoiGianInput, formatter);
-                    System.out.println("Thời gian bạn muốn ăn: " + thoiGianAn);
+                    if (thoiGianInput.equals("0")) {
+                        return null; 
+                    }
+                    ngayAn = LocalDateTime.parse(thoiGianInput, dinhDang);
+                    long tgDatBan = Duration.between(ngayDat, ngayAn).toHours();
+                    if(tgDatBan >168){
+                        System.out.println("Bạn chỉ được đặt bàn trong 7 ngày tới!!");
+                        ngayAn = null;
+                    }
+                    // else if (tgDatBan<6){
+                    //     System.out.println("Bàn cần được đặt trước thời gian ăn 6 tiếng!!");
+                    //     ngayAn = null;
+                    // }
+                    else{
+                        System.out.println("Thời gian bạn muốn ăn: " + ngayAn);
+                    }
+                    
                 } catch (Exception e) {
                     System.out.println("Lỗi: Định dạng ngày giờ không đúng. Vui lòng nhập lại theo định dạng yyyy-MM-dd HH:mm");
                 }
             }
 
+            //Check bàn có phù hợp không
             boolean coBanBiTrung = false;
             boolean banKhongTrong = false;
-            boolean saiChiNhanh =false;
-            for( int idBan : listIDBan){
-                String sqlCheckBan = "SELECT TrangThai FROM banan WHERE ID_BanAn = ?";
-                try (Connection conn = DatabaseConnection.getConnection();
-                     PreparedStatement stmt = conn.prepareStatement(sqlCheckBan)) {
-                    stmt.setInt(1, idBan);
-                    ResultSet rs = stmt.executeQuery();
-                    if (rs.next()) {
-                        String trangThai = rs.getString("TrangThai");
-                        if (!trangThai.equals("TRONG")) {
-                            System.out.println("Bàn này hiện không trống. Vui lòng chọn bàn khác!");
-                            banKhongTrong = true;
+            boolean saiChiNhanh = false;
+
+            try (Connection conn = DatabaseConnection.getConnection()) {
+
+                for (int idBan : listIDBan) {
+
+                    // Kiểm tra trạng thái bàn
+                    String sqlCheckBan = "SELECT TrangThai FROM banan WHERE ID_BanAn = ?";
+                    try (PreparedStatement checkBan = conn.prepareStatement(sqlCheckBan)) {
+                        checkBan.setInt(1, idBan);
+                        try (ResultSet rs = checkBan.executeQuery()) {
+                            if (rs.next()) {
+                                String trangThai = rs.getString("TrangThai");
+                                if (!"TRONG".equals(trangThai)) {
+                                    System.out.println("Bàn " + idBan + " không trống. Vui lòng chọn bàn khác!");
+                                    banKhongTrong = true;
+                                }
+                            } else {
+                                System.out.println("Không tìm thấy bàn " + idBan + "!");
+                                banKhongTrong = true;
+                            }
                         }
-                    } else {
-                        System.out.println("Không tìm thấy bàn này!");
-                        banKhongTrong = true;
                     }
-                } catch (SQLException e) {
-                    System.out.println("Lỗi khi kiểm tra trạng thái bàn");
-                    e.printStackTrace();
+
+                    // Kiểm tra bàn đã được đặt chưa
+                    String sqlCheckDatBan = "SELECT * FROM datban " +
+                            "WHERE ID_USER = ? AND FIND_IN_SET(?, List_BanAn) > 0 " +
+                            "AND TrangThai IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN') " +
+                            "AND NgayAn < DATE_ADD(?, INTERVAL 90 MINUTE) " +
+                            "AND DATE_ADD(NgayAn, INTERVAL 90 MINUTE) > ?";
+                    try (PreparedStatement checkDatBan = conn.prepareStatement(sqlCheckDatBan)) {
+                        checkDatBan.setInt(1, userID);
+                        checkDatBan.setInt(2, idBan);
+                        checkDatBan.setTimestamp(3, Timestamp.valueOf(ngayAn));
+                        checkDatBan.setTimestamp(4, Timestamp.valueOf(ngayAn));
+                        try (ResultSet rs = checkDatBan.executeQuery()) {
+                            if (rs.next()) {
+                                System.out.println("Bàn " + idBan + " đã được đặt trong khoảng thời gian này. Vui lòng chọn bàn khác!");
+                                coBanBiTrung = true;
+                            }
+                        }
+                    }
+
+                    // Kiểm tra bàn có thuộc chi nhánh không
+                    String sqlCheckChiNhanh = "SELECT * FROM banan WHERE ID_BanAn = ? AND ID_ChiNhanh = ?";
+                    try (PreparedStatement checkChiNhanh = conn.prepareStatement(sqlCheckChiNhanh)) {
+                        checkChiNhanh.setInt(1, idBan);
+                        checkChiNhanh.setInt(2, idChiNhanh);
+                        try (ResultSet rs = checkChiNhanh.executeQuery()) {
+                            if (!rs.next()) {
+                                System.out.println("Bàn " + idBan + " không tồn tại trong chi nhánh. Vui lòng chọn bàn khác!");
+                                saiChiNhanh = true;
+                            }
+                        }
+                    }
+
                 }
 
-                String sqlCheckDatBan = 
-                "SELECT * FROM datban " +
-                "WHERE ID_USER = ? AND FIND_IN_SET(?, List_BanAn) > 0 " +
-                "AND TrangThai IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN') " +
-                "AND NgayDat < DATE_ADD(?, INTERVAL 90 MINUTE) " +
-                "AND DATE_ADD(NgayDat, INTERVAL 90 MINUTE) > ?";
-                try (Connection conn = DatabaseConnection.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(sqlCheckDatBan)) {
-                    stmt.setInt(1, userID);
-                    stmt.setInt(2, idBan);
-                    stmt.setTimestamp(3, Timestamp.valueOf(thoiGianAn)); 
-                    stmt.setTimestamp(4, Timestamp.valueOf(thoiGianAn)); 
-                    ResultSet rs = stmt.executeQuery();
-            
-                    if (rs.next()) {
-                        System.out.println("Bàn "+ idBan + " đã được đặt trong khoảng thời gian này. Vui lòng chọn bàn hoặc thời gian khác.");
-                        coBanBiTrung = true;
-                    }
-                } catch (SQLException e) {
-                    System.out.println("Lỗi khi kiểm tra lịch đặt bàn.");
-                    e.printStackTrace();
-                }
-
-                String sqlCheckChiNhanh = "SELECT * FROM banan WHERE ID_BanAn = ? AND ID_ChiNhanh = ?";
-                try (Connection conn = DatabaseConnection.getConnection();
-                    PreparedStatement stmt = conn.prepareStatement(sqlCheckChiNhanh)) {
-                    stmt.setInt(1,idBan);
-                    stmt.setInt(2, idChiNhanh);
-                    ResultSet rs = stmt.executeQuery();
-            
-                    if (!rs.next()) {
-                        System.out.println("Bàn "+ idBan + " không tồn tại. Vui lòng chọn bàn hoặc thời gian khác.");
-                        saiChiNhanh = true;
-                    }
-                } catch (SQLException e) {
-                    System.out.println("Lỗi khi kiểm tra lịch đặt bàn.");
-                    e.printStackTrace();
-                }
-                
+            } catch (Exception e) {
+                System.out.println("Lỗi khi kiểm tra lịch đặt bàn.");
+                e.printStackTrace();
             }
+
             if (coBanBiTrung || banKhongTrong || saiChiNhanh) {
                 return null;
             }
+
 
             String idBanAnChuoi = listIDBan.stream()
             .map(String::valueOf)
             .collect(Collectors.joining(","));
             
-            String sql = "INSERT INTO datban (ID_ChiNhanh, ID_User, List_BanAn, NgayDat, TrangThai) VALUES (?, ?, ?, ?, 'CHO_XAC_NHAN')";
+            String sql = "INSERT INTO datban (ID_ChiNhanh, ID_User, List_BanAn, NgayDat, NgayAn, TrangThai) VALUES (?, ?, ?, ?, ?, 'CHO_XAC_NHAN')";
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, idChiNhanh);
                 stmt.setInt(2, userID);
                 stmt.setString(3, idBanAnChuoi);
-                stmt.setTimestamp(4, Timestamp.valueOf(thoiGianAn));
+                stmt.setTimestamp(4, Timestamp.valueOf(ngayDat));
+                stmt.setTimestamp(5, Timestamp.valueOf(ngayAn));
                 int rowInserted = stmt.executeUpdate();
                 if (rowInserted > 0) {
                     try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
                             int idDatBan = generatedKeys.getInt(1);
                             System.out.println("Đặt bàn thành công! ID_DatBan: " + idDatBan);
-                            return new DatBan(idDatBan, idChiNhanh, userID, idBanAnChuoi, thoiGianAn, DatBan.TrangThai.CHO_XAC_NHAN);
+                            return new DatBan(idDatBan, idChiNhanh, userID, idBanAnChuoi, ngayDat, ngayAn, DatBan.TrangThai.CHO_XAC_NHAN);
                         }
                     }
                 }
@@ -222,26 +247,27 @@ public class DatBanServices {
             stmt.setInt(1,idCN);
             ResultSet rs = stmt.executeQuery();
     
-            System.out.println("\n=============================== " + tieuDe.toUpperCase() + " ==============================");
-            System.out.println("================================================================================");
-            System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Trạng thái");
-            System.out.println("================================================================================");
+            System.out.println("\n===================================== " + tieuDe.toUpperCase() + " ====================================");
+            System.out.println("=========================================================================================================");
+            System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Ngày ăn", "Trạng thái");
+            System.out.println("=========================================================================================================");
     
             while (rs.next()) {
                 int id = rs.getInt("ID_DatBan");
                 int idUser = rs.getInt("ID_User");
                 String idBanAn = rs.getString("List_BanAn");
-                LocalDateTime thoiGianAn = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
                 DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
     
-                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, thoiGianAn, trangThai);
+                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                 danhSach.add(datBan);
     
-                System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-15s |\n",
-                        id, idCN, idUser, idBanAn, thoiGianAn, trangThai);
+                System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
+                        id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
             }
     
-            System.out.println("================================================================================");
+            System.out.println("=========================================================================================================");
             rs.close();
         } catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách đặt bàn!");
@@ -268,7 +294,6 @@ public class DatBanServices {
     public static List<DatBan> xemDanhSach() {
         List<DatBan> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM datban";
-        
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -278,10 +303,11 @@ public class DatBanServices {
                 int idCN = rs.getInt("ID_ChiNhanh");
                 int idUser = rs.getInt("ID_User");
                 String idBanAn = rs.getString("List_BanAn");
-                LocalDateTime thoiGianAn = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
                 DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
     
-                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, thoiGianAn, trangThai);
+                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                 danhSach.add(datBan);
         } 
         rs.close();
@@ -393,11 +419,11 @@ public class DatBanServices {
 
                 int idUser = rs.getInt("ID_User");
                 String idBanAn = rs.getString("List_BanAn");
-                LocalDateTime thoiGianAn = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayAn = rs.getTimestamp("NgayDat").toLocalDateTime();
                 DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
 
                 System.out.println("Cập nhật đơn:");
-                hienThiThongTin(idDatBan, idUser, idBanAn, thoiGianAn, trangThai);
+                hienThiThongTin(idDatBan, idUser, idBanAn, ngayAn, trangThai);
 
                 String sqlUpdate = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
                 try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
@@ -416,9 +442,9 @@ public class DatBanServices {
         }
     }
 
-    private static void hienThiThongTin(int idDatBan, int idUser, String idBanAn, LocalDateTime thoiGianAn, DatBan.TrangThai trangThai) {
+    private static void hienThiThongTin(int idDatBan, int idUser, String idBanAn, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
         System.out.println("ID: " + idDatBan + " | idUser: " + idUser +
-            " | Bàn: " + idBanAn + " | Ngày đặt: " + thoiGianAn + " | Trạng thái: " + trangThai);
+            " | Bàn: " + idBanAn + " | Ngày đặt: " + ngayAn + " | Trạng thái: " + trangThai);
     }
 
     public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV) {
@@ -445,12 +471,13 @@ public class DatBanServices {
     }
     
     //Lấy bàn đã đặt
-    public static DatBan layDatBan(int idUser) {
-        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN'";
-        
+    public static DatBan layDatBan(int idUser, String dieuKienWhere) {
+        String sql = "SELECT * FROM datban WHERE ID_User = ? ";
+        if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()){
+            sql += " AND " + dieuKienWhere;
+        }
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idUser);
             ResultSet rs = stmt.executeQuery();
 
@@ -458,13 +485,13 @@ public class DatBanServices {
                 int id_DatBan = rs.getInt("ID_DatBan");
                 int id_ChiNhanh = rs.getInt("ID_ChiNhanh");
                 String id_BanAn = rs.getString("List_BanAn");
-                java.sql.Timestamp ngayDatSQL = rs.getTimestamp("NgayDat");
-                LocalDateTime ngayDat = ngayDatSQL.toLocalDateTime();
+                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
 
                 String trangThaiStr = rs.getString("TrangThai");
                 DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(trangThaiStr);
 
-                return new DatBan(id_DatBan, id_ChiNhanh, idUser, id_BanAn, ngayDat, trangThai);
+                return new DatBan(id_DatBan, id_ChiNhanh, idUser, id_BanAn, ngayDat, ngayAn , trangThai);
             }
 
         } catch (Exception e) {
@@ -475,6 +502,13 @@ public class DatBanServices {
         return null;
     }
 
+    public static DatBan daXacNhanDatBan(int idUser){
+        return layDatBan(idUser, "TrangThai = 'DA_XAC_NHAN'");
+    }
+
+    public static DatBan daDatBan(int idUser){
+        return layDatBan(idUser, "TrangThai IN ('DA_XAC_NHAN', 'CHO_XAC_NHAN')");
+    }
 
     //Check khách đã nhận bàn
     public static boolean daNhanBan(int idUser) {
@@ -490,5 +524,4 @@ public class DatBanServices {
         }
         return false;
     }
-
 }

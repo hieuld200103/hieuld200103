@@ -6,8 +6,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+
 import connection.DatabaseConnection;
+import model.DatBan;
 import model.KhachHang;
+import model.User;
 public class KhachHangServices {
     // Thêm khách hàng
     public static KhachHang khachHangNhanBan(Scanner scanner) {
@@ -128,4 +132,45 @@ public class KhachHangServices {
         return danhSach;
     }
     
+
+    //Xem bàn đã đặt
+    public static List<DatBan> xemDanhSachDatBan(User currentUser) {
+        List<DatBan> danhSach = new ArrayList<>();
+        int idUser = currentUser.getID_User();
+        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'CHO_XAC_NHAN' OR TrangThai = 'DA_XAC_NHAN'";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1,idUser);
+            ResultSet rs = stmt.executeQuery();
+    
+            System.out.println("\n========================================= DANH SÁCH BÀN ĐÃ ĐẶT ========================================");
+            System.out.println("========================================================================================================");
+            System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "List bàn", "Ngày đặt","Ngày ăn","Trạng thái");
+            System.out.println("========================================================================================================");
+    
+            while (rs.next()) {
+                int id = rs.getInt("ID_DatBan");
+                int idCN = rs.getInt("ID_ChiNhanh");
+                String idBanAn = rs.getString("List_BanAn");
+                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
+                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
+                DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
+    
+                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                danhSach.add(datBan);
+    
+                System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
+                        id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+            }
+    
+            System.out.println("========================================================================================================");
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy danh sách đặt bàn!");
+            e.printStackTrace();
+        }
+    
+        return danhSach;
+    }
 }

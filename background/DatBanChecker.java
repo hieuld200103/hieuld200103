@@ -26,16 +26,16 @@ public class DatBanChecker implements Runnable {
             List<DatBan> banBiHuy = new ArrayList<>();
 
             for (DatBan datBan : danhSachDatBan) {
-                LocalDateTime gioDat = datBan.getNgayDat();
-                if (gioDat == null) continue;
+                LocalDateTime gioAn = datBan.getNgayAn();
+                if (gioAn == null) continue;
 
                 if (datBan.getTrangThai() == DatBan.TrangThai.CHO_XAC_NHAN) {
                     coDonChoXacNhan = true;
                     break; 
                 }
         
-                long tgBooking = Duration.between(now, gioDat).toMinutes();
-                long tgCho = Duration.between(gioDat, now).toMinutes();
+                long tgBooking = Duration.between(now, gioAn).toMinutes();
+                long tgCho = Duration.between(gioAn, now).toMinutes();
                 String listBan =  datBan.getListID_BanAn();
                 String[] idBan = listBan.split(",");
         
@@ -58,16 +58,16 @@ public class DatBanChecker implements Runnable {
             if (coDonChoXacNhan) {
                 NhanVien currentNV = NhanVienServices.getCurrentNV();
                 if(currentNV != null){
-                    DatBanServices.thongBao(currentNV);                }
-                
+                    DatBanServices.thongBao(currentNV);
+                }                
             }
 
             if (!banDuocXacNhan.isEmpty()) {
                 
-                System.out.println("\n✅ Các bàn đã được đặt: " + inDanhSach(banDuocXacNhan));
+                System.out.println("\n Các bàn đã được đặt: " + inDanhSach(banDuocXacNhan));
             }
             if (!banBiHuy.isEmpty()) {
-                System.out.println("\n❌ Các bàn bị huỷ: " + inDanhSach(banBiHuy));
+                System.out.println("\n Các bàn bị huỷ: " + inDanhSach(banBiHuy));
             }
 
             sleepOneMinute();
