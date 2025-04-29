@@ -36,10 +36,12 @@ public class UserServices {
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, sdt);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                return true;
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return true;
+                }
             }
+            
         } catch (SQLException e) {
             System.out.println("Lỗi kiểm tra số điện thoại!");
             e.printStackTrace();
@@ -94,13 +96,13 @@ public class UserServices {
                     stmt.setString(4, hashedMatKhau);
                     stmt.executeUpdate();
 
-                    ResultSet rs = stmt.getGeneratedKeys();
-                    if (rs.next()) {
-                        int idUser = rs.getInt(1);
-                        System.out.println("Đăng ký thành công! ID của bạn là: " + idUser);
-                        return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Role.SLIVER); 
+                    try(ResultSet rs = stmt.getGeneratedKeys()){
+                        if (rs.next()) {
+                            int idUser = rs.getInt(1);
+                            System.out.println("Đăng ký thành công! ID của bạn là: " + idUser);
+                            return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Role.SLIVER); 
+                        }
                     }
-                    
                 } catch (SQLException e) {
                     System.out.println("Lỗi khi Đăng Ký!");
                     e.printStackTrace();
@@ -189,67 +191,66 @@ public class UserServices {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmtCheck = conn.prepareStatement(sql)) {
             stmtCheck.setInt(1, idUser);
-            ResultSet rs = stmtCheck.executeQuery();
-    
-            if (!rs.next()) {
-                System.out.println("Không tìm thấy tài khoản!");
-                return;
-            }
-    
-            String tenUser = rs.getString("TenUser");
-            String sdt = rs.getString("SDT");
-            String email = rs.getString("Email");
-            String matKhau = rs.getString("MatKhau");
-    
-            System.out.println("1. Tên: " + tenUser);
-            System.out.println("2. Số điện thoại: " + sdt);
-            System.out.println("3. Email: " + email);
-            System.out.println("4. Đổi mật khẩu");
-            System.out.println("0.Thoát");
-            System.out.print("Chọn mục cần sửa: ");
-            while (!scanner.hasNextInt()) {
-                System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
-                scanner.next(); 
-                System.out.print("Chọn mục cần sửa: "); 
-            }
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-            String field = "";
-            
-            if (choice == 4) { 
-                System.out.print("Nhập mật khẩu cũ: ");
-                String oldPassword = scanner.nextLine();
-                if (!hashPassword(oldPassword).equals(matKhau)) {
-                    System.out.println("Mật khẩu cũ không đúng!");
+            try(ResultSet rs = stmtCheck.executeQuery()){
+                if (!rs.next()) {
+                    System.out.println("Không tìm thấy tài khoản!");
                     return;
                 }
-                field = "MatKhau";
-            } else {
-                switch (choice) {
-                    case 1: field = "TenUser"; break;
-                    case 2: field = "SDT"; break;
-                    case 3: field = "Email"; break;
-                    case 0: 
-                    DichVuKhachHang.dichVu(currentUser);
-                    break;
-                    default:
-                        System.out.println("Lựa chọn không hợp lệ!");
+        
+                String tenUser = rs.getString("TenUser");
+                String sdt = rs.getString("SDT");
+                String email = rs.getString("Email");
+                String matKhau = rs.getString("MatKhau");
+        
+                System.out.println("1. Tên: " + tenUser);
+                System.out.println("2. Số điện thoại: " + sdt);
+                System.out.println("3. Email: " + email);
+                System.out.println("4. Đổi mật khẩu");
+                System.out.println("0.Thoát");
+                System.out.print("Chọn mục cần sửa: ");
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
+                    scanner.next(); 
+                    System.out.print("Chọn mục cần sửa: "); 
+                }
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                String field = "";
+                
+                if (choice == 4) { 
+                    System.out.print("Nhập mật khẩu cũ: ");
+                    String oldPassword = scanner.nextLine();
+                    if (!hashPassword(oldPassword).equals(matKhau)) {
+                        System.out.println("Mật khẩu cũ không đúng!");
                         return;
+                    }
+                    field = "MatKhau";
+                } else {
+                    switch (choice) {
+                        case 1: field = "TenUser"; break;
+                        case 2: field = "SDT"; break;
+                        case 3: field = "Email"; break;
+                        case 0: 
+                        DichVuKhachHang.dichVu(currentUser);
+                        break;
+                        default:
+                            System.out.println("Lựa chọn không hợp lệ!");
+                            return;
+                    }
+                }
+        
+                System.out.print("Nhập mật khẩu mới: ");
+                String newValue = scanner.nextLine();
+                if (choice == 4) newValue = hashPassword(newValue); 
+        
+                String sqlUpdate = "UPDATE user SET " + field + " = ? WHERE ID_User = ?";
+                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+                    stmtUpdate.setString(1, newValue);
+                    stmtUpdate.setInt(2, idUser);
+                    stmtUpdate.executeUpdate();
+                    System.out.println(" Cập nhật thành công!");
                 }
             }
-    
-            System.out.print("Nhập mật khẩu mới: ");
-            String newValue = scanner.nextLine();
-            if (choice == 4) newValue = hashPassword(newValue); 
-    
-            String sqlUpdate = "UPDATE user SET " + field + " = ? WHERE ID_User = ?";
-            try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
-                stmtUpdate.setString(1, newValue);
-                stmtUpdate.setInt(2, idUser);
-                stmtUpdate.executeUpdate();
-                System.out.println(" Cập nhật thành công!");
-            }
-    
         } catch (SQLException e) {
             System.out.println(" Lỗi cập nhật!");
             e.printStackTrace();

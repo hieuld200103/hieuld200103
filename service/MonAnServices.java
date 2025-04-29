@@ -78,12 +78,13 @@ public class MonAnServices {
                 stmt.setString(5, danhMuc.name());
                 stmt.executeUpdate();
 
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
-                if (generatedKeys.next()){
-                    int idMA = generatedKeys.getInt(1);
-                    System.out.println("Thêm món ăn thành công!");
-                    return new MonAn(idMA, tenMon, gia, moTa, loaiMonAn, danhMuc);
-                }
+                try(ResultSet rs = stmt.getGeneratedKeys()){
+                    if (rs.next()){
+                        int idMA = rs.getInt(1);
+                        System.out.println("Thêm món ăn thành công!");
+                        return new MonAn(idMA, tenMon, gia, moTa, loaiMonAn, danhMuc);
+                    }
+                }              
 
             }catch (SQLException e) {
                 System.out.println("Lỗi khi thêm món ăn!");
@@ -136,115 +137,115 @@ public class MonAnServices {
         try(Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
                 stmt.setInt(1,idMA);
-                ResultSet rs = stmt.executeQuery();
-
-                if(!rs.next()){
-                    System.out.println("Không có món ăn có ID: "+ idMA);
-                    return null;
-                }
-
-                String tenMon = rs.getString("TenMon");
-                int gia = rs.getInt("Gia");
-                String moTa = rs.getString("Mota");
-                String loaiMonAn = rs.getString("LoaiMonAn");
-                String danhMuc= rs.getString("DanhMuc");
-               
-                System.out.println("Các thông tin có thể sửa ");
-                System.out.println("1. Tên món: "+ tenMon);
-                System.out.println("2. Giá: "+ gia);
-                System.out.println("3. Mô tả: " + moTa); 
-                System.out.println("4. Loại món ăn: " + loaiMonAn);
-                System.out.println("5. Loại: " + danhMuc);
-                
-                System.out.print("Chọn mục cần sửa:");
-                
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                
-                String field = null;
-                switch (choice){
-                    case 1:
-                    field = "TenMon"; 
-                    break;
-                    case 2:
-                    field = "Gia"; 
-                    break;
-                    case 3:
-                    field = "Mota";
-                    break; 
-                    case 4:
-                    field = "LoaiMonAn";
-                    break; 
-                    case 5:
-                    field = "DanhMuc"; 
-                    break;
-                    default:
-                    System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
-                }
-
-                System.out.print("Nhập giá trị mới: ");
-                Object newValue;
-
-                if (choice == 2) {                     
-                    if (scanner.hasNextInt()) {
-                        newValue = scanner.nextInt();
-                        scanner.nextLine(); 
-                    } else {
-                        System.out.println("Lỗi: Giá phải là số nguyên hợp lệ!");
-                        scanner.next(); 
+                try(ResultSet rs = stmt.executeQuery()){
+                    if(!rs.next()){
+                        System.out.println("Không có món ăn có ID: "+ idMA);
                         return null;
                     }
-                } else { 
-                    newValue = scanner.nextLine();
-                }
-            
-                String sqlUpdate = "UPDATE monan SET " + field +" = ? WHERE ID_MonAn = ?";
-                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)){
-                    stmtUpdate.setObject(1,newValue);
-                    stmtUpdate.setInt(2, idMA);
-                    stmtUpdate.executeUpdate();
-
-                    switch(choice){
+    
+                    String tenMon = rs.getString("TenMon");
+                    int gia = rs.getInt("Gia");
+                    String moTa = rs.getString("Mota");
+                    String loaiMonAn = rs.getString("LoaiMonAn");
+                    String danhMuc= rs.getString("DanhMuc");
+                   
+                    System.out.println("Các thông tin có thể sửa ");
+                    System.out.println("1. Tên món: "+ tenMon);
+                    System.out.println("2. Giá: "+ gia);
+                    System.out.println("3. Mô tả: " + moTa); 
+                    System.out.println("4. Loại món ăn: " + loaiMonAn);
+                    System.out.println("5. Loại: " + danhMuc);
+                    
+                    System.out.print("Chọn mục cần sửa:");
+                    
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+                    
+                    String field = null;
+                    switch (choice){
                         case 1:
-                            tenMon = (String) newValue;
-                            break;
+                        field = "TenMon"; 
+                        break;
                         case 2:
-                            gia = (int) newValue;
-                            break;
+                        field = "Gia"; 
+                        break;
                         case 3:
-                            moTa = (String) newValue;
-                            break;
+                        field = "Mota";
+                        break; 
                         case 4:
-                        while(true){
-                            loaiMonAn = (String) newValue;
-                            if (loaiMonAn.equals("DoAn") || loaiMonAn.equals("DoUong")) {
-                                break;
-                            }
-                            System.out.println("Lỗi: Chỉ được nhập 'DoAn' hoặc 'DoUong'. Hãy nhập lại!");
-                            break;
-                        }break;
+                        field = "LoaiMonAn";
+                        break; 
                         case 5:
-                        while (true){
-                            if (loaiMonAn.equals("DoAn")) {
-                                System.out.print("Danh mục (Do_Kho / Do_Nuoc): ");
-                            } else {
-                                System.out.print("Danh mục (Co_Con / Khong_Con): ");
-                            }
-                            danhMuc = (String) newValue;
-                            if ((loaiMonAn.equals("DoAn") && (danhMuc.equals("Do_Kho") || danhMuc.equals("Do_Nuoc"))) ||
-                            (loaiMonAn.equals("DoUong") && (danhMuc.equals("Co_Con") || danhMuc.equals("Khong_Con")))) {
-                            break;
-                            }
-                            System.out.println("Lỗi: Danh mục không hợp lệ. Hãy nhập lại!");
-                        }break;
+                        field = "DanhMuc"; 
+                        break;
                         default:
                         System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
                     }
-                    System.out.println("Cập hật thành công!");                   
-                }
-                catch (SQLException e){
-                    System.out.println("Lỗi cập nhật!");
-                    e.printStackTrace();
+    
+                    System.out.print("Nhập giá trị mới: ");
+                    Object newValue;
+    
+                    if (choice == 2) {                     
+                        if (scanner.hasNextInt()) {
+                            newValue = scanner.nextInt();
+                            scanner.nextLine(); 
+                        } else {
+                            System.out.println("Lỗi: Giá phải là số nguyên hợp lệ!");
+                            scanner.next(); 
+                            return null;
+                        }
+                    } else { 
+                        newValue = scanner.nextLine();
+                    }
+                
+                    String sqlUpdate = "UPDATE monan SET " + field +" = ? WHERE ID_MonAn = ?";
+                    try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)){
+                        stmtUpdate.setObject(1,newValue);
+                        stmtUpdate.setInt(2, idMA);
+                        stmtUpdate.executeUpdate();
+    
+                        switch(choice){
+                            case 1:
+                                tenMon = (String) newValue;
+                                break;
+                            case 2:
+                                gia = (int) newValue;
+                                break;
+                            case 3:
+                                moTa = (String) newValue;
+                                break;
+                            case 4:
+                            while(true){
+                                loaiMonAn = (String) newValue;
+                                if (loaiMonAn.equals("DoAn") || loaiMonAn.equals("DoUong")) {
+                                    break;
+                                }
+                                System.out.println("Lỗi: Chỉ được nhập 'DoAn' hoặc 'DoUong'. Hãy nhập lại!");
+                                break;
+                            }break;
+                            case 5:
+                            while (true){
+                                if (loaiMonAn.equals("DoAn")) {
+                                    System.out.print("Danh mục (Do_Kho / Do_Nuoc): ");
+                                } else {
+                                    System.out.print("Danh mục (Co_Con / Khong_Con): ");
+                                }
+                                danhMuc = (String) newValue;
+                                if ((loaiMonAn.equals("DoAn") && (danhMuc.equals("Do_Kho") || danhMuc.equals("Do_Nuoc"))) ||
+                                (loaiMonAn.equals("DoUong") && (danhMuc.equals("Co_Con") || danhMuc.equals("Khong_Con")))) {
+                                break;
+                                }
+                                System.out.println("Lỗi: Danh mục không hợp lệ. Hãy nhập lại!");
+                            }break;
+                            default:
+                            System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
+                        }
+                        System.out.println("Cập hật thành công!");                   
+                    }
+                    catch (SQLException e){
+                        System.out.println("Lỗi cập nhật!");
+                        e.printStackTrace();
+                    }
                 }
             }
             catch (SQLException e) {

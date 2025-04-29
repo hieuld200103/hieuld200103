@@ -153,7 +153,6 @@ public class DatBanChecker implements Runnable {
                 DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                 danhSach.add(datBan);
         } 
-        rs.close();
         }catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách đặt bàn!");
             e.printStackTrace();
@@ -169,15 +168,17 @@ public class DatBanChecker implements Runnable {
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)){
                 stmt.setInt(1,idChiNhanh);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()){
-                    int soDon = rs.getInt("soDon");
-                    if(soDon>0){
-                        System.out.println("!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
-                    }else{
-                        System.out.println("Không có đơn đặt bàn nào đang chờ!");
-                    }
-                }            
+                try(ResultSet rs = stmt.executeQuery()){
+                    if (rs.next()){
+                        int soDon = rs.getInt("soDon");
+                        if(soDon>0){
+                            System.out.println("!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
+                        }else{
+                            System.out.println("Không có đơn đặt bàn nào đang chờ!");
+                        }
+                    }    
+                }
+                        
         } catch (SQLException e) {
             System.out.println("Lỗi khi kiểm tra đơn đặt bàn chờ xác nhận.");
             e.printStackTrace();
@@ -190,8 +191,9 @@ public class DatBanChecker implements Runnable {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
+            try(ResultSet rs = stmt.executeQuery()){
+                return rs.next();
+            }            
         } catch (SQLException e) {
             System.out.println("Lỗi kiểm tra trạng thái nhận bàn!");
             e.printStackTrace();

@@ -108,10 +108,11 @@ public class GoiMonServices {
             String sql = "SELECT COUNT(*) FROM monan WHERE ID_MonAn = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, idMonAn);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,21 +126,18 @@ public class GoiMonServices {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
     
             stmt.setInt(1, idMonAn);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                return rs.getInt("Gia");
-            } else {
-                System.out.println("Không tìm thấy món ăn với ID: " + idMonAn);
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt("Gia");
+                } else {
+                    System.out.println("Không tìm thấy món ăn với ID: " + idMonAn);
+                }    
             }
-    
+
         } catch (SQLException e) {
             System.out.println("Lỗi khi lấy giá món ăn từ cơ sở dữ liệu:");
             e.printStackTrace();
         }
-    
         return 0; 
     }
-
-    
 }

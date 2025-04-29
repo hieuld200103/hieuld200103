@@ -32,14 +32,13 @@ public class BanAnServices {
                 stmt.setInt(1, idChiNhanh);
                 stmt.setInt(2,soGhe);
                 stmt.executeUpdate();
-
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) {
-                    int idBA = rs.getInt(1);
-                    System.out.println("Thêm bàn ăn thành công! Mã bàn: " + idBA);
-                    return new BanAn(idBA, idChiNhanh , soGhe, BanAn.TrangThai.TRONG);
-                }
-                
+                try(ResultSet rs = stmt.getGeneratedKeys()){
+                    if (rs.next()) {
+                        int idBA = rs.getInt(1);
+                        System.out.println("Thêm bàn ăn thành công! Mã bàn: " + idBA);
+                        return new BanAn(idBA, idChiNhanh , soGhe, BanAn.TrangThai.TRONG);
+                    }
+                }      
             }catch (SQLException e){
                 System.out.println("Lỗi khi thêm bàn!");
                 e.printStackTrace();
@@ -64,86 +63,85 @@ public class BanAnServices {
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)){
                 stmt.setInt(1,idBA);
-                ResultSet rs = stmt.executeQuery();
-
-                if(!rs.next()){
-                    System.out.println("Không có bàn có ID: " + idBA );
-                    return null;
-                }
-
-                int soGhe = rs.getInt("Soghe");
-                String trangThai = rs.getString("TrangThai");
-
-                System.out.println("Các thông tin có thể sửa:");
-                System.out.println("1. Số ghế: " + soGhe);
-                System.out.println("2. Trạng thái: " + trangThai);
-                System.out.println("Chọn mục cần sửa: ");
-                while (!scanner.hasNextInt()) {
-                    System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
-                    scanner.next(); 
-                    System.out.print("Chọn mục cần sửa: "); 
-                }
-    
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-
-                String field = null;
-                switch (choice){
-                    case 1:
-                    field = "Soghe";
-                    break;
-                    case 2:
-                    field = "TrangThai";
-                    break;
-                    default:
-                    System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
-                }
-                System.out.println("Nhập giá trị mới: ");
-                Object newValue;
-
-                if(choice == 1){
-                    if (scanner.hasNextInt()){
-                        newValue = scanner.nextInt();
-                        scanner.nextLine();
-                    }else{
-                        System.out.println("Lỗi: Giá trị phải nhập số nguyên hợp lệ!");
-                        scanner.next();
+                try(ResultSet rs = stmt.executeQuery()){
+                    if(!rs.next()){
+                        System.out.println("Không có bàn có ID: " + idBA );
                         return null;
                     }
-                }else{
-                    newValue = scanner.nextLine();
-                }
-
-                String sqlUpdate = "UPDATE banan SET " + field + " = ? WHERE ID_BanAn = ?";
-                try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)){
-                    stmtUpdate.setObject(1, newValue);
-                    stmtUpdate.setInt(2, idBA);
-                    stmtUpdate.executeUpdate();
-
-                    switch(choice){
+    
+                    int soGhe = rs.getInt("Soghe");
+                    String trangThai = rs.getString("TrangThai");
+    
+                    System.out.println("Các thông tin có thể sửa:");
+                    System.out.println("1. Số ghế: " + soGhe);
+                    System.out.println("2. Trạng thái: " + trangThai);
+                    System.out.println("Chọn mục cần sửa: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
+                        scanner.next(); 
+                        System.out.print("Chọn mục cần sửa: "); 
+                    }
+        
+                    int choice = scanner.nextInt();
+                    scanner.nextLine();
+    
+                    String field = null;
+                    switch (choice){
                         case 1:
-                        soGhe = (int) newValue;
+                        field = "Soghe";
                         break;
-                        case 2: 
-                        while(true){
-                            trangThai = (String) newValue;
-                            if(trangThai.equals("TRONG")|| trangThai.equals("DA_DAT") ||trangThai.equals("DANG_SU_DUNG")){
-                                break;
-                            }
-                            System.out.println("Lỗi");
-                            break;
-                        }break;
+                        case 2:
+                        field = "TrangThai";
+                        break;
                         default:
                         System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
                     }
-                    System.out.println("Cập hật thành công!");
+                    System.out.println("Nhập giá trị mới: ");
+                    Object newValue;
+    
+                    if(choice == 1){
+                        if (scanner.hasNextInt()){
+                            newValue = scanner.nextInt();
+                            scanner.nextLine();
+                        }else{
+                            System.out.println("Lỗi: Giá trị phải nhập số nguyên hợp lệ!");
+                            scanner.next();
+                            return null;
+                        }
+                    }else{
+                        newValue = scanner.nextLine();
+                    }
+    
+                    String sqlUpdate = "UPDATE banan SET " + field + " = ? WHERE ID_BanAn = ?";
+                    try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)){
+                        stmtUpdate.setObject(1, newValue);
+                        stmtUpdate.setInt(2, idBA);
+                        stmtUpdate.executeUpdate();
+    
+                        switch(choice){
+                            case 1:
+                            soGhe = (int) newValue;
+                            break;
+                            case 2: 
+                            while(true){
+                                trangThai = (String) newValue;
+                                if(trangThai.equals("TRONG")|| trangThai.equals("DA_DAT") ||trangThai.equals("DANG_SU_DUNG")){
+                                    break;
+                                }
+                                System.out.println("Lỗi");
+                                break;
+                            }break;
+                            default:
+                            System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
+                        }
+                        System.out.println("Cập hật thành công!");
+                    }
+                    catch (SQLException e){
+                        System.out.println("Lỗi cập nhật!");
+                        e.printStackTrace();
+                    }
                 }
-                catch (SQLException e){
-                    System.out.println("Lỗi cập nhật!");
-                    e.printStackTrace();
-                }
-            }
-            catch (SQLException e){
+            } catch (SQLException e){
                 System.out.println("Lỗi kết nối cơ sở dữ liệu!");
                 e.printStackTrace();
             }
@@ -194,7 +192,7 @@ public class BanAnServices {
             PreparedStatement stmt = conn.prepareStatement(sql)){
 
             stmt.setInt(1,idChiNhanh);
-            ResultSet rs = stmt.executeQuery();
+            try(ResultSet rs = stmt.executeQuery()){
                 System.out.println("\n======== " +tieuDe.toUpperCase() +" ========");
                 System.out.println("=================================");
                 System.out.printf("| %-5s | %-7s | %-7s | %-10s | \n", "ID", "ID CN", "Số ghế", "Trạng thái");
@@ -210,12 +208,12 @@ public class BanAnServices {
                     System.out.printf("| %-5d | %-7s|  %-7s | %-10s | \n", id, idCN, soGhe,trangThai);
                 }
                 System.out.println("=================================");
-                rs.close();
-            }catch (SQLException e) {
-                System.out.println("Lỗi khi lấy danh sách món ăn!");
-                e.printStackTrace();
             }
-            return danhSach;
+        }catch (SQLException e) {
+            System.out.println("Lỗi khi lấy danh sách món ăn!");
+            e.printStackTrace();
+        }
+        return danhSach;
     }
 
     //Xem danh sách bàn
