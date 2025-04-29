@@ -40,7 +40,7 @@ public class Main {
                     if(!matKhauNhaHang.equals(mk)){
                         System.out.println("Mật khẩu không đúng!");
                     } else {
-                        System.out.println("Đăng nhập thành công với tư cách Nhân viên!");
+                        System.out.println("Chào mừng đến với nhà hàng!");
                         QuanLyNhanVien.quanLyNhanVien();
                     } 
                     break;    

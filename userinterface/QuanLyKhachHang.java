@@ -32,7 +32,7 @@ public class QuanLyKhachHang {
 
             switch (choice) {
                 case 1:
-                    KhachHangServices.khachHangNhanBan(scanner);
+                    KhachHangServices.khachHangNhanBan(scanner, currentNV);
                     break;
                 case 2:
                     KhachHangServices.xoaKhachHang(scanner);

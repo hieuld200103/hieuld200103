@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import Main.Main;
@@ -32,7 +30,7 @@ public class DichVuKhachHang {
 
     while (true) {
         System.out.println("\n=== DỊCH VỤ KHÁCH HÀNG ===");
-        System.out.println("1. Gọi món tại quán");
+        System.out.println("1. Gọi món tại nhà hàng");
         System.out.println("2. Đặt món mang về");
         System.out.println("3. Đặt bàn");
         System.out.println("4. Xem thực đơn");
@@ -52,23 +50,26 @@ public class DichVuKhachHang {
         switch (choice) {
             case 1: 
                 DatBan currentDatBan = daXacNhanDatBan(currentUser.getID_User());
-                if(DatBanChecker.daNhanBan(currentUser.getID_User())){
-                    if (currentDatBan != null ) {    
-                    DonHang donHang = layDonHangHienTai(currentUser.getID_User());
-                    if (donHang == null) {
-                        donHang = DonHangServices.themDonHang(currentUser,DonHang.KieuDonHang.TAI_QUAN, scanner );
-                    }
-                    if (donHang != null) {
-                        donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_QUAN);
-                        GoiMonServices.goiMon(currentUser, donHang, scanner);
-                    } else {
-                        System.out.println("Không thể tạo hoặc lấy đơn hàng.");
-                    }
-                    }
-                } else {
-                    System.out.println("Bạn cần đặt và nhận bàn trước khi gọi món tại quán.");
-                }
+                if (currentDatBan != null ) { 
+                    if(DatBanChecker.daNhanBan(currentUser.getID_User())){
+                        DonHang donHang = layDonHangHienTai(currentUser.getID_User());
+                        if (donHang == null) {
+                            donHang = DonHangServices.themDonHang(currentUser,DonHang.KieuDonHang.TAI_QUAN, scanner );
+                        }
+                        if (donHang != null) {
+                            donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_QUAN);
+                            GoiMonServices.goiMon(currentUser, donHang, scanner);
+                        } else {
+                            System.out.println("Không thể tạo hoặc lấy đơn hàng.");
+                        }
+                    }else {
+                        System.out.println("Bạn cần NHẬN BÀN  trước khi gọi món tại nhà hàng.");
+                    }   
                 
+                } else {
+                    System.out.println("Bạn cần ĐẶT BÀN trước khi gọi món tại quán.");
+                }                  
+             
                 break;
 
             case 2: 
@@ -78,13 +79,10 @@ public class DichVuKhachHang {
                 //     DonHangServices.goiMon(donMangVe, currentUser);
                 // }
                 // break;
-
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
                     System.out.println("Bạn đã đặt bàn rồi!");
-                    int idUser = currentUser.getID_User();
-                    xemDanhSachDatBan(idUser);
                 }else{
                     DatBanServices.datBan(currentUser);
                 }
@@ -108,6 +106,7 @@ public class DichVuKhachHang {
 
     //Lấy bàn đã đặt
     public static DatBan layDatBan(int idUser, String dieuKienWhere) {
+        String tenUser = layTenUser(idUser);
         String sql = "SELECT * FROM datban WHERE ID_User = ? ";
         if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()){
             sql += " AND " + dieuKienWhere;
@@ -125,7 +124,7 @@ public class DichVuKhachHang {
     
                     String trangThaiStr = rs.getString("TrangThai");
                     DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(trangThaiStr);
-    
+                    hienThiThongTin(id_DatBan,idUser,tenUser, id_BanAn, ngayDat, ngayAn, trangThai);
                     return new DatBan(id_DatBan, id_ChiNhanh, idUser, id_BanAn, ngayDat, ngayAn , trangThai);
                 }
             }            
@@ -137,6 +136,9 @@ public class DichVuKhachHang {
 
         return null;
     }
+    private static void hienThiThongTin(int idDatBan,int idUser,String tenUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
+        System.out.println("ID Đặt bàn: "+idDatBan+ " | ID: " + idUser +" | Tên KH: "+tenUser+" | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
+    }
 
     public static DatBan daXacNhanDatBan(int idUser){
         return layDatBan(idUser, "TrangThai = 'DA_XAC_NHAN'");
@@ -144,6 +146,24 @@ public class DichVuKhachHang {
 
     public static DatBan daDatBan(int idUser){
         return layDatBan(idUser, "TrangThai IN ('DA_XAC_NHAN', 'CHO_XAC_NHAN')");
+    }
+
+    //Lấy tên
+    public static String layTenUser(int idUser) {
+        String sql = "SELECT TenUser FROM user WHERE ID_User = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUser);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("TenUser");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy tên người dùng!");
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //Lấy đơn hiện tại
@@ -204,45 +224,4 @@ public class DichVuKhachHang {
             }
         }
     }  
-
-    //Xem bàn đã đặt
-    public static List<DatBan> xemDanhSachDatBan(int idUser) {
-        List<DatBan> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN')";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1,idUser);
-            try(ResultSet rs = stmt.executeQuery()){
-                System.out.println("\n========================================= DANH SÁCH BÀN ĐÃ ĐẶT ========================================");
-                System.out.println("========================================================================================================");
-                System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "List bàn", "Ngày đặt","Ngày ăn","Trạng thái");
-                System.out.println("========================================================================================================");
-        
-                while (rs.next()) {
-                    int id = rs.getInt("ID_DatBan");
-                    int idCN = rs.getInt("ID_ChiNhanh");
-                    String idBanAn = rs.getString("List_BanAn");
-                    LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
-                    LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
-                    DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
-        
-                    DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
-                    danhSach.add(datBan);
-        
-                    System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
-                            id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
-                }
-        
-                System.out.println("========================================================================================================");
-            }
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách đặt bàn!");
-            e.printStackTrace();
-        }
-    
-        return danhSach;
-    }
-
-
 }

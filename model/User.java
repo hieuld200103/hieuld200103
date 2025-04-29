@@ -28,6 +28,10 @@ public class User {
         this.email = email;
         this.role = role;
     }
+    public User(int id_User, String tenUser){
+        this.id_User = id_User;
+        this.tenUser = tenUser;
+    }
 
     public int getID_User() { return id_User; }
     public void setID_User(int id_User) { this.id_User = id_User; }

@@ -138,7 +138,7 @@ public class DatBanServices {
                     String sqlCheckDatBan = "SELECT * FROM datban " +
                             "WHERE ID_USER = ? AND FIND_IN_SET(?, List_BanAn) > 0 " +
                             "AND TrangThai IN ('CHO_XAC_NHAN', 'DA_XAC_NHAN') " +
-                            "AND NgayAn < DATE_ADD(?, INTERVAL 90 MINUTE) " +
+                            "AND NgayAn < DATE_ADD(?, INTERVAL 60 MINUTE) " +
                             "AND DATE_ADD(NgayAn, INTERVAL 90 MINUTE) > ?";
                     try (PreparedStatement checkDatBan = conn.prepareStatement(sqlCheckDatBan)) {
                         checkDatBan.setInt(1, userID);
@@ -261,6 +261,10 @@ public class DatBanServices {
     
     public static List<DatBan> xemDSChoXacNhan(NhanVien currentNV) {
         return xemDanhSachDatBan(currentNV,"Danh sách chờ xác nhận", "TrangThai = 'CHO_XAC_NHAN'");
+    }
+
+    public static List<DatBan> xemDSDaXacNhan(NhanVien currentNV) {
+        return xemDanhSachDatBan(currentNV,"Danh sách chờ xác nhận", "TrangThai = 'DA_XAC_NHAN'");
     }
     
     public static List<DatBan> xemDSCoTheHuy(NhanVien currentNV) {
@@ -385,8 +389,7 @@ public class DatBanServices {
     }
 
     private static void hienThiThongTin(int idDatBan, int idUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
-        System.out.println("ID: " + idDatBan + " | idUser: " + idUser +
-            " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
+        System.out.println("ID: " + idDatBan + " | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
     }
 
     public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV) {

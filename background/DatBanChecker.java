@@ -46,7 +46,7 @@ public class DatBanChecker implements Runnable {
                 for (String list : idBan){
                     int id = Integer.parseInt(list.trim());
                     if (datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
-                        if (tgBooking <= 90 && tgCho <= 30) {
+                        if (tgBooking <= 60 && tgCho <= 30) {
                             capNhatTrangThai(id, "DA_DAT");
                             banDuocXacNhan.add(datBan);
                         } else if (tgCho > 30) {
@@ -60,7 +60,6 @@ public class DatBanChecker implements Runnable {
                 if(daNhanBan(datBan.getID_User())){
                     for( String list :idBan){
                         int id = Integer.parseInt(list.trim());
-                        capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DANG_SU_DUNG);
                         capNhatTrangThai(id, "DANG_SU_DUNG");
                     }
                 }  
@@ -82,13 +81,13 @@ public class DatBanChecker implements Runnable {
                 System.out.println("\n Các bàn bị huỷ: " + inDanhSach(banBiHuy));
             }
 
-            sleepOneMinute();
+            sleep5Minute();
         }
     }
 
-    private void sleepOneMinute() {
+    private void sleep5Minute() {
         try {
-            Thread.sleep(60 * 1000);
+            Thread.sleep(300* 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -172,7 +171,7 @@ public class DatBanChecker implements Runnable {
                     if (rs.next()){
                         int soDon = rs.getInt("soDon");
                         if(soDon>0){
-                            System.out.println("!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
+                            System.out.println("\n!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
                         }else{
                             System.out.println("Không có đơn đặt bàn nào đang chờ!");
                         }

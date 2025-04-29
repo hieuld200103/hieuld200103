@@ -20,7 +20,7 @@ public class DonHangServices {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
-        System.out.print("ID bàn của bạn: ");
+        System.out.print("ID bàn của bạn (đại diện 1 bàn): ");
         int idBanAn = scanner.nextInt();
         String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, KieuDonHang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
         try (Connection conn = DatabaseConnection.getConnection();

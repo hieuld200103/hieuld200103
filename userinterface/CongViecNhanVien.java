@@ -14,7 +14,7 @@ public class CongViecNhanVien {
         Scanner scanner = new Scanner(System.in);
         
         while (true) {
-            String[] menuOptions = {
+            String[] menu = {
                 "CÔNG VIỆC NHÂN VIÊN",
                 "1. Check đặt bàn",
                 "2. Quản lý khách hàng",
@@ -25,9 +25,9 @@ public class CongViecNhanVien {
                 "0. Đăng xuất"
             };
             
-            System.out.println("\n=== " + menuOptions[0] + " ===");
-            for (int i = 1; i < menuOptions.length; i++) {
-                System.out.println(menuOptions[i]);
+            System.out.println("\n=== " + menu[0] + " ===");
+            for (int i = 1; i < menu.length; i++) {
+                System.out.println(menu[i]);
             }
             
             System.out.println("Chọn chức năng: ");
