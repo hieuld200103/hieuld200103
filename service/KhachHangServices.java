@@ -6,17 +6,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 
 import connection.DatabaseConnection;
-import model.DatBan;
 import model.KhachHang;
-import model.User;
 public class KhachHangServices {
     // Thêm khách hàng
     public static KhachHang khachHangNhanBan(Scanner scanner) {
-        System.out.println("\n=== Xác nhận nhận bàn ===");
-    
+        System.out.println("\n=== Xác nhận nhận bàn ===");    
         System.out.print("Nhập số điện thoại đã dùng để đăng ký tài khoản và đặt bàn: ");
         String sdt = scanner.nextLine();
         if (!sdt.matches("\\d{10}")) {
@@ -52,16 +48,18 @@ public class KhachHangServices {
                             if (genKeys.next()) {
                                 int idKH = genKeys.getInt(1);
                                 System.out.println("Xác nhận nhận bàn thành công!");
-                                return new KhachHang(idKH, idUser, tenKH, sdt);
+                                return new KhachHang(idKH, idUser, tenKH, sdt, KhachHang.TrangThai.DA_NHAN_BAN);
                             }
                         }
                     } else {
                         System.out.println("Số điện thoại này chưa có đặt bàn trước!");
                     }
+                    rsDatBan.close();
                 }
             } else {
                 System.out.println("Không tìm thấy tài khoản với số điện thoại này!");
             }
+        rsUser.close();
         } catch (SQLException e) {
             System.out.println("Lỗi khi xác nhận nhận bàn!");
             e.printStackTrace();
@@ -98,7 +96,6 @@ public class KhachHangServices {
             e.printStackTrace();
         }
     }
-   
 
     //Xem danh sách khách hàng
     public static List<KhachHang> xemDanhSachKhachHang() {
@@ -109,68 +106,27 @@ public class KhachHangServices {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
     
-            System.out.println("==========================================");
-            System.out.printf("| %-5s | %-20s | %-12s |\n", "ID", "Tên Khách Hàng", "Số Điện Thoại");
-            System.out.println("==========================================");
+            System.out.println("========================DANH SÁCH KHÁCH HÀNG=======================");
+            System.out.printf("| %-5s | %-20s | %-15s | %-15s |\n", "ID", "Tên Khách Hàng", "Số Điện Thoại", "Trạng thái");
+            System.out.println("====================================================");
     
             while (rs.next()) {
                 int id = rs.getInt("ID_KhachHang");
                 int idUser = rs.getInt("ID_User");
                 String tenKH = rs.getString("TenKH");
                 String sdt = rs.getString("SDT");
-                danhSach.add(new KhachHang(id,idUser, tenKH, sdt));
+                KhachHang.TrangThai trangThai = KhachHang.TrangThai.valueOf(rs.getString("TrangThai"));
+                danhSach.add(new KhachHang(id,idUser, tenKH, sdt,trangThai));
     
-                System.out.printf("| %-5d | %-20s | %-12s |\n", id, tenKH, sdt);
+                System.out.printf("| %-5d | %-20s | %-15s | %-15s |\n", id, tenKH, sdt,trangThai);
             }
     
-            System.out.println("==========================================");
-    
+            System.out.println("====================================================");
+        rs.close();
         } catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách khách hàng!");
             e.printStackTrace();
         }
-        return danhSach;
-    }
-    
-
-    //Xem bàn đã đặt
-    public static List<DatBan> xemDanhSachDatBan(User currentUser) {
-        List<DatBan> danhSach = new ArrayList<>();
-        int idUser = currentUser.getID_User();
-        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'CHO_XAC_NHAN' OR TrangThai = 'DA_XAC_NHAN'";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1,idUser);
-            ResultSet rs = stmt.executeQuery();
-    
-            System.out.println("\n========================================= DANH SÁCH BÀN ĐÃ ĐẶT ========================================");
-            System.out.println("========================================================================================================");
-            System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "List bàn", "Ngày đặt","Ngày ăn","Trạng thái");
-            System.out.println("========================================================================================================");
-    
-            while (rs.next()) {
-                int id = rs.getInt("ID_DatBan");
-                int idCN = rs.getInt("ID_ChiNhanh");
-                String idBanAn = rs.getString("List_BanAn");
-                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
-                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
-                DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
-    
-                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
-                danhSach.add(datBan);
-    
-                System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
-                        id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
-            }
-    
-            System.out.println("========================================================================================================");
-            rs.close();
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách đặt bàn!");
-            e.printStackTrace();
-        }
-    
         return danhSach;
     }
 }

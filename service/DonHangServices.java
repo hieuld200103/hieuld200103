@@ -49,26 +49,6 @@ public class DonHangServices {
     
         return null;
     }
-   
-    //Lấy đơn hiện tại
-    public static DonHang layDonHangHienTai(int idUser) {
-        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DANG_CHUAN_BI'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
-            stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                int idDonHang = rs.getInt("ID_DonHang");
-                return new DonHang(idDonHang, idUser, DonHang.TrangThai.DANG_CHUAN_BI);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     //Thêm vào chi tiết đơn
     public static void themChiTietDonHang(List<ChiTietDonHang> dsChiTiet) {

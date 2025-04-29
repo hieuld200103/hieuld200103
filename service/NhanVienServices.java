@@ -18,8 +18,6 @@ import model.User.Role;
 import userinterface.CongViecNhanVien;
 import userinterface.QuanLyBanAn;
 
-
-
 public class NhanVienServices {
     //Mã hóa mật khẩu
     private static String hashPassword(String password){

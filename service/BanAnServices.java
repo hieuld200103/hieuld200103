@@ -18,10 +18,9 @@ import connection.DatabaseConnection;
 
 public class BanAnServices {
     //Thêm bàn ăn
-    public static BanAn themBanAn(Scanner scanner){
+    public static BanAn themBanAn(NhanVien currentNV, Scanner scanner){
+        int idChiNhanh = currentNV.getID_ChiNhanh();
         System.out.println("\n==== Thêm bàn mới ====");
-        System.out.print("ID Chi Nhánh: ");
-        int idCN = scanner.nextInt();
         scanner.nextLine();
         System.out.print("Số ghế: ");     
         int soGhe = scanner.nextInt();
@@ -30,7 +29,7 @@ public class BanAnServices {
         String sql = "INSERT INTO banan (ID_ChiNhanh, Soghe, TrangThai) VALUES (?,?,'TRONG')";
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
-                stmt.setInt(1, idCN);
+                stmt.setInt(1, idChiNhanh);
                 stmt.setInt(2,soGhe);
                 stmt.executeUpdate();
 
@@ -38,7 +37,7 @@ public class BanAnServices {
                 if (rs.next()) {
                     int idBA = rs.getInt(1);
                     System.out.println("Thêm bàn ăn thành công! Mã bàn: " + idBA);
-                    return new BanAn(idBA, idCN , soGhe, BanAn.TrangThai.TRONG);
+                    return new BanAn(idBA, idChiNhanh , soGhe, BanAn.TrangThai.TRONG);
                 }
                 
             }catch (SQLException e){
@@ -317,19 +316,4 @@ public class BanAnServices {
         }
     }
 
-
-    //Cập nhật theo checker
-    public static void capNhatTrangThai(int idBan, String trangThaiMoi) {
-        String sql = "UPDATE banan SET TrangThai = ? WHERE ID_BanAn = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, trangThaiMoi);
-            stmt.setInt(2, idBan);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi cập nhật trạng thái bàn.");
-            e.printStackTrace();
-        }
-        }
-        
 }

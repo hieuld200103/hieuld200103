@@ -1,16 +1,21 @@
 package model;
 
 public class KhachHang {
+    public enum TrangThai {
+        DA_NHAN_BAN, DA_THANH_TOAN
+    }
     private int id_KhachHang;
     private int id_User;
     private String tenKH;
     private String sdt;
+    private TrangThai trangThai;
 
-    public KhachHang(int id_KhachHang,int id_User, String tenKH, String sdt) {
+    public KhachHang(int id_KhachHang,int id_User, String tenKH, String sdt, TrangThai trangThai) {
         this.id_KhachHang = id_KhachHang;
         this.id_User = id_User;
         this.tenKH = tenKH ;
         this.sdt = sdt;
+        this.trangThai = trangThai;
     }
 
     public int getID_KhachHang() { return id_KhachHang; }
@@ -24,4 +29,8 @@ public class KhachHang {
 
     public String getSDT() { return sdt; }
     public void setSDT(String sdt) { this.sdt = sdt;}
+
+    public TrangThai getTrangThai(){return trangThai;}
+    public void setTrangThai(TrangThai trangThai){this.trangThai = trangThai;}
+
 }

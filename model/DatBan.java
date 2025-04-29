@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class DatBan {
     public enum TrangThai{
-        CHO_XAC_NHAN, DA_XAC_NHAN,DA_HUY
+        CHO_XAC_NHAN, DA_XAC_NHAN,DA_HUY, DANG_SU_DUNG
     }
     private int id_DatBan;
     private int id_ChiNhanh;

@@ -8,13 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import connection.DatabaseConnection;
-import Main.Main;
 import model.MonAn.DanhMucMonAn;
 import model.MonAn.LoaiMonAn;
 import model.MonAn;
-import model.User;
-import userinterface.DichVuKhachHang;
-
 
 public class MonAnServices {
     //Thêm món ăn
@@ -397,83 +393,6 @@ public class MonAnServices {
         }    
     }
 
-    public static void timMon(User currentUser) {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {            
-            System.out.println("\n=== TÌM MÓN ĂN ===");
-            System.out.println("1. Xem menu");
-            System.out.println("2. Tìm món ăn");
-            System.out.println("0. THOÁT");
-            System.out.print("Chọn chức năng: ");
-
-            if (!scanner.hasNextInt()) {
-                System.out.println(" Lỗi: Vui lòng nhập số hợp lệ!");
-                scanner.next(); 
-                continue;
-            }
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    MonAnServices.xemMenu();
-                    break;
-                case 2:
-                    MonAnServices.timKiemMonAn(scanner);
-                    break;
-               
-                case 0: 
-                    DichVuKhachHang.dichVu(currentUser);                    
-                    System.out.println("Bạn chưa đăng nhập!");
-                    Main.main(new String [] {});                              
-                    scanner.close();
-                    return;
-                default:
-                    System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");
-            }
-        }
-    }  
-
-    //Kiểm tra món có tồn tại k
-    public static boolean kiemTraMonAnTonTai(int idMonAn) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT COUNT(*) FROM monan WHERE ID_MonAn = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idMonAn);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    //Lấy giá
-    public static int layGiaMonAn(int idMonAn) {
-        String sql = "SELECT Gia FROM monan WHERE ID_MonAn = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
-            stmt.setInt(1, idMonAn);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                return rs.getInt("Gia");
-            } else {
-                System.out.println("Không tìm thấy món ăn với ID: " + idMonAn);
-            }
-    
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy giá món ăn từ cơ sở dữ liệu:");
-            e.printStackTrace();
-        }
-    
-        return 0; 
-    }
 }
 
      

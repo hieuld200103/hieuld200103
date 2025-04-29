@@ -209,29 +209,6 @@ public class DatBanServices {
         }        
     }
 
-    //Thông báo có đơn chờ xác nhận
-    public static void thongBao(NhanVien currentNV){
-        int idChiNhanh = currentNV.getID_ChiNhanh();
-        String sql = "SELECT COUNT(*) AS soDon FROM datban WHERE ID_ChiNhanh = ? AND TrangThai = 'CHO_XAC_NHAN'"; 
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-                stmt.setInt(1,idChiNhanh);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()){
-                    int soDon = rs.getInt("soDon");
-                    if(soDon>0){
-                        System.out.println("!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
-                    }else{
-                        System.out.println("Không có đơn đặt bàn nào đang chờ!");
-                    }
-                }
-            
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi kiểm tra đơn đặt bàn chờ xác nhận.");
-                e.printStackTrace();
-            }
-    }
-
     //Danh sách Đặt bàn
     public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV, String tieuDe, String dieuKienWhere) {
         List<DatBan> danhSach = new ArrayList<>();
@@ -290,35 +267,6 @@ public class DatBanServices {
         return xemDanhSachDatBan(currentNV, "Danh sách có thể huỷ", "TrangThai ='CHO_XAC_NHAN' OR TrangThai = 'DA_XAC_NHAN'");
     }
 
-    //Danh sách để checker
-    public static List<DatBan> xemDanhSach() {
-        List<DatBan> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM datban";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-    
-            while (rs.next()) {
-                int id = rs.getInt("ID_DatBan");
-                int idCN = rs.getInt("ID_ChiNhanh");
-                int idUser = rs.getInt("ID_User");
-                String idBanAn = rs.getString("List_BanAn");
-                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
-                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
-                DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
-    
-                DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
-                danhSach.add(datBan);
-        } 
-        rs.close();
-        }catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách đặt bàn!");
-            e.printStackTrace();
-        }
-    
-        return danhSach;
-    }
-    
     //Lọc danh sách đặt bàn
     public static void locDanhSachDatBan(NhanVien currentNV, Scanner scanner) {
         while (true) {
@@ -364,14 +312,8 @@ public class DatBanServices {
         }
     }
     
-    
     //Cập nhận trạng thái đặt bàn
-    public static void capNhatTrangThaiDatBan(
-        Scanner scanner,
-        NhanVien currentNV,
-        DatBan.TrangThai trangThaiMoi,
-        Runnable hienThiDS
-    ) {
+    public static void capNhatTrangThaiDatBan(Scanner scanner, NhanVien currentNV, DatBan.TrangThai trangThaiMoi, Runnable hienThiDS) {
         while(true){
             hienThiDS.run(); 
 
@@ -453,75 +395,5 @@ public class DatBanServices {
 
     public static void huyDatBan(Scanner scanner, NhanVien currentNV) {
         capNhatTrangThaiDatBan(scanner, currentNV, DatBan.TrangThai.DA_HUY, () -> DatBanServices.xemDSCoTheHuy(currentNV));
-    }
-    
-
-    //Cập nhật theo checker
-    public static void capNhatTrangThai(int idDatBan, DatBan.TrangThai trangThaiMoi) {
-        String sql = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, trangThaiMoi.name());
-            stmt.setInt(2, idDatBan);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi cập nhật trạng thái đặt bàn.");
-            e.printStackTrace();
-        }
-    }
-    
-    //Lấy bàn đã đặt
-    public static DatBan layDatBan(int idUser, String dieuKienWhere) {
-        String sql = "SELECT * FROM datban WHERE ID_User = ? ";
-        if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()){
-            sql += " AND " + dieuKienWhere;
-        }
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                int id_DatBan = rs.getInt("ID_DatBan");
-                int id_ChiNhanh = rs.getInt("ID_ChiNhanh");
-                String id_BanAn = rs.getString("List_BanAn");
-                LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
-                LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
-
-                String trangThaiStr = rs.getString("TrangThai");
-                DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(trangThaiStr);
-
-                return new DatBan(id_DatBan, id_ChiNhanh, idUser, id_BanAn, ngayDat, ngayAn , trangThai);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Lỗi khi lấy thông tin đặt bàn: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static DatBan daXacNhanDatBan(int idUser){
-        return layDatBan(idUser, "TrangThai = 'DA_XAC_NHAN'");
-    }
-
-    public static DatBan daDatBan(int idUser){
-        return layDatBan(idUser, "TrangThai IN ('DA_XAC_NHAN', 'CHO_XAC_NHAN')");
-    }
-
-    //Check khách đã nhận bàn
-    public static boolean daNhanBan(int idUser) {
-        String sql = "SELECT * FROM khachhang WHERE ID_User = ? AND TrangThai = 'DA_NHAN_BAN'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idUser);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            System.out.println("Lỗi kiểm tra trạng thái nhận bàn!");
-            e.printStackTrace();
-        }
-        return false;
     }
 }

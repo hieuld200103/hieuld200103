@@ -33,7 +33,7 @@ public class QuanLyBanAn {
 
             switch (choice) {
                 case 1:
-                    BanAnServices.themBanAn(scanner);
+                    BanAnServices.themBanAn(currentNV, scanner);
                     break;
                 case 2:
                     BanAnServices.xoaBanAn(currentNV, scanner);
