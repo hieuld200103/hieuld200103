@@ -1,7 +1,6 @@
 package background;
 
 import model.DatBan;
-import model.KhachHang;
 import model.NhanVien;
 import service.NhanVienServices;
 
@@ -23,12 +22,10 @@ public class DatBanChecker implements Runnable {
     public void run() {
         while (true) {
             List<DatBan> danhSachDatBan = xemDanhSachDatBan();
-            List<KhachHang> danhSachKhachHang = xemDanhSachKhachHang();
             LocalDateTime now = LocalDateTime.now();
 
             List<DatBan> banDuocXacNhan = new ArrayList<>();
             List<DatBan> banBiHuy = new ArrayList<>();
-            List<KhachHang> danhSachKH = new ArrayList<>();
             
             boolean coDonChoXacNhan = false;
 
@@ -59,15 +56,17 @@ public class DatBanChecker implements Runnable {
                         }
                     }
                 }
+
+                if(daNhanBan(datBan.getID_User())){
+                    for( String list :idBan){
+                        int id = Integer.parseInt(list.trim());
+                        capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DANG_SU_DUNG);
+                        capNhatTrangThai(id, "DANG_SU_DUNG");
+                    }
+                }  
+                
             }
 
-            for(KhachHang khachHang : danhSachKhachHang){
-                int idUser = khachHang.getID_User();
-                if(daNhanBan(idUser)){
-                    // BanAnServices.capNhatTrangThai(, null);
-                }
-            }
-            
             if (coDonChoXacNhan) {
                 NhanVien currentNV = NhanVienServices.getCurrentNV();
                 if(currentNV != null){
@@ -183,29 +182,6 @@ public class DatBanChecker implements Runnable {
             System.out.println("Lỗi khi kiểm tra đơn đặt bàn chờ xác nhận.");
             e.printStackTrace();
         }    
-    }
-
-    //Xem danh sách khách hàng
-    public static List<KhachHang> xemDanhSachKhachHang() {
-        List<KhachHang> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM khachhang";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                int id = rs.getInt("ID_KhachHang");
-                int idUser = rs.getInt("ID_User");
-                String tenKH = rs.getString("TenKH");
-                String sdt = rs.getString("SDT");
-                KhachHang.TrangThai trangThai = KhachHang.TrangThai.valueOf(rs.getString("TrangThai"));
-                danhSach.add(new KhachHang(id,idUser, tenKH, sdt,trangThai));
-            }
-        rs.close();
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách khách hàng!");
-            e.printStackTrace();
-        }
-        return danhSach;
     }
 
     //Check khách đã nhận bàn
