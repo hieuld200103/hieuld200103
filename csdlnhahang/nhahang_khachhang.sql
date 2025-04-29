@@ -27,7 +27,7 @@ CREATE TABLE `khachhang` (
   `ID_User` int unsigned NOT NULL,
   `TenKH` varchar(50) NOT NULL,
   `SDT` varchar(50) NOT NULL,
-  `TrangThai` enum('DA_NHAN_BAN','CHUA_DAT_BAN') DEFAULT 'DA_NHAN_BAN',
+  `TrangThai` enum('DA_NHAN_BAN','DA_THANH_TOAN') DEFAULT 'DA_NHAN_BAN',
   PRIMARY KEY (`ID_KhachHang`),
   UNIQUE KEY `SDT` (`SDT`),
   KEY `fk_khachhang_user` (`ID_User`),
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-29  0:59:13
+-- Dump completed on 2025-04-29 13:53:59

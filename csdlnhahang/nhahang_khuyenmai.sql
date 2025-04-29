@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `khuyenmai`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `khuyenmai` (
   `ID_KhuyenMai` int unsigned NOT NULL AUTO_INCREMENT,
-  `TenChuongTrinhKM` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `TenChuongTrinhKM` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `PhanTramKM` decimal(5,2) NOT NULL,
   `NgayBatDau` date NOT NULL,
   `NgayKetThuc` date NOT NULL,
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-29  0:59:13
+-- Dump completed on 2025-04-29 13:53:59
