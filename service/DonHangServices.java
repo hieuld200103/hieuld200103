@@ -14,19 +14,41 @@ import model.DonHang;
 import model.User;
 
 public class DonHangServices {
-    //Thêm món vào đơn
-    public static DonHang themDonHang(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
+    //Thêm đơn hàng tại nhà hàng
+    public static DonHang themDonHangTaiNhaHang(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
         if (user == null || kieuDonHang == null) {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
         System.out.print("ID bàn của bạn (đại diện 1 bàn): ");
         int idBanAn = scanner.nextInt();
+        
+        themDH(user.getID_User(), idBanAn, kieuDonHang);    
+        return null;
+    }
+
+    //Thêm đơn hàng mang về
+    public static DonHang themDonHangMangVe(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
+        if (user == null || kieuDonHang == null) {
+            System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
+            return null;
+        }
+        return themDH(user.getID_User(), null, kieuDonHang);
+
+    }
+
+
+    //Thêm đơn hàng
+    public static DonHang themDH(int idUser, Integer idBanAn, DonHang.KieuDonHang kieuDonHang){
         String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, KieuDonHang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {    
-            stmt.setInt(1, user.getID_User());
-            stmt.setInt(2, idBanAn);
+            stmt.setInt(1, idUser);
+            if (idBanAn == null) {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(2, idBanAn);
+            }
             stmt.setString(3, kieuDonHang.name());
     
             int row = stmt.executeUpdate();
@@ -34,7 +56,7 @@ public class DonHangServices {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int idDH = rs.getInt(1);
-                        DonHang donHang = new DonHang(idDH, user.getID_User(), idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
+                        DonHang donHang = new DonHang(idDH, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
                         donHang.setKieuDonHang(kieuDonHang);
                         System.out.println("Tạo đơn hàng thành công! Mã đơn: " + idDH);
                         return donHang;
@@ -46,9 +68,9 @@ public class DonHangServices {
             System.out.println("Lỗi khi tạo đơn hàng!");
             e.printStackTrace();
         }
-    
         return null;
     }
+
 
     //Thêm vào chi tiết đơn
     public static void themChiTietDonHang(List<ChiTietDonHang> dsChiTiet) {

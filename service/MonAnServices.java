@@ -294,25 +294,38 @@ public class MonAnServices {
             System.out.println("\n======= TÌM KIẾM =======");
             System.out.println("1. Tìm theo loại món ăn");
             System.out.println("2. Tìm theo danh mục món ăn");
-            System.out.print("Chọn: ");
+            System.out.print("Chọn (0 để thoát): ");
             if (!scanner.hasNextInt()) {
                 System.out.println(" Lỗi: Vui lòng nhập số hợp lệ!");
                 scanner.next(); 
                 continue;
             }
+            
             int luaChon = scanner.nextInt();
+            if(luaChon == 0){
+                return null;
+            }
+
             scanner.nextLine();
             String sql = "";
             String filterValue = "";
         
             if (luaChon == 1) { 
-                System.out.println("\n======= TÌM MÓN ĂN =======");
+                boolean luaChonHopLe1 = false;
+                while(!luaChonHopLe1){
+                    System.out.println("\n======= TÌM MÓN ĂN =======");
                 System.out.println("1. Đồ ăn");
                 System.out.println("2. Đồ uống");
                 System.out.print("Chọn (0 để thoát): ");
+
+                if (!scanner.hasNextInt()) {
+                    System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
+                    scanner.next();
+                    continue;
+                }
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-        
+             
                 switch (choice) {
                     case 1:
                         filterValue = "DO_AN";
@@ -328,38 +341,50 @@ public class MonAnServices {
                     
                 }    
                 sql = "SELECT * FROM monan WHERE LoaiMonAn = ?";
+                luaChonHopLe1 = true;
+                }
+                
         
             } else if (luaChon == 2) { 
-                System.out.println("\n======= TÌM THEO DANH MỤC =======");
-                System.out.println("1. Đồ khô");
-                System.out.println("2. Đồ nước");
-                System.out.println("3. Đồ uống có cồn");
-                System.out.println("4. Đồ uống không cồn");
-                System.out.print("Chọn (0 để thoát): ");
-                int subchoice = scanner.nextInt();
-                scanner.nextLine();
-        
-                switch (subchoice) {
-                    case 1:
-                        filterValue = "DO_KHO";
-                        break;
-                    case 2:
-                        filterValue = "DO_NUOC";
-                        break;
-                    case 3:
-                        filterValue = "CO_CON";
-                        break;
-                    case 4:
-                        filterValue = "KHONG_CON";
-                        break;
-                    case 0:
-                        break;
-                    default:
-                        System.out.println("Lỗi! Vui lòng nhập lại.");
-                        return danhSach;
+                boolean luaChonHopLe2 = false;
+                while(!luaChonHopLe2){
+                    System.out.println("\n======= TÌM THEO DANH MỤC =======");
+                    System.out.println("1. Đồ khô");
+                    System.out.println("2. Đồ nước");
+                    System.out.println("3. Đồ uống có cồn");
+                    System.out.println("4. Đồ uống không cồn");
+                    System.out.print("Chọn (0 để thoát): ");
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
+                        scanner.next();
+                        continue;
+                    }
+                    int subchoice = scanner.nextInt();
+                    scanner.nextLine();
+                    switch (subchoice) {
+                        case 1:
+                            filterValue = "DO_KHO";
+                            break;
+                        case 2:
+                            filterValue = "DO_NUOC";
+                            break;
+                        case 3:
+                            filterValue = "CO_CON";
+                            break;
+                        case 4:
+                            filterValue = "KHONG_CON";
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            System.out.println("Lỗi! Vui lòng nhập lại.");
+                            return danhSach;
+                    }
+            
+                    sql = "SELECT * FROM monan WHERE DanhMuc = ?";
+                    luaChonHopLe2 = true;
                 }
-        
-                sql = "SELECT * FROM monan WHERE DanhMuc = ?";
+                
             } else {
                 System.out.println("Lựa chọn không hợp lệ. Vui lòng nhập lại.");
                 return danhSach;

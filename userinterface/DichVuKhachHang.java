@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
@@ -50,12 +51,12 @@ public class DichVuKhachHang {
                 DatBan currentDatBan = daXacNhanDatBan(currentUser.getID_User());
                 if (currentDatBan != null ) { 
                     if(DatBanChecker.daNhanBan(currentUser.getID_User())){
-                        DonHang donHang = layDonHangHienTai(currentUser.getID_User());
+                        DonHang donHang = layDHTaiNhaHang(currentUser.getID_User());
                         if (donHang == null) {
-                            donHang = DonHangServices.themDonHang(currentUser,DonHang.KieuDonHang.TAI_QUAN, scanner );
+                            donHang = DonHangServices.themDonHangTaiNhaHang(currentUser,DonHang.KieuDonHang.TAI_NHA_HANG, scanner );
                         }
                         if (donHang != null) {
-                            donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_QUAN);
+                            donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_NHA_HANG);
                             GoiMonServices.goiMon(currentUser, donHang, scanner);
                         } else {
                             System.out.println("Không thể tạo hoặc lấy đơn hàng.");
@@ -70,14 +71,17 @@ public class DichVuKhachHang {
              
                 break;
 
-            case 2: 
-                System.out.println("Đang pt");
-                // DonHang donMangVe = DonHangServices.taoDonHangMangVe(currentUser); 
-                // if (donMangVe != null) {
-                //     donMangVe.setKieuDonHang(ChiTietDonHang.KieuDonHang.MANG_VE);
-                //     DonHangServices.goiMon(donMangVe, currentUser);
-                // }
-                
+            case 2:
+                DonHang donHang = layDHMangVe(currentUser.getID_User());
+                        if (donHang == null) {
+                            donHang = DonHangServices.themDonHangMangVe(currentUser,DonHang.KieuDonHang.MANG_VE, scanner );
+                        }
+                        if (donHang != null) {
+                            donHang.setKieuDonHang(DonHang.KieuDonHang.MANG_VE);
+                            GoiMonServices.goiMon(currentUser, donHang, scanner);
+                        } else {
+                            System.out.println("Không thể tạo hoặc lấy đơn hàng.");
+                        }    
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
@@ -166,9 +170,9 @@ public class DichVuKhachHang {
         return null;
     }
 
-    //Lấy đơn hiện tại
-    public static DonHang layDonHangHienTai(int idUser) {
-        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DANG_CHUAN_BI'";
+    //Lấy đơn ăn tại nhà hàng
+    public static DonHang layDHTaiNhaHang(int idUser) {
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND kieudonhang = 'TAI_NHA_HANG'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
     
@@ -176,10 +180,30 @@ public class DichVuKhachHang {
             try(ResultSet rs = stmt.executeQuery()){
                 if (rs.next()) {
                     int idDonHang = rs.getInt("ID_DonHang");
-                    return new DonHang(idDonHang, idUser, DonHang.TrangThai.DANG_CHUAN_BI);
+                    return new DonHang(idDonHang, idUser, DonHang.KieuDonHang.TAI_NHA_HANG);
                 }
             }    
-            
+        
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Lấy đơn mang về
+    public static DonHang layDHMangVe(int idUser) {
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND kieudonhang = 'MANG_VE'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    
+            stmt.setInt(1, idUser);
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()) {
+                    int idDonHang = rs.getInt("ID_DonHang");
+                    return new DonHang(idDonHang, idUser, DonHang.KieuDonHang.MANG_VE);
+                }
+            }    
+        
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -223,6 +247,8 @@ public class DichVuKhachHang {
         }
     } 
     
+
+    //Thao tác hủy đặt bàn
     public static void qlHuyDatBan(Scanner scanner, User currentUser){
         while (true) {
             System.out.print("\nBạn muốn thay đổi thời gian (Y/n)?: ");
@@ -230,8 +256,21 @@ public class DichVuKhachHang {
             if (s.equalsIgnoreCase("y") || s.equalsIgnoreCase("yes")) {
                 System.out.print("\nBạn cần hủy lịch hiện tại để đặt lịch mới (Y/n)?: ");
                 String input = scanner.nextLine();
-                if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) {                   
-                    DatBanServices.huyDatBan(currentUser);
+                if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) { 
+                    String trangThai = layTrangThaiDatBan(currentUser.getID_User());
+                    switch (trangThai){
+                        case "CHO_XAC_NHAN":
+                            huyDatBan(currentUser);
+                        break;
+                        case "DA_XAC_NHAN":
+                            if(!thoiGianHuyBan(currentUser.getID_User())){
+                                System.out.println("Khách hàng chỉ được hủy trước thời gian dùng bữa 12 tiếng! \nXin liên hệ hostline nhà hàng để được hỗ trợ!");
+                                
+                            }else{
+                                huyDatBan(currentUser);
+                            }
+                            break;
+                    }                  
                     return;
                 } else {
                     DichVuKhachHang.dichVu(currentUser, scanner);
@@ -242,6 +281,63 @@ public class DichVuKhachHang {
                     return;
             }
         }
+    }
 
+    //Hủy đặt bàn
+    public static void huyDatBan(User currentUser){
+        String sql = "UPDATE datban SET TrangThai = 'DA_HUY' WHERE ID_User = ? AND TrangThai IN ('CHO_XAC_NHAN','DA_XAC_NHAN')";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,currentUser.getID_User());
+                stmt.executeUpdate();
+                System.out.println("\nBạn đã hủy lịch đặt bàn hiện tại!");
+            } catch (SQLException e) {
+                System.out.println("Lỗi khi hủy lịch đặt bàn!");
+                e.printStackTrace();
+            }  
+    }
+
+    //Lấy trạng thái đặt bàn (qlHuyDatBan)
+    public static String layTrangThaiDatBan(int idUser) {
+        String sql = "SELECT TrangThai FROM datban WHERE ID_User = ? AND TrangThai IN ('DA_XAC_NHAN', 'CHO_XAC_NHAN')";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUser);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("TrangThai");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi kiểm tra trạng thái đặt bàn!");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    //Thời gian có thể hủy đặt bàn
+    public static boolean thoiGianHuyBan(int idUser){
+        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN'";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,idUser);
+                try(ResultSet rs = stmt.executeQuery()){
+                    if(rs.next()){
+                        LocalDateTime now = LocalDateTime.now();
+                        LocalDateTime gioAn = rs.getTimestamp("NgayAn").toLocalDateTime();
+                        long tgCoTheDat = Duration.between(now,gioAn).toHours();
+
+                        if(tgCoTheDat>12){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }
+                }
+            }catch (SQLException e) {
+            System.out.println("Lỗi khi kiểm tra thời gian!");
+            e.printStackTrace();
+            }
+            return false; 
     }
 }

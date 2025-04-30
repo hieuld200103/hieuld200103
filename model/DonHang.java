@@ -5,7 +5,7 @@ public class DonHang {
         DANG_CHUAN_BI, DA_HOAN_THANH;
     }
     public enum KieuDonHang{
-        TAI_QUAN, MANG_VE ,DAT_ONLINE
+        TAI_NHA_HANG, MANG_VE 
     }
     private int id_DonHang;
     private int id_User;
@@ -21,10 +21,10 @@ public class DonHang {
         this.kieuDonHang = kieuDonHang;
     }
     
-    public DonHang(int id_DonHang, int id_User, TrangThai trangThai){
+    public DonHang(int id_DonHang, int id_User, KieuDonHang kieuDonHang){
         this.id_DonHang = id_DonHang;
         this.id_User = id_User;
-        this.trangThai = trangThai;
+        this.kieuDonHang = kieuDonHang;
     }
 
     public int getID_DonHang(){return id_DonHang;}

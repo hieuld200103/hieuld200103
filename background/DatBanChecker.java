@@ -38,7 +38,7 @@ public class DatBanChecker implements Runnable {
                     break; 
                 }
         
-                long tgBooking = Duration.between(now, gioAn).toMinutes();
+                long tgDat = Duration.between(now, gioAn).toMinutes();
                 long tgCho = Duration.between(gioAn, now).toMinutes();
                 String listBan =  datBan.getListID_BanAn();
                 String[] idBan = listBan.split(",");
@@ -46,10 +46,11 @@ public class DatBanChecker implements Runnable {
                 for (String list : idBan){
                     int id = Integer.parseInt(list.trim());
                     if (datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
-                        if (tgBooking <= 60 && tgCho <= 30) {
+                        if (tgDat <= 90 && tgCho <= 30) {
                             capNhatTrangThai(id, "DA_DAT");
                             banDuocXacNhan.add(datBan);
-                        } else if (tgCho > 30) {
+                        } 
+                        else if (tgCho > 30 && !daNhanBan(datBan.getID_User())) {
                             capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
                             capNhatTrangThai(id, "TRONG");
                             banBiHuy.add(datBan);
@@ -74,7 +75,6 @@ public class DatBanChecker implements Runnable {
             }
 
             if (!banDuocXacNhan.isEmpty()) {
-                
                 System.out.println("\n Các bàn đã được đặt: " + inDanhSach(banDuocXacNhan));
             }
             if (!banBiHuy.isEmpty()) {
@@ -101,7 +101,7 @@ public class DatBanChecker implements Runnable {
                 idSet.add(id.trim());
             }
         }
-        return String.join(" ", idSet);
+        return String.join(", ", idSet);
     }
 
     //Cập nhật theo checker
@@ -135,7 +135,7 @@ public class DatBanChecker implements Runnable {
     //Danh sách để checker
     public static List<DatBan> xemDanhSachDatBan() {
         List<DatBan> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM datban";
+        String sql = "SELECT * FROM datban WHERE TrangThai = 'DA_XAC_NHAN'";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
