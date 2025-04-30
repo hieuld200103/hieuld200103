@@ -20,13 +20,11 @@ import model.User;
 import service.UserServices;
 
 public class DichVuKhachHang {
-    public static void dichVu(User currentUser) {
+    public static void dichVu(User currentUser, Scanner scanner) {
     if (currentUser == null) {
         System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
         return;
     }
-
-    Scanner scanner = new Scanner(System.in);
 
     while (true) {
         System.out.println("\n=== DỊCH VỤ KHÁCH HÀNG ===");
@@ -63,39 +61,41 @@ public class DichVuKhachHang {
                             System.out.println("Không thể tạo hoặc lấy đơn hàng.");
                         }
                     }else {
-                        System.out.println("Bạn cần NHẬN BÀN  trước khi gọi món tại nhà hàng.");
+                        System.out.println("\nBạn cần NHẬN BÀN  trước khi gọi món tại nhà hàng.");
                     }   
                 
                 } else {
-                    System.out.println("Bạn cần ĐẶT BÀN trước khi gọi món tại quán.");
+                    System.out.println("\nBạn cần ĐẶT BÀN trước khi gọi món tại quán.");
                 }                  
              
                 break;
 
             case 2: 
+                System.out.println("Đang pt");
                 // DonHang donMangVe = DonHangServices.taoDonHangMangVe(currentUser); 
                 // if (donMangVe != null) {
                 //     donMangVe.setKieuDonHang(ChiTietDonHang.KieuDonHang.MANG_VE);
                 //     DonHangServices.goiMon(donMangVe, currentUser);
                 // }
-                // break;
+                
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
-                    System.out.println("Bạn đã đặt bàn rồi!");
+                    System.out.println("\nBạn đã đặt bàn rồi!");
+                    qlHuyDatBan(scanner, currentUser);
                 }else{
-                    DatBanServices.datBan(currentUser);
+                    DatBanServices.datBan(currentUser, scanner);
                 }
                 break;
             case 4:
-                timMon(currentUser);
+                timMon(currentUser, scanner);
                 break;
             case 5:
                 UserServices.suaThongTinCaNhan(scanner, currentUser.getID_User(), currentUser);
                 break;
             case 0:
                 UserServices.dangXuat();
-                TaiKhoanKhachHang.taiKhoanKhachHang();
+                TaiKhoanKhachHang.taiKhoanKhachHang(scanner);
                 return;
 
             default:
@@ -137,7 +137,7 @@ public class DichVuKhachHang {
         return null;
     }
     private static void hienThiThongTin(int idDatBan,int idUser,String tenUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
-        System.out.println("ID Đặt bàn: "+idDatBan+ " | ID: " + idUser +" | Tên KH: "+tenUser+" | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
+        System.out.println("\nID Đặt bàn: "+idDatBan+ " | ID: " + idUser +" | Tên KH: "+tenUser+" | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
     }
 
     public static DatBan daXacNhanDatBan(int idUser){
@@ -187,8 +187,7 @@ public class DichVuKhachHang {
     }
     
     //Tìm món
-    public static void timMon(User currentUser) {
-        Scanner scanner = new Scanner(System.in);
+    public static void timMon(User currentUser, Scanner scanner) {
         while (true) {            
             System.out.println("\n=== TÌM MÓN ĂN ===");
             System.out.println("1. Xem menu");
@@ -214,14 +213,35 @@ public class DichVuKhachHang {
                     break;
                
                 case 0: 
-                    DichVuKhachHang.dichVu(currentUser);                    
+                    DichVuKhachHang.dichVu(currentUser, scanner);                    
                     System.out.println("Bạn chưa đăng nhập!");
                     Main.main(new String [] {});                              
-                    scanner.close();
                     return;
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");
             }
         }
-    }  
+    } 
+    
+    public static void qlHuyDatBan(Scanner scanner, User currentUser){
+        while (true) {
+            System.out.print("\nBạn muốn thay đổi thời gian (Y/n)?: ");
+            String s = scanner.nextLine();
+            if (s.equalsIgnoreCase("y") || s.equalsIgnoreCase("yes")) {
+                System.out.print("\nBạn cần hủy lịch hiện tại để đặt lịch mới (Y/n)?: ");
+                String input = scanner.nextLine();
+                if (input.equalsIgnoreCase("y") || input.equalsIgnoreCase("yes")) {                   
+                    DatBanServices.huyDatBan(currentUser);
+                    return;
+                } else {
+                    DichVuKhachHang.dichVu(currentUser, scanner);
+                    return;
+                }
+            } else {
+                DichVuKhachHang.dichVu(currentUser, scanner);
+                    return;
+            }
+        }
+
+    }
 }

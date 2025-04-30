@@ -22,19 +22,18 @@ import userinterface.QuanLyDatBan;
 
 public class DatBanServices {
     //Đặt bàn
-    public static DatBan datBan(User currentUser){
+    public static DatBan datBan(User currentUser, Scanner scanner){
         if (currentUser == null) {
             System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             return null;
         }
-        Scanner scanner = new Scanner(System.in);
         while (true) {
+            System.out.println("\n============= ĐẶT BÀN ==============");
             int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
             if (idChiNhanh == 0) {
                 return null; 
             }
 
-            System.out.println("\n========= ĐẶT BÀN =========");
             int userID = currentUser.getID_User();
        
             System.out.println("ID Chi nhánh: " + idChiNhanh);
@@ -307,7 +306,7 @@ public class DatBanServices {
                     xemDanhSachDatBan(currentNV, "Toàn bộ danh sách", null);
                     break;
                 case 0:
-                    QuanLyDatBan.quanLy(currentNV, idChiNhanh);
+                    QuanLyDatBan.quanLy(currentNV, idChiNhanh, scanner);
                     return;
                 default:
                     System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
@@ -398,5 +397,19 @@ public class DatBanServices {
 
     public static void huyDatBan(Scanner scanner, NhanVien currentNV) {
         capNhatTrangThaiDatBan(scanner, currentNV, DatBan.TrangThai.DA_HUY, () -> DatBanServices.xemDSCoTheHuy(currentNV));
+    }
+
+    //Hủy đặt bàn
+    public static void huyDatBan(User currentUser){
+        String sql = "UPDATE datban SET TrangThai = 'DA_HUY' WHERE ID_User = ? AND TrangThai IN ('CHO_XAC_NHAN','DA_XAC_NHAN')";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,currentUser.getID_User());
+                stmt.executeUpdate();
+                System.out.println("\nBạn đã hủy lịch đặt bàn hiện tại!");
+            } catch (SQLException e) {
+                System.out.println("Lỗi khi hủy lịch đặt bàn!");
+                e.printStackTrace();
+            }  
     }
 }

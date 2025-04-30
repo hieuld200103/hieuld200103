@@ -8,9 +8,7 @@ import service.UserServices;
 
 public class TaiKhoanKhachHang {
     public static User currentUser = null;
-    public static void taiKhoanKhachHang(){
-        Scanner scanner = new Scanner(System.in);
-        
+    public static void taiKhoanKhachHang(Scanner scanner){ 
         while (true) {
             System.out.println("\n=== KHÁCH HÀNG ===");
             System.out.println("1. Đăng nhập");
@@ -31,7 +29,7 @@ public class TaiKhoanKhachHang {
                 case 1:
                     currentUser = UserServices.dangNhap(scanner);
                     if (currentUser != null){
-                        DichVuKhachHang.dichVu(currentUser);
+                        DichVuKhachHang.dichVu(currentUser, scanner);
                     
                         return;
                     }else{
@@ -40,11 +38,9 @@ public class TaiKhoanKhachHang {
                     break;
                 case 2:
                     UserServices.dangKy(scanner);
-                    break;
-                                  
+                    break;         
                 case 0: 
                     Main.main(new String[] {});
-                    scanner.close();
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

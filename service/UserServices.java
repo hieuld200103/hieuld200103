@@ -231,7 +231,7 @@ public class UserServices {
                         case 2: field = "SDT"; break;
                         case 3: field = "Email"; break;
                         case 0: 
-                        DichVuKhachHang.dichVu(currentUser);
+                        DichVuKhachHang.dichVu(currentUser,scanner);
                         break;
                         default:
                             System.out.println("Lựa chọn không hợp lệ!");

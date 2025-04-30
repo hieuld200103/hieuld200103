@@ -101,8 +101,7 @@ public class NhanVienServices {
     }
 
     //Tìm món
-    public static void timMon(NhanVien currentNV, int idChiNhanh) {
-        Scanner scanner = new Scanner(System.in);
+    public static void timMon(NhanVien currentNV, int idChiNhanh,Scanner scanner){
         while (true) {            
             System.out.println("\n=== TÌM MÓN ĂN ===");
             System.out.println("1. Xem menu");
@@ -128,7 +127,7 @@ public class NhanVienServices {
                     break;
                
                 case 0: 
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh);                    
+                    CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                    
                     System.out.println("Bạn chưa đăng nhập!");
                     Main.main(new String [] {});                              
                     scanner.close();
@@ -166,7 +165,7 @@ public class NhanVienServices {
                     BanAnServices.xemBan(idChiNhanh);
                     break;
                 case 0:
-                    QuanLyBanAn.quanLy(currentNV, idChiNhanh);            
+                    QuanLyBanAn.quanLy(currentNV, idChiNhanh, scanner);            
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

@@ -276,7 +276,7 @@ public class BanAnServices {
 
                 Set<Integer> danhSachID = new HashSet<>();
 
-                System.out.println("\n========= CHỌN CHI NHÁNH =========");
+                System.out.println("\n=========== CHỌN CHI NHÁNH ==========");
                 System.out.println("=====================================");
                 System.out.println("| ID    | Tên chi nhánh             |");
                 System.out.println("=====================================");

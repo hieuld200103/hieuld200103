@@ -7,12 +7,11 @@ import service.BanAnServices;
 import service.NhanVienServices;
 
 public class QuanLyBanAn {
-    public static void quanLy(NhanVien currentNV, int idChiNhanh) {
+    public static void quanLy(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         if (currentNV == null) {
             System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\n=== QUẢN LÝ BÀN ĂN ===");
             System.out.println("1. Thêm bàn ăn");
@@ -45,8 +44,7 @@ public class QuanLyBanAn {
                     NhanVienServices.checkBan(currentNV,scanner);
                     break;
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh);                    
-                    scanner.close();
+                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);                    
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

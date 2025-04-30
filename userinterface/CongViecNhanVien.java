@@ -6,13 +6,12 @@ import model.NhanVien;
 import service.NhanVienServices;
 
 public class CongViecNhanVien {
-     public static void congViec(NhanVien currentNV, int idChiNhanh) {
+     public static void congViec(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         if (currentNV == null){
             System.out.println("Bạn chưa đăng nhập!");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
-        
+    
         while (true) {
             String[] menu = {
                 "CÔNG VIỆC NHÂN VIÊN",
@@ -42,27 +41,26 @@ public class CongViecNhanVien {
 
             switch (choice) {
                 case 1:
-                    QuanLyDatBan.quanLy(currentNV, idChiNhanh);
+                    QuanLyDatBan.quanLy(currentNV, idChiNhanh,scanner);
                     break;
                 case 2:
-                    QuanLyKhachHang.quanLy(currentNV,idChiNhanh);;
+                    QuanLyKhachHang.quanLy(currentNV,idChiNhanh,scanner);;
                     break;
                 case 3:
-                    QuanLyDonHang.quanLy(currentNV, idChiNhanh);
+                    QuanLyDonHang.quanLy(currentNV, idChiNhanh, scanner);
                     break;
                 case 4:
-                    QuanLyMonAn.quanLy(currentNV, idChiNhanh);
+                    QuanLyMonAn.quanLy(currentNV, idChiNhanh,scanner);
                     break;
                 case 5:
-                    QuanLyBanAn.quanLy(currentNV, idChiNhanh);                    
+                    QuanLyBanAn.quanLy(currentNV, idChiNhanh, scanner);                    
                     break;
                 case 6:
                     System.out.println("Đang phát triển");
                     break;
                 case 0:
                     NhanVienServices.dangXuat();
-                    QuanLyNhanVien.quanLyNhanVien();
-                    scanner.close();
+                    QuanLyNhanVien.quanLyNhanVien(scanner);
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

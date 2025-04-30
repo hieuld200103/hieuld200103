@@ -6,12 +6,11 @@ import service.KhachHangServices;
 import service.NhanVienServices;
 
 public class QuanLyKhachHang {
-    public static void quanLy(NhanVien currentNV, int idChiNhanh) {
+    public static void quanLy(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         if (currentNV == null) {
             System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\n=== QUẢN LÝ KHÁCH HÀNG ===");
             System.out.println("1. Xác nhận nhận bàn");
@@ -44,8 +43,7 @@ public class QuanLyKhachHang {
                     NhanVienServices.xemDanhSachUser();
                     break;
                 case 0:                    
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh);
-                    scanner.close();
+                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

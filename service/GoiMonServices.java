@@ -53,7 +53,7 @@ public class GoiMonServices {
                     if (!danhSachChiTiet.isEmpty()) {
                         DonHangServices.themChiTietDonHang(danhSachChiTiet);
                     }
-                    DichVuKhachHang.dichVu(currentUser);
+                    DichVuKhachHang.dichVu(currentUser, scanner);
                     return;
 
                 default:

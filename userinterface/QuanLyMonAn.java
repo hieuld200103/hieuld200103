@@ -6,12 +6,12 @@ import model.NhanVien;
 import service.MonAnServices;
 
 public class QuanLyMonAn {
-    public static void quanLy(NhanVien currentNV, int idChiNhanh) {
+    public static void quanLy(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         if (currentNV == null) {
             System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
+        
         while (true) {
             System.out.println("\n=== QUẢN LÝ MENU ===");
             System.out.println("1. Thêm món ăn");
@@ -48,8 +48,7 @@ public class QuanLyMonAn {
                     MonAnServices.timKiemMonAn(scanner);
                     break;
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh);                    
-                    scanner.close();
+                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);                    
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

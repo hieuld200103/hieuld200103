@@ -8,8 +8,7 @@ import service.NhanVienServices;
 
 public class QuanLyNhanVien {
     public static NhanVien currentNV = null;
-    public static void quanLyNhanVien() {
-        Scanner scanner = new Scanner(System.in);        
+    public static void quanLyNhanVien(Scanner scanner) {       
         while (true) {
             System.out.println("\n=== NHÂN VIÊN ===");
             System.out.println("1. Đăng Nhập");
@@ -30,7 +29,7 @@ public class QuanLyNhanVien {
                     currentNV = NhanVienServices.dangNhap(scanner);
                     if (currentNV != null) {
                         int idChiNhanh = currentNV.getID_ChiNhanh();
-                        CongViecNhanVien.congViec(currentNV, idChiNhanh);
+                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
                         return; 
                     } else {
                         System.out.println("Đăng nhập thất bại, vui lòng thử lại!");
@@ -38,7 +37,6 @@ public class QuanLyNhanVien {
                     break;      
                 case 0:
                     Main.main(new String[] {});
-                    scanner.close();
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

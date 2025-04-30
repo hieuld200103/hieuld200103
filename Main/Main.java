@@ -32,7 +32,7 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    TaiKhoanKhachHang.taiKhoanKhachHang();
+                    TaiKhoanKhachHang.taiKhoanKhachHang(scanner);
                     break;
                 case 2:
                     System.out.println("Nhập mật khẩu nhà hàng: ");
@@ -41,7 +41,7 @@ public class Main {
                         System.out.println("Mật khẩu không đúng!");
                     } else {
                         System.out.println("Chào mừng đến với nhà hàng!");
-                        QuanLyNhanVien.quanLyNhanVien();
+                        QuanLyNhanVien.quanLyNhanVien(scanner);
                     } 
                     break;    
                 case 0:
