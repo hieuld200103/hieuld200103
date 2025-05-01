@@ -77,16 +77,9 @@ public class DichVuKhachHang {
                 break;
 
             case 2:
-                DonHang donHang = layDHMangVe(currentUser.getID_User());
-                        if (donHang == null) {
-                            donHang = DonHangServices.themDonHangMangVe(currentUser,DonHang.KieuDonHang.MANG_VE, scanner );
-                        }
-                        if (donHang != null) {
-                            donHang.setKieuDonHang(DonHang.KieuDonHang.MANG_VE);
-                            GoiMonServices.goiMon(currentUser, donHang, scanner);
-                        } else {
-                            System.out.println("Không thể tạo hoặc lấy đơn hàng.");
-                        }    
+                DonHang donHang = DonHangServices.themDonHangMangVe(currentUser,DonHang.KieuDonHang.MANG_VE, scanner );     
+                GoiMonServices.goiMon(currentUser, donHang, scanner); 
+                xoaDHMangVe(donHang.getID_DonHang()); 
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
@@ -107,6 +100,7 @@ public class DichVuKhachHang {
                 break;
             case 7:
                 KhuyenMaiServices.xemKhuyenMai2(currentUser, scanner);
+                break;
             case 0:
                 UserServices.dangXuat();
                 TaiKhoanKhachHang.taiKhoanKhachHang(scanner);
@@ -200,24 +194,26 @@ public class DichVuKhachHang {
         return null;
     }
 
-    //Lấy đơn mang về
-    public static DonHang layDHMangVe(int idUser) {
-        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND kieudonhang = 'MANG_VE'";
+    //Xóa đơn mang về nếu k gọi món
+    public static void xoaDHMangVe(int idDH) {
+        String sql = "SELECT COUNT(*) FROM chitietdonhang WHERE ID_DonHang = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
-            stmt.setInt(1, idUser);
+            stmt.setInt(1, idDH);
             try(ResultSet rs = stmt.executeQuery()){
-                if (rs.next()) {
-                    int idDonHang = rs.getInt("ID_DonHang");
-                    return new DonHang(idDonHang, idUser, DonHang.KieuDonHang.MANG_VE);
+                if (rs.next() && rs.getInt(1) == 0) {
+                    String deleteSQL = "DELETE FROM donhang WHERE ID_DonHang = ?";
+                    try (PreparedStatement deletePs = conn.prepareStatement(deleteSQL)){
+                        deletePs.setInt(1, idDH);
+                        deletePs.executeUpdate();
+                        System.out.println("Đã xóa đơn khi không gọi món!");
+                    }                    
                 }
             }    
-        
         } catch (SQLException e) {
+            System.out.println("Lỗi khi xóa đơn!");
             e.printStackTrace();
         }
-        return null;
     }
     
     //Tìm món
