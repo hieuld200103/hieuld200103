@@ -62,6 +62,7 @@ public class GoiMonServices {
 
     // Gọi món (thao tác thêm món)
     private static boolean goiMonAction(User currentUser, DonHang donHang, Scanner scanner, List<ChiTietDonHang> danhSachChiTiet) {
+        boolean daThemMon = false;
         while (true) {
             System.out.print("\nNhập ID để gọi món (0 để quay lại): ");
             if (!scanner.hasNextInt()) {
@@ -69,32 +70,34 @@ public class GoiMonServices {
                 scanner.next();
                 continue;
             }
+    
             int idDH = donHang.getID_DonHang();
             int idMon = scanner.nextInt();
             if (idMon == 0){
-                return false;
+                return daThemMon; 
             }
-
+    
             if (!kiemTraMonAnTonTai(idMon)) {
                 System.out.println("Không có món ăn với ID này! Vui lòng thử lại.");
                 continue;
             }
-
+    
             System.out.print("Nhập số lượng: ");
             if (!scanner.hasNextInt()) {
                 System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
                 scanner.next();
                 continue;
             }
+    
             int soLuong = scanner.nextInt();
-
             int donGia = layGiaMonAn(idMon);
             int thanhTien = donGia * soLuong;
             DonHang.KieuDonHang kieuDonHang = donHang.getKieuDonHang();
             DonHangServices.themChiTietDonHang(idDH, idMon, soLuong, donGia, thanhTien, kieuDonHang);
-            return true;         
+            daThemMon = true;
         }
     }
+    
 
     //Kiểm tra món có tồn tại k
     public static boolean kiemTraMonAnTonTai(int idMonAn) {

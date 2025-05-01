@@ -485,7 +485,6 @@ public class DatBanServices {
         return danhSachDatBan;
     }
     
-
     //Tìm lịch đặt bàn từ sdt
     public static void timDatBan(Scanner scanner){
         while(true){

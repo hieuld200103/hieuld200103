@@ -10,20 +10,15 @@ public class DonHang {
     private int id_DonHang;
     private int id_User;
     private Integer id_BanAn;
+    private int id_ChiNhanh;
     private TrangThai trangThai;
     private KieuDonHang kieuDonHang;
 
-    public DonHang(int id_DonHang, int id_User, Integer id_BanAn, TrangThai trangThai, KieuDonHang kieuDonHang){
+    public DonHang(int id_DonHang, int id_ChiNhanh, int id_User, Integer id_BanAn, TrangThai trangThai, KieuDonHang kieuDonHang){
         this.id_DonHang = id_DonHang;
         this.id_User = id_User;
+        this.id_ChiNhanh = id_ChiNhanh;
         this.id_BanAn = id_BanAn;  
-        this.trangThai = trangThai;
-        this.kieuDonHang = kieuDonHang;
-    }
-    
-    public DonHang(int id_DonHang, int id_User,TrangThai trangThai, KieuDonHang kieuDonHang){
-        this.id_DonHang = id_DonHang;
-        this.id_User = id_User;
         this.trangThai = trangThai;
         this.kieuDonHang = kieuDonHang;
     }
@@ -39,6 +34,9 @@ public class DonHang {
 
     public int getID_User(){return id_User;}
     public void setID_User(int id_User){this.id_User = id_User;}
+
+    public int getID_ChiNhanh(){return id_ChiNhanh;}
+    public void setID_ChiNhanh(int id_ChiNhanh){this.id_ChiNhanh = id_ChiNhanh;}
 
     public Integer getID_BanAn(){return id_BanAn;}
     public void setID_BanAn(Integer id_BanAn){this.id_BanAn = id_BanAn;}

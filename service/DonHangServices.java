@@ -15,16 +15,14 @@ import model.User;
 
 public class DonHangServices {
     //Thêm đơn hàng tại nhà hàng
-    public static DonHang themDonHangTaiNhaHang(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
+    public static DonHang themDonHangTaiNhaHang(User user, int idChiNhanh, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
         if (user == null || kieuDonHang == null) {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
-        System.out.print("\nID bàn của bạn (đại diện 1 bàn): ");
-        int idBanAn = scanner.nextInt();
+        int idBanAn = layBan(user.getID_User());
         
-        return themDH(user.getID_User(), idBanAn, kieuDonHang);    
-        
+        return themDH(user.getID_User(),idChiNhanh, idBanAn, kieuDonHang);     
     }
 
     //Thêm đơn hàng mang về
@@ -33,30 +31,34 @@ public class DonHangServices {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
-        return themDH(user.getID_User(), null, kieuDonHang);
+
+        int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
+        return themDH(user.getID_User(),idChiNhanh, null, kieuDonHang);
         
     }
 
 
     //Thêm đơn hàng
-    public static DonHang themDH(int idUser, Integer idBanAn, DonHang.KieuDonHang kieuDonHang){
-        String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, kieudonhang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
+    public static DonHang themDH(int idUser, int idChiNhanh, Integer idBanAn, DonHang.KieuDonHang kieuDonHang){
+        String sql = "INSERT INTO donhang (ID_User, ID_ChiNhanh, ID_BanAn, TrangThai, kieudonhang) VALUES (?, ?, ?, 'DANG_CHUAN_BI', ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {    
             stmt.setInt(1, idUser);
+            stmt.setInt(2,idChiNhanh);
             if (idBanAn == null) {
-                stmt.setNull(2, java.sql.Types.INTEGER);
+                stmt.setNull(3, java.sql.Types.INTEGER);
             } else {
-                stmt.setInt(2, idBanAn);
+                stmt.setInt(3, idBanAn);
             }
-            stmt.setString(3, kieuDonHang.name());
+            
+            stmt.setString(4, kieuDonHang.name());
     
             int row = stmt.executeUpdate();
             if (row > 0) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int idDH = rs.getInt(1);
-                        DonHang donHang = new DonHang(idDH, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
+                        DonHang donHang = new DonHang(idDH, idChiNhanh, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
                         donHang.setKieuDonHang(kieuDonHang);
                         System.out.println("\nTạo đơn hàng thành công! Mã đơn: " + idDH);
                         return donHang;
@@ -107,22 +109,23 @@ public class DonHangServices {
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
-            System.out.println("=====================================================================================");
-                System.out.printf("| %-5s | %-12s | %-12s | %-25s | %-20s |\n",
-                                  "ID", "IDUser", "IDBanAn", "Trạng Thái", "Kiểu");
-                System.out.println("=====================================================================================");
+            System.out.println("===============================================================================================");
+                System.out.printf("| %-5s | %-12s | %-12s | %-12s | %-25s | %-20s |\n",
+                                  "ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu");
+                System.out.println("===============================================================================================");
                 
                 while (rs.next()) {
                     int id = rs.getInt("ID_DonHang");
                     int idUser = rs.getInt("ID_User");
+                    int idCN = rs.getInt("ID_ChiNhanh");
                     Integer idBanAn = rs.getInt("ID_BanAn");
                     DonHang.TrangThai trangThai = DonHang.TrangThai.valueOf(rs.getString("TrangThai"));
                     DonHang.KieuDonHang kieuDonHang = DonHang.KieuDonHang.valueOf(rs.getString("kieudonhang"));
                     
-                    danhSach.add(new DonHang(id, idUser, idBanAn, trangThai, kieuDonHang));
-                    System.out.printf("| %-5d | %-12s | %-12s | %-25s | %-20s |\n",id, idUser, idBanAn , trangThai, kieuDonHang);
+                    danhSach.add(new DonHang(id, idCN, idUser, idBanAn, trangThai, kieuDonHang));
+                    System.out.printf("| %-5d | %-12s | %-12s | %-12s | %-25s | %-20s |\n",id, idCN, idUser, idBanAn , trangThai, kieuDonHang);
                 }               
-                System.out.println("=====================================================================================");
+                System.out.println("===============================================================================================");
         }catch(SQLException e){
             System.out.println("Lỗi khi lấy danh sách đơn hàng!");
             e.printStackTrace();
@@ -172,4 +175,23 @@ public class DonHangServices {
         return null;
     }
     
+    //Lấy bàn của khách
+    public static int layBan(int idUser){
+        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN' LIMIT 1";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,idUser);
+                try(ResultSet rs = stmt.executeQuery()){
+                    if(rs.next()){
+                        return rs.getInt("List_BanAn");
+                    }else{
+                        System.out.println("Không tìm thấy bàn!");
+                    }
+                }
+            }catch (SQLException e) {
+            System.out.println("Lỗi khi lấy bàn ăn từ cơ sở dữ liệu");
+            e.printStackTrace();
+        }
+        return 0; 
+    }
 }

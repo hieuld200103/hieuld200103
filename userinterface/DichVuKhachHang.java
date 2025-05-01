@@ -54,11 +54,12 @@ public class DichVuKhachHang {
         switch (choice) {
             case 1: 
                 DatBan currentDatBan = daXacNhanDatBan(currentUser.getID_User());
-                if (currentDatBan != null ) { 
-                    if(DatBanChecker.daNhanBan(currentUser.getID_User())){
+                if (currentDatBan != null) { 
+                    if (DatBanChecker.daNhanBan(currentUser.getID_User())) {
+                        int idChiNhanh = currentDatBan.getID_ChiNhanh();
                         DonHang donHang = layDHTaiNhaHang(currentUser.getID_User());
                         if (donHang == null) {
-                            donHang = DonHangServices.themDonHangTaiNhaHang(currentUser,DonHang.KieuDonHang.TAI_NHA_HANG, scanner );
+                            donHang = DonHangServices.themDonHangTaiNhaHang(currentUser, idChiNhanh, DonHang.KieuDonHang.TAI_NHA_HANG, scanner);
                         }
                         if (donHang != null) {
                             donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_NHA_HANG);
@@ -66,23 +67,26 @@ public class DichVuKhachHang {
                         } else {
                             System.out.println("Không thể tạo hoặc lấy đơn hàng.");
                         }
-                    }else {
-                        System.out.println("\nBạn cần NHẬN BÀN  trước khi gọi món tại nhà hàng.");
-                    }   
-                
+                    } else {
+                        System.out.println("Bạn cần NHẬN BÀN trước khi gọi món tại nhà hàng.");
+                    }
                 } else {
-                    System.out.println("\nBạn cần ĐẶT BÀN trước khi gọi món tại quán.");
-                }                  
-             
+                    System.out.println("Bạn cần ĐẶT BÀN trước khi gọi món tại quán.");
+                }
                 break;
 
             case 2:
-                DonHang donHang = DonHangServices.themDonHangMangVe(currentUser,DonHang.KieuDonHang.MANG_VE, scanner );     
-                boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner); 
-                if (!daGoiMon) {
-                    xoaDHMangVe(donHang.getID_DonHang());
+                DonHang donHang = DonHangServices.themDonHangMangVe(currentUser, DonHang.KieuDonHang.MANG_VE, scanner);
+                if (donHang != null) {
+                    boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner);
+                    if (!daGoiMon) {
+                        xoaDHMangVe(donHang.getID_DonHang());
+                    }
+                } else {
+                    System.out.println("Không thể tạo đơn hàng mang về.");
                 }
-                DichVuKhachHang.dichVu(currentUser, scanner); 
+                DichVuKhachHang.dichVu(currentUser, scanner);
+                break;
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
