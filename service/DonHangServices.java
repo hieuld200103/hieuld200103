@@ -34,13 +34,13 @@ public class DonHangServices {
             return null;
         }
         return themDH(user.getID_User(), null, kieuDonHang);
-
+        
     }
 
 
     //Thêm đơn hàng
     public static DonHang themDH(int idUser, Integer idBanAn, DonHang.KieuDonHang kieuDonHang){
-        String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, KieuDonHang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
+        String sql = "INSERT INTO donhang (ID_User, ID_BanAn, TrangThai, kieudonhang) VALUES (?, ?, 'DANG_CHUAN_BI', ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {    
             stmt.setInt(1, idUser);
@@ -133,7 +133,7 @@ public class DonHangServices {
     // Sửa trạng thái đơn
     public static DonHang suaTrangThai(Scanner scanner){
         xemDSDonHang();
-        System.out.println("Nhập ID đơn hàng cần sửa: ");
+        System.out.println("Nhập ID đơn hàng cần sửa(0 để thoát): ");
         String input = scanner.nextLine().trim();
     
         if (input.equals("0")) {

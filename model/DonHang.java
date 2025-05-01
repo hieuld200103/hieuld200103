@@ -21,6 +21,13 @@ public class DonHang {
         this.kieuDonHang = kieuDonHang;
     }
     
+    public DonHang(int id_DonHang, int id_User,TrangThai trangThai, KieuDonHang kieuDonHang){
+        this.id_DonHang = id_DonHang;
+        this.id_User = id_User;
+        this.trangThai = trangThai;
+        this.kieuDonHang = kieuDonHang;
+    }
+
     public DonHang(int id_DonHang, int id_User, KieuDonHang kieuDonHang){
         this.id_DonHang = id_DonHang;
         this.id_User = id_User;

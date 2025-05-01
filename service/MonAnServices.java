@@ -16,15 +16,30 @@ public class MonAnServices {
     //Thêm món ăn
     public static MonAn themMonAn(Scanner scanner){
         System.out.println("\n=== Thêm món ăn mới ===");
-        System.out.print("Tên món ăn: ");
-        String tenMon = scanner.nextLine();
-        if (tenMon.isEmpty()) {
-            System.out.println("Lỗi: Tên khách hàng không được để trống!");
-            return null;
+            String tenMon;
+            while (true) {
+             System.out.print("Tên món ăn: ");
+            tenMon = scanner.nextLine().trim();
+             if (!tenMon.isEmpty()) {
+            break;
         }
+        System.out.println("Lỗi: Tên món ăn không được để trống! Vui lòng nhập lại.");
+    }
+        int gia;
+        while (true) {
         System.out.print("Giá: ");
-        int gia = scanner.nextInt();
-        scanner.nextLine();
+        try {
+            gia = Integer.parseInt(scanner.nextLine().trim());
+            if (gia > 0) {
+                break;
+            } else {
+                System.out.println("Lỗi: Giá phải lớn hơn 0! Vui lòng nhập lại.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Lỗi: Vui lòng nhập một số hợp lệ!");
+        }
+    }
+        
         System.out.print("Mô tả: ");
         String moTa = scanner.nextLine();
 
@@ -78,13 +93,10 @@ public class MonAnServices {
                 stmt.setString(5, danhMuc.name());
                 stmt.executeUpdate();
 
-                try(ResultSet rs = stmt.getGeneratedKeys()){
-                    if (rs.next()){
-                        int idMA = rs.getInt(1);
-                        System.out.println("Thêm món ăn thành công!");
-                        return new MonAn(idMA, tenMon, gia, moTa, loaiMonAn, danhMuc);
-                    }
-                }              
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()){
+                    System.out.println("Thêm món ăn thành công!");
+                }             
 
             }catch (SQLException e) {
                 System.out.println("Lỗi khi thêm món ăn!");
@@ -95,7 +107,7 @@ public class MonAnServices {
     
     // Xóa thông tin món ăn
     public static void xoaMonAn(Scanner scanner){
-        System.out.println("Nhập ID món ăn cần xóa: ");
+        System.out.print("Nhập ID món ăn cần xóa: ");
         if(!scanner.hasNextInt()){
             System.out.println("Lỗi: ID không hợp lệ");
             scanner.next();
@@ -122,12 +134,12 @@ public class MonAnServices {
     }
 
     //Sửa món ăn
-    public static MonAn suaMonAn(Scanner scanner){
+    public static void suaMonAn(Scanner scanner){
         System.out.print("Nhập ID món ăn cần sửa: ");
         if(!scanner.hasNextInt()){
             System.out.println("Lỗi: ID không hợp lệ!");
             scanner.next();
-            return null;
+            return ;
         }
 
         int idMA = scanner.nextInt();
@@ -140,7 +152,7 @@ public class MonAnServices {
                 try(ResultSet rs = stmt.executeQuery()){
                     if(!rs.next()){
                         System.out.println("Không có món ăn có ID: "+ idMA);
-                        return null;
+                        return ;
                     }
     
                     String tenMon = rs.getString("TenMon");
@@ -192,7 +204,7 @@ public class MonAnServices {
                         } else {
                             System.out.println("Lỗi: Giá phải là số nguyên hợp lệ!");
                             scanner.next(); 
-                            return null;
+                            return ;
                         }
                     } else { 
                         newValue = scanner.nextLine();
@@ -252,7 +264,7 @@ public class MonAnServices {
                 System.out.println("Lỗi kết nối cơ sở dữ liệu!");
                 e.printStackTrace();
             }
-            return null;
+            return ;
     }
 
     //Menu
@@ -277,8 +289,9 @@ public class MonAnServices {
                     MonAn monAn = new MonAn(id, tenMon, gia, moTa, loaiMonAn, danhMuc);
                     danhSach.add(monAn);
                     System.out.printf("| %-5d | %-20s | %-12s | %25s | %-12s | %-10s |\n", id, tenMon, gia, moTa, loaiMonAn,danhMuc);
+                    System.out.println("---------------------------------------------------------------------------------------------------------");
                 }
-                System.out.println("==========================================================================================================");
+                
                 
             }catch (SQLException e) {
                 System.out.println("Lỗi khi lấy danh sách món ăn!");
@@ -287,45 +300,37 @@ public class MonAnServices {
             return danhSach;
     }
 
-    //Tìm kiếm món ăn
-    public static List<MonAn> timKiemMonAn(Scanner scanner) {
+       //Tìm kiếm món ăn
+       public static List<MonAn> timKiemMonAn(Scanner scanner) {
         List<MonAn> danhSach = new ArrayList<>();
         while(true){
             System.out.println("\n======= TÌM KIẾM =======");
             System.out.println("1. Tìm theo loại món ăn");
             System.out.println("2. Tìm theo danh mục món ăn");
-            System.out.print("Chọn (0 để thoát): ");
+            System.out.println("0. THOÁT");
+            System.out.print("Chọn: ");
             if (!scanner.hasNextInt()) {
                 System.out.println(" Lỗi: Vui lòng nhập số hợp lệ!");
                 scanner.next(); 
                 continue;
             }
-            
             int luaChon = scanner.nextInt();
-            if(luaChon == 0){
-                return null;
-            }
-
             scanner.nextLine();
             String sql = "";
             String filterValue = "";
+            if (luaChon == 0) {
+                return danhSach;
+            }
         
-            if (luaChon == 1) { 
-                boolean luaChonHopLe1 = false;
-                while(!luaChonHopLe1){
-                    System.out.println("\n======= TÌM MÓN ĂN =======");
+            else if (luaChon == 1) { 
+                System.out.println("\n======= TÌM MÓN ĂN =======");
                 System.out.println("1. Đồ ăn");
                 System.out.println("2. Đồ uống");
-                System.out.print("Chọn (0 để thoát): ");
-
-                if (!scanner.hasNextInt()) {
-                    System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
-                    scanner.next();
-                    continue;
-                }
+                System.out.println("0. THOÁT");
+                System.out.print("Chọn: ");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-             
+                if(choice==0) continue;
                 switch (choice) {
                     case 1:
                         filterValue = "DO_AN";
@@ -333,58 +338,43 @@ public class MonAnServices {
                     case 2:
                         filterValue = "DO_UONG";
                         break;
-                    case 0:
-                        break;
                     default:
                         System.out.println("Lỗi! Vui lòng nhập lại.");
                         return danhSach;
                     
                 }    
                 sql = "SELECT * FROM monan WHERE LoaiMonAn = ?";
-                luaChonHopLe1 = true;
-                }
-                
         
             } else if (luaChon == 2) { 
-                boolean luaChonHopLe2 = false;
-                while(!luaChonHopLe2){
-                    System.out.println("\n======= TÌM THEO DANH MỤC =======");
-                    System.out.println("1. Đồ khô");
-                    System.out.println("2. Đồ nước");
-                    System.out.println("3. Đồ uống có cồn");
-                    System.out.println("4. Đồ uống không cồn");
-                    System.out.print("Chọn (0 để thoát): ");
-                    if (!scanner.hasNextInt()) {
-                        System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
-                        scanner.next();
-                        continue;
-                    }
-                    int subchoice = scanner.nextInt();
-                    scanner.nextLine();
-                    switch (subchoice) {
-                        case 1:
-                            filterValue = "DO_KHO";
-                            break;
-                        case 2:
-                            filterValue = "DO_NUOC";
-                            break;
-                        case 3:
-                            filterValue = "CO_CON";
-                            break;
-                        case 4:
-                            filterValue = "KHONG_CON";
-                            break;
-                        case 0:
-                            break;
-                        default:
-                            System.out.println("Lỗi! Vui lòng nhập lại.");
-                            return danhSach;
-                    }
-            
-                    sql = "SELECT * FROM monan WHERE DanhMuc = ?";
-                    luaChonHopLe2 = true;
+                System.out.println("\n======= TÌM THEO DANH MỤC =======");
+                System.out.println("1. Đồ khô");
+                System.out.println("2. Đồ nước");
+                System.out.println("3. Đồ uống có cồn");
+                System.out.println("4. Đồ uống không cồn");
+                System.out.println("0. THOÁT");
+                System.out.print("Chọn: ");
+                int subchoice = scanner.nextInt();
+                scanner.nextLine();
+                if(subchoice==0 ) continue;
+                switch (subchoice) {
+                    case 1:
+                        filterValue = "DO_KHO";
+                        break;
+                    case 2:
+                        filterValue = "DO_NUOC";
+                        break;
+                    case 3:
+                        filterValue = "CO_CON";
+                        break;
+                    case 4:
+                        filterValue = "KHONG_CON";
+                        break;
+                    default:
+                        System.out.println("Lỗi! Vui lòng nhập lại.");
+                        return danhSach;
                 }
-                
+        
+                sql = "SELECT * FROM monan WHERE DanhMuc = ?";
             } else {
                 System.out.println("Lựa chọn không hợp lệ. Vui lòng nhập lại.");
                 return danhSach;
@@ -407,8 +397,9 @@ public class MonAnServices {
                         String moTa = rs.getString("Mota");
         
                         System.out.printf("| %-5d | %-20s | %-10d | %-25s |\n", id, tenMon, gia, moTa);
+                        System.out.println("-----------------------------------------------------------------------------------");
                     }
-                    System.out.println("================================================================================");
+                    ;
         
                 }
             } catch (SQLException e) {
@@ -418,6 +409,7 @@ public class MonAnServices {
             return danhSach;       
         }    
     }
+
 
 }
 

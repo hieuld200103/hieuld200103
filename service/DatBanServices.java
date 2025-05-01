@@ -372,7 +372,7 @@ public class DatBanServices {
         String[] idStrings = input.split("[,\\s]+"); 
         List<Integer> idList = new ArrayList<>();
         if(input.equals("all")){
-            idList = dsID();
+            idList = dsIDChoiXacNhan();
         }else{
             for (String idStr : idStrings) {
                 try {
@@ -441,7 +441,7 @@ public class DatBanServices {
     }
 
     //Lọc ID đặt bàn
-    public static List<Integer> dsID(){
+    public static List<Integer> dsIDChoiXacNhan(){
         List<Integer> dsID = new ArrayList<>();
         List<DatBan> dsDatBan = DatBanChecker.xemDSChoXacNhan();
         for(DatBan datBan : dsDatBan){
@@ -450,4 +450,5 @@ public class DatBanServices {
         }
         return dsID;
     }
+
 }

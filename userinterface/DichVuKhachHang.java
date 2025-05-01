@@ -16,9 +16,12 @@ import service.DatBanServices;
 import model.DonHang;
 import service.DonHangServices;
 import service.GoiMonServices;
+import service.KhuyenMaiServices;
 import service.MonAnServices;
+import service.TrangThaiDonHang;
 import model.User;
 import service.UserServices;
+
 
 public class DichVuKhachHang {
     public static void dichVu(User currentUser, Scanner scanner) {
@@ -34,6 +37,8 @@ public class DichVuKhachHang {
         System.out.println("3. Đặt bàn");
         System.out.println("4. Xem thực đơn");
         System.out.println("5. Sửa thông tin cá nhân");
+        System.out.println("6. Kiểm tra trạng thái đơn hàng");
+        System.out.println("7. Xem chương trình khuyến mãi");
         System.out.println("0. Đăng xuất");
         System.out.print("Chọn chức năng: ");
 
@@ -97,6 +102,11 @@ public class DichVuKhachHang {
             case 5:
                 UserServices.suaThongTinCaNhan(scanner, currentUser.getID_User(), currentUser);
                 break;
+            case 6: 
+                TrangThaiDonHang.kiemTraDonHangKH(scanner,currentUser);
+                break;
+            case 7:
+                KhuyenMaiServices.xemKhuyenMai2(currentUser, scanner);
             case 0:
                 UserServices.dangXuat();
                 TaiKhoanKhachHang.taiKhoanKhachHang(scanner);

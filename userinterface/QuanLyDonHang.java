@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import model.NhanVien;
 import service.DonHangServices;
-
+import service.TrangThaiDonHang;
 public class QuanLyDonHang {
      public static void quanLy(NhanVien currentNV, int idChiNhanh,Scanner scanner) {
         if (currentNV == null) {
@@ -15,6 +15,8 @@ public class QuanLyDonHang {
             System.out.println("\n=== QUẢN LÝ ĐƠN HÀNG ===");
             System.out.println("1. Xem danh sách đơn hàng");
             System.out.println("2. Sửa trạng thái đơn hàng ");
+            System.out.println("3. Kiểm tra đơn hàng theo ID ");
+            System.out.println("4. Xem trạng thái tất cả đơn hàng ");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -33,6 +35,12 @@ public class QuanLyDonHang {
                     break;
                 case 2:
                     DonHangServices.suaTrangThai(scanner);
+                    break;
+                case 3:
+                    TrangThaiDonHang.kiemTraDonHangNV(scanner, currentNV, idChiNhanh);
+                    break;
+                case 4:
+                    TrangThaiDonHang.kiemTraDonHangNV2(scanner, currentNV, idChiNhanh);
                     break;
                 case 0:
                     CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                     

@@ -23,6 +23,15 @@ public class DatBan {
         this.ngayAn = ngayAn;
         this.trangThai = trangThai;
     }
+
+    public DatBan(int id_DatBan,int id_User,String listID_BanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, TrangThai trangThai){
+        this.id_DatBan = id_DatBan;
+        this.id_User = id_User;
+        this.listID_BanAn  = listID_BanAn;
+        this.ngayDat = ngayDat;
+        this.ngayAn = ngayAn;
+        this.trangThai = trangThai;
+    }
    
     public int getID_DatBan(){return id_DatBan;}
     public void setID_DatBan(int id_DatBan){this.id_DatBan = id_DatBan;}

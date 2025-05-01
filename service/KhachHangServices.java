@@ -18,7 +18,7 @@ public class KhachHangServices {
     public static KhachHang khachHangNhanBan(Scanner scanner, NhanVien currentNV) {
         while (true) {
             System.out.println("\n=== XÁC NHẬN NHẬN BÀN ===");    
-            System.out.print("Nhập số điện thoại đã dùng để đăng ký tài khoản và đặt bàn (0 để thoát): ");
+            System.out.print("Nhập số điện thoại đã dùng để đặt bàn (0 để thoát): ");
             String sdt = scanner.nextLine();
 
             if (sdt.equals("0")) return null;
