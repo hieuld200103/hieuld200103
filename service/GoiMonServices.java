@@ -129,7 +129,7 @@ public class GoiMonServices {
             }
 
         } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy giá món ăn từ cơ sở dữ liệu:");
+            System.out.println("Lỗi khi lấy giá món ăn từ cơ sở dữ liệu");
             e.printStackTrace();
         }
         return 0; 

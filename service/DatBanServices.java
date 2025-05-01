@@ -409,7 +409,7 @@ public class DatBanServices {
                     DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
     
                     System.out.println("\nCập nhật đơn:");
-                    hienThiThongTin(idDatBan, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    hienThiThongTin(idDatBan, idChiNhanh, idUser, idBanAn, ngayDat, ngayAn, trangThai);
     
                     String sqlUpdate = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
                     try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
@@ -428,8 +428,8 @@ public class DatBanServices {
         }
     }
 
-    private static void hienThiThongTin(int idDatBan, int idUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
-        System.out.println("ID: " + idDatBan + " | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
+    private static void hienThiThongTin(int idDatBan, int idChiNhanh, int idUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
+        System.out.println("ID: " + idDatBan +  " | CN: "+ idChiNhanh +" | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
     }
 
     public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV) {
@@ -450,5 +450,60 @@ public class DatBanServices {
         }
         return dsID;
     }
+    
+    //Lấy lich từ sdt
+    public static List<DatBan> layDatBanTheoSDT(String sdt) {
+        List<DatBan> danhSachDatBan = new ArrayList<>();
+        String sql = "SELECT db.* FROM datban db JOIN user u ON db.ID_User = u.ID_User WHERE u.SDT = ?";
+    
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    
+            stmt.setString(1, sdt);
+    
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int idDB = rs.getInt("ID_DatBan");
+                    int idCN = rs.getInt("ID_ChiNhanh");
+                    int idUser = rs.getInt("ID_User");
+                    String idBanAn = rs.getString("List_BanAn");
+                    LocalDateTime ngayDat = rs.getTimestamp("NgayDat").toLocalDateTime();
+                    LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
+                    DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
+    
+                    DatBan datBan = new DatBan(idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    danhSachDatBan.add(datBan);
+    
+                    hienThiThongTin(idDB, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy lịch đặt bàn theo SĐT");
+            e.printStackTrace();
+        }
+    
+        return danhSachDatBan;
+    }
+    
 
+    //Tìm lịch đặt bàn từ sdt
+    public static void timDatBan(Scanner scanner){
+        while(true){
+            System.out.println("\n=== TÌM LỊCH ĐẶT BÀN TỪ SDT ===");    
+            System.out.print("Nhập số điện thoại đã dùng để đặt bàn (0 để thoát): ");
+            String sdt = scanner.nextLine();
+    
+            if (sdt.equals("0")) return;
+            if (!sdt.matches("\\d{10}")) {
+                System.out.println("Lỗi: Số điện thoại không hợp lệ!");
+                continue;
+            } 
+            List<DatBan> danhSach = layDatBanTheoSDT(sdt); 
+
+            if (danhSach.isEmpty()) {
+                System.out.println("Không tìm thấy lịch đặt bàn nào với số điện thoại này.");
+            }
+        }
+        
+    }
 }

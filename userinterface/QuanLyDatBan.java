@@ -14,8 +14,8 @@ public class QuanLyDatBan {
         while (true) {
             System.out.println("\n=== QUẢN LÝ ĐẶT BÀN ===");
             System.out.println("1. Xác nhận đặt bàn");
-            System.out.println("2. Hủy đặt bàn");
-            System.out.println("3. Kiểm tra đặt bàn");
+            System.out.println("2. Kiểm tra đặt bàn");
+            System.out.println("3. Hủy đặt bàn");
             System.out.println("4. Danh sách đặt bàn ");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
@@ -34,10 +34,10 @@ public class QuanLyDatBan {
                     DatBanServices.xacNhanDatBan(scanner, currentNV);
                     break;
                 case 2:
-                    DatBanServices.huyDatBan(scanner, currentNV);
+                    DatBanServices.timDatBan(scanner);
                     break;
                 case 3:
-                
+                    DatBanServices.huyDatBan(scanner, currentNV);
                     break;
                 case 4:
                     DatBanServices.locDanhSachDatBan(currentNV, scanner);
