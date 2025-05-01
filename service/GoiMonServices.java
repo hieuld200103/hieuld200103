@@ -12,12 +12,12 @@ import connection.DatabaseConnection;
 import model.ChiTietDonHang;
 import model.DonHang;
 import model.User;
-import userinterface.DichVuKhachHang;
 
 public class GoiMonServices {
     // Gọi món tại quán
-    public static void goiMon(User currentUser, DonHang donHang, Scanner scanner) {
+    public static boolean goiMon(User currentUser, DonHang donHang, Scanner scanner) {
         List<ChiTietDonHang> danhSachChiTiet = new ArrayList<>();
+        boolean daThemMon = false;
         while (true) {
             System.out.println("\n=== GỌI MÓN ===");
             System.out.println("1. Xem menu");
@@ -38,19 +38,21 @@ public class GoiMonServices {
             switch (choice) {
                 case 1:
                     MonAnServices.xemMenu();
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    boolean themMon1 = goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    if(themMon1) daThemMon = true;
                     break;
 
                 case 2:
                     MonAnServices.timKiemMonAn(scanner);
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    boolean themMon2 = goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    if(themMon2) daThemMon = true;
                     break;
                 case 3:
-                    goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    boolean themMon3 = goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
+                    if(themMon3) daThemMon = true;
                     break;    
                 case 0:
-                    DichVuKhachHang.dichVu(currentUser, scanner);
-                    return;
+                    return daThemMon;
 
                 default:
                     System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
@@ -59,7 +61,7 @@ public class GoiMonServices {
     }
 
     // Gọi món (thao tác thêm món)
-    private static void goiMonAction(User currentUser, DonHang donHang, Scanner scanner, List<ChiTietDonHang> danhSachChiTiet) {
+    private static boolean goiMonAction(User currentUser, DonHang donHang, Scanner scanner, List<ChiTietDonHang> danhSachChiTiet) {
         while (true) {
             System.out.print("\nNhập ID để gọi món (0 để quay lại): ");
             if (!scanner.hasNextInt()) {
@@ -69,7 +71,9 @@ public class GoiMonServices {
             }
             int idDH = donHang.getID_DonHang();
             int idMon = scanner.nextInt();
-            if (idMon == 0) break;
+            if (idMon == 0){
+                return false;
+            }
 
             if (!kiemTraMonAnTonTai(idMon)) {
                 System.out.println("Không có món ăn với ID này! Vui lòng thử lại.");
@@ -87,7 +91,8 @@ public class GoiMonServices {
             int donGia = layGiaMonAn(idMon);
             int thanhTien = donGia * soLuong;
             DonHang.KieuDonHang kieuDonHang = donHang.getKieuDonHang();
-            DonHangServices.themChiTietDonHang(idDH, idMon, soLuong, donGia, thanhTien, kieuDonHang);         
+            DonHangServices.themChiTietDonHang(idDH, idMon, soLuong, donGia, thanhTien, kieuDonHang);
+            return true;         
         }
     }
 

@@ -78,8 +78,11 @@ public class DichVuKhachHang {
 
             case 2:
                 DonHang donHang = DonHangServices.themDonHangMangVe(currentUser,DonHang.KieuDonHang.MANG_VE, scanner );     
-                GoiMonServices.goiMon(currentUser, donHang, scanner); 
-                xoaDHMangVe(donHang.getID_DonHang()); 
+                boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner); 
+                if (!daGoiMon) {
+                    xoaDHMangVe(donHang.getID_DonHang());
+                }
+                DichVuKhachHang.dichVu(currentUser, scanner); 
             case 3: 
                 DatBan datBan = daDatBan(currentUser.getID_User());
                 if (datBan != null){                  
