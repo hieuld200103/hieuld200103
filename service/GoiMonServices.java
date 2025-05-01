@@ -49,18 +49,13 @@ public class GoiMonServices {
                     goiMonAction(currentUser, donHang, scanner, danhSachChiTiet);
                     break;    
                 case 0:
-                    if (!danhSachChiTiet.isEmpty()) {
-                        DonHangServices.themChiTietDonHang(danhSachChiTiet);
-                    }
                     DichVuKhachHang.dichVu(currentUser, scanner);
                     return;
 
                 default:
                     System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại!");
             }
-        }    
-       
-        
+        }       
     }
 
     // Gọi món (thao tác thêm món)
@@ -72,7 +67,7 @@ public class GoiMonServices {
                 scanner.next();
                 continue;
             }
-
+            int idDH = donHang.getID_DonHang();
             int idMon = scanner.nextInt();
             if (idMon == 0) break;
 
@@ -92,12 +87,7 @@ public class GoiMonServices {
             int donGia = layGiaMonAn(idMon);
             int thanhTien = donGia * soLuong;
             DonHang.KieuDonHang kieuDonHang = donHang.getKieuDonHang();
-            ChiTietDonHang ctdh = new ChiTietDonHang(donHang.getID_DonHang(), idMon, soLuong, donGia, thanhTien, kieuDonHang);
-            danhSachChiTiet.add(ctdh);
-
-            System.out.println("Đã thêm món vào đơn tạm!");
-            DonHangServices.themChiTietDonHang(danhSachChiTiet);
-            danhSachChiTiet.clear();
+            DonHangServices.themChiTietDonHang(idDH, idMon, soLuong, donGia, thanhTien, kieuDonHang);         
         }
     }
 

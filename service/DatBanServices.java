@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import background.DatBanChecker;
 import connection.DatabaseConnection;
 import model.BanAn;
 import model.BanAn.TrangThai;
@@ -370,15 +371,19 @@ public class DatBanServices {
 
         String[] idStrings = input.split("[,\\s]+"); 
         List<Integer> idList = new ArrayList<>();
-
-        for (String idStr : idStrings) {
-            try {
-                int id = Integer.parseInt(idStr);
-                idList.add(id);
-            } catch (NumberFormatException e) {
-                System.out.println("ID không hợp lệ: " + idStr + ". Bỏ qua ID này.");
+        if(input.equals("all")){
+            idList = dsID();
+        }else{
+            for (String idStr : idStrings) {
+                try {
+                    int id = Integer.parseInt(idStr);
+                    idList.add(id);
+                } catch (NumberFormatException e) {
+                    System.out.println("ID không hợp lệ: " + idStr + ". Bỏ qua ID này.");
+                }
             }
         }
+        
 
         if (idList.isEmpty()) {
             System.out.println("Không có ID hợp lệ để cập nhật!");
@@ -403,7 +408,7 @@ public class DatBanServices {
                     LocalDateTime ngayAn = rs.getTimestamp("NgayAn").toLocalDateTime();
                     DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
     
-                    System.out.println("Cập nhật đơn:");
+                    System.out.println("\nCập nhật đơn:");
                     hienThiThongTin(idDatBan, idUser, idBanAn, ngayDat, ngayAn, trangThai);
     
                     String sqlUpdate = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
@@ -433,5 +438,16 @@ public class DatBanServices {
 
     public static void huyDatBan(Scanner scanner, NhanVien currentNV) {
         capNhatTrangThaiDatBan(scanner, currentNV, DatBan.TrangThai.DA_HUY, () -> DatBanServices.xemDSCoTheHuy(currentNV));
+    }
+
+    //Lọc ID đặt bàn
+    public static List<Integer> dsID(){
+        List<Integer> dsID = new ArrayList<>();
+        List<DatBan> dsDatBan = DatBanChecker.xemDSChoXacNhan();
+        for(DatBan datBan : dsDatBan){
+            int id = datBan.getID_DatBan();
+            dsID.add(id);
+        }
+        return dsID;
     }
 }

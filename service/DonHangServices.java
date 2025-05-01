@@ -20,11 +20,11 @@ public class DonHangServices {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
-        System.out.print("ID bàn của bạn (đại diện 1 bàn): ");
+        System.out.print("\nID bàn của bạn (đại diện 1 bàn): ");
         int idBanAn = scanner.nextInt();
         
-        themDH(user.getID_User(), idBanAn, kieuDonHang);    
-        return null;
+        return themDH(user.getID_User(), idBanAn, kieuDonHang);    
+        
     }
 
     //Thêm đơn hàng mang về
@@ -58,7 +58,7 @@ public class DonHangServices {
                         int idDH = rs.getInt(1);
                         DonHang donHang = new DonHang(idDH, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
                         donHang.setKieuDonHang(kieuDonHang);
-                        System.out.println("Tạo đơn hàng thành công! Mã đơn: " + idDH);
+                        System.out.println("\nTạo đơn hàng thành công! Mã đơn: " + idDH);
                         return donHang;
                     }
                 }
@@ -71,30 +71,33 @@ public class DonHangServices {
         return null;
     }
 
-
-    //Thêm vào chi tiết đơn
-    public static void themChiTietDonHang(List<ChiTietDonHang> dsChiTiet) {
-        String sql = "INSERT INTO chitietdonhang (ID_DonHang, ID_MonAn, SoLuong, dongia, thanhtien) VALUES (?, ?, ?, ?, ?)";
-
+    //Thêm vào chi tiết đơn hàng
+    public static ChiTietDonHang themChiTietDonHang(int idDH, int idMonAn, int soLuong, int donGia, int thanhTien, DonHang.KieuDonHang kieuDonHang){
+        String sql = "INSERT INTO chitietdonhang (ID_DonHang, ID_MonAn, Soluong, dongia, thanhtien, kieudonhang) VALUES (?,?,?,?,?,?)";
         try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            for (ChiTietDonHang ctdh : dsChiTiet) {
-                stmt.setInt(1, ctdh.getID_DonHang());
-                stmt.setInt(2, ctdh.getID_MonAn());
-                stmt.setInt(3, ctdh.getSoLuong());
-                stmt.setInt(4, ctdh.getGia());
-                stmt.setInt(5, ctdh.getThanhTien());
-                stmt.addBatch();
+            PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+                stmt.setInt(1,idDH);
+                stmt.setInt(2,idMonAn);
+                stmt.setInt(3,soLuong);
+                stmt.setInt(4,donGia);
+                stmt.setInt(5,thanhTien);
+                stmt.setString(6, kieuDonHang.name());
+                int row = stmt.executeUpdate();
+                if(row>0){
+                    try (ResultSet rs = stmt.getGeneratedKeys()){
+                        if(rs.next()){
+                            ChiTietDonHang ctDonHang = new ChiTietDonHang(idDH, idMonAn, soLuong, donGia, thanhTien,kieuDonHang);
+                            ctDonHang.setKieuDonHang(kieuDonHang);
+                            System.out.println("Thêm vào chi tiết đơn hàng thành công!");
+                            return ctDonHang;
+                        }
+                    }
+                }
+            }catch (SQLException e) {
+                System.out.println("Lỗi khi thêm chi tiết đơn hàng!");
+                e.printStackTrace();
             }
-
-            stmt.executeBatch();
-            System.out.println("Đã lưu các món vào đơn hàng thành công!");
-
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi thêm chi tiết đơn hàng!");
-            e.printStackTrace();
-        }
+        return null;
     }
 
     //Danh sách đơn hàng
@@ -131,26 +134,42 @@ public class DonHangServices {
     public static DonHang suaTrangThai(Scanner scanner){
         xemDSDonHang();
         System.out.println("Nhập ID đơn hàng cần sửa: ");
-        if(!scanner.hasNextInt()){
-            System.out.println("Lỗi: ID không hợp lệ!");
-            scanner.next();
+        String input = scanner.nextLine().trim();
+    
+        if (input.equals("0")) {
             return null;
         }
-        int idDH = scanner.nextInt();
-        scanner.nextLine();
 
-        String sqlUpdate = "UPDATE donhang SET TrangThai = 'DA_HOAN_THANH' WHERE ID_DonHang = ?";
-        try(Connection conn =DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sqlUpdate)){
-                stmt.setInt(1,idDH);
-                stmt.executeUpdate();
-                System.out.println("Cập hật thành công!");
-                
-            }catch (SQLException e){
-                System.out.println("Lỗi kết nối cơ sở dữ liệu!");
-                e.printStackTrace();
+        String[] idStrings = input.split("[,\\s]+");
+        List<Integer> listDH = new ArrayList<>();
+        for( String idList : idStrings ){
+            try{
+                int id = Integer.parseInt(idList);
+                listDH.add(id);
+            }catch (NumberFormatException e){
+                System.out.println("ID không hợp lệ: "+idList +". Bỏ qua ID này.");
             }
+        }
+        
+        if (listDH.isEmpty()) {
+            System.out.println("Không có ID hợp lệ để cập nhật!");
             return null;
+        }
+
+        for(int idDH : listDH){
+            String sqlUpdate = "UPDATE donhang SET TrangThai = 'DA_HOAN_THANH' WHERE ID_DonHang = ?";
+            try(Connection conn =DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sqlUpdate)){
+                    stmt.setInt(1,idDH);
+                    stmt.executeUpdate();
+                }catch (SQLException e){
+                    System.out.println("Lỗi kết nối cơ sở dữ liệu!");
+                    e.printStackTrace();
+                }
+        } 
+        System.out.println("Cập nhật thành công!");
+        
+        return null;
     }
     
 }

@@ -21,23 +21,15 @@ public class DatBanChecker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            List<DatBan> danhSachDatBan = xemDanhSachDatBan();
+            List<DatBan> dsDaXacNhan = xemDSDaXacNhan();
             LocalDateTime now = LocalDateTime.now();
 
             List<DatBan> banDuocXacNhan = new ArrayList<>();
             List<DatBan> banBiHuy = new ArrayList<>();
-            
-            boolean coDonChoXacNhan = false;
-
-            for (DatBan datBan : danhSachDatBan) {
+    
+            for (DatBan datBan : dsDaXacNhan) {
                 LocalDateTime gioAn = datBan.getNgayAn();
                 if (gioAn == null) continue;
-
-                if (datBan.getTrangThai() == DatBan.TrangThai.CHO_XAC_NHAN) {
-                    coDonChoXacNhan = true;
-                    break; 
-                }
-        
                 long tgDat = Duration.between(now, gioAn).toMinutes();
                 long tgCho = Duration.between(gioAn, now).toMinutes();
                 String listBan =  datBan.getListID_BanAn();
@@ -58,22 +50,30 @@ public class DatBanChecker implements Runnable {
                     }
                 }
 
-                if(daNhanBan(datBan.getID_User())){
-                    for( String list :idBan){
-                        int id = Integer.parseInt(list.trim());
-                        capNhatTrangThai(id, "DANG_SU_DUNG");
-                    }
-                }  
+                // if(daNhanBan(datBan.getID_User())){
+                //     for( String list :idBan){
+                //         int id = Integer.parseInt(list.trim());
+                //         capNhatTrangThai(id, "DANG_SU_DUNG");
+                //     }
+                // }  
                 
             }
-
+            boolean coDonChoXacNhan = false;
+            List<DatBan> dsChoXacNhan = xemDSChoXacNhan();
+            for(DatBan datBan : dsChoXacNhan){
+                if (datBan.getTrangThai() == DatBan.TrangThai.CHO_XAC_NHAN) {
+                    coDonChoXacNhan = true;
+                    break; 
+                } 
+            }
+            
             if (coDonChoXacNhan) {
                 NhanVien currentNV = NhanVienServices.getCurrentNV();
                 if(currentNV != null){
                     thongBao(currentNV);
                 }                
             }
-
+            
             if (!banDuocXacNhan.isEmpty()) {
                 System.out.println("\n Các bàn đã được đặt: " + inDanhSach(banDuocXacNhan));
             }
@@ -81,13 +81,13 @@ public class DatBanChecker implements Runnable {
                 System.out.println("\n Các bàn bị huỷ: " + inDanhSach(banBiHuy));
             }
 
-            sleep5Minute();
+            sleep3Minute();
         }
     }
 
-    private void sleep5Minute() {
+    private void sleep3Minute() {
         try {
-            Thread.sleep(300* 1000);
+            Thread.sleep(180*1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -133,9 +133,12 @@ public class DatBanChecker implements Runnable {
     }
 
     //Danh sách để checker
-    public static List<DatBan> xemDanhSachDatBan() {
+    public static List<DatBan> xemDanhSachDatBan(String dieuKienWhere) {
         List<DatBan> danhSach = new ArrayList<>();
-        String sql = "SELECT * FROM datban WHERE TrangThai = 'DA_XAC_NHAN'";
+        String sql = "SELECT * FROM datban";
+        if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()) {
+            sql += " WHERE " + dieuKienWhere;
+        }
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -158,6 +161,14 @@ public class DatBanChecker implements Runnable {
         }
     
         return danhSach;
+    }
+
+    public static List<DatBan> xemDSChoXacNhan (){
+        return xemDanhSachDatBan("TrangThai = 'CHO_XAC_NHAN'");
+    }
+
+    public static List<DatBan> xemDSDaXacNhan (){
+        return xemDanhSachDatBan("TrangThai = 'DA_XAC_NHAN'");
     }
     
     //Thông báo có đơn chờ xác nhận

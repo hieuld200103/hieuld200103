@@ -15,7 +15,6 @@ public class QuanLyDonHang {
             System.out.println("\n=== QUẢN LÝ ĐƠN HÀNG ===");
             System.out.println("1. Xem danh sách đơn hàng");
             System.out.println("2. Sửa trạng thái đơn hàng ");
-            System.out.println("3. ");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -34,9 +33,6 @@ public class QuanLyDonHang {
                     break;
                 case 2:
                     DonHangServices.suaTrangThai(scanner);
-                    break;
-                case 3:
-                    System.out.println("Đang phát triển");
                     break;
                 case 0:
                     CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                     
