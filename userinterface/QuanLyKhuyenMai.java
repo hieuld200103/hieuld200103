@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import model.NhanVien;
 import service.KhuyenMaiServices;
+import service.NhanVienServices;
 
 public class QuanLyKhuyenMai {
     public static void quanLy(NhanVien currentNV, int idChiNhanh) {
@@ -14,10 +15,14 @@ public class QuanLyKhuyenMai {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\n=== QUẢN LÝ KHUYẾN MÃI ===");
-            System.out.println("1. Thêm khuyến mãi");
-            System.out.println("2. Xóa khuyến mãi");
-            System.out.println("3. Sửa thông tin khuyến mãi");
-            System.out.println("4. Xem danh sách khuyến mãi");
+            System.out.println("1. Xem danh sách khuyến mãi");
+            if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                System.out.println("2. Thêm khuyến mãi");
+                System.out.println("3. Xóa khuyến mãi");
+                System.out.println("4. Sửa thông tin khuyến mãi");
+            }
+            
+            
             System.out.println("0. THOÁT");
             System.out.print("Chọn: ");
 
@@ -32,19 +37,24 @@ public class QuanLyKhuyenMai {
 
             switch (choice) {
                 case 1:
-                    KhuyenMaiServices.themKhuyenMai(scanner);
-                    break;
-                case 2:
-                    KhuyenMaiServices.xoaKhuyenMai(scanner);
-                    break;
-                case 3:
-                    KhuyenMaiServices.suaKhuyenMai(scanner);
-                    break;
-                case 4:
                     KhuyenMaiServices.xemKhuyenMai(currentNV, idChiNhanh);
                     break;
+                case 2:
+                    KhuyenMaiServices.themKhuyenMai(scanner);
+                    break;
+                case 3:
+                    KhuyenMaiServices.xoaKhuyenMai(scanner);
+                    break;
+                case 4:
+                    KhuyenMaiServices.suaKhuyenMai(scanner);
+                    break;
+               
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);                    
+                    if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                        QuanLy.congViec(currentNV, idChiNhanh, scanner);
+                    }else{
+                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
+                    }                    
                     scanner.close();
                     return; 
                 default:

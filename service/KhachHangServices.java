@@ -72,37 +72,59 @@ public class KhachHangServices {
 
     
     //Thêm vào bảng khách hàng
-    public static KhachHang themKH(int idUser, String tenKH, String sdt){
-        String sql = "INSERT INTO khachhang (ID_User, TenKH, SDT, TrangThai) VALUES (?, ?, ?, 'DA_NHAN_BAN')";
+    public static KhachHang themKH(int idUser, String tenKH, String sdt) {
+        int idChiNhanh = layIDCN(idUser);
+        String sql = "INSERT INTO khachhang (ID_User, ID_ChiNhanh, TenKH, SDT, TrangThai) VALUES (?, ?, ?, ?, ?)";
+    
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, idUser);
+            stmt.setInt(2, idChiNhanh);
+            stmt.setString(3, tenKH);
+            stmt.setString(4, sdt);
+            stmt.setString(5, "DA_NHAN_BAN");
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int idKH = rs.getInt(1);
+                    System.out.println("Xác nhận nhận bàn thành công!");
+                    return new KhachHang(idKH, idUser, idChiNhanh, tenKH, sdt, KhachHang.TrangThai.DA_NHAN_BAN);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi check đặt bàn!");
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    //Lấy chi nhánh từ user
+    public static int layIDCN(int idUser){
+        String sql = "SELECT ID_ChiNhanh FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN'";
         try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
-                stmt.setInt(1,idUser);
-                stmt.setString(2,tenKH);
-                stmt.setString(3,sdt);
-                stmt.executeUpdate();
-                try(ResultSet rs = stmt.getGeneratedKeys()){
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1, idUser);
+                try(ResultSet rs = stmt.executeQuery()){
                     if(rs.next()){
-                        int idKH = rs.getInt(1);
-                        System.out.println("Xác nhận nhận bàn thành công!");
-                        return new KhachHang(idKH, idUser, tenKH, sdt, KhachHang.TrangThai.DA_NHAN_BAN);
+                        return rs.getInt("ID_ChiNhanh");
                     }
                 }
-            }catch(SQLException e){
-                System.out.println("Lỗi khi check đặt bàn!");
+            }catch (SQLException e) {
+                System.out.println("Lỗi khi lấy IDCN từ cơ sở dữ liệu");
                 e.printStackTrace();
-            } 
-            return null;
+            }
+        return 0;
     }
 
     //Xem danh sách khách hàng
-    public static List<KhachHang> xemDanhSachKhachHang() {
+    public static List<KhachHang> xemDanhSachKhachHang(int idCN) {
         List<KhachHang> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM khachhang";    
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {    
             System.out.println("========================DANH SÁCH KHÁCH HÀNG=======================");
-            System.out.printf("| %-5s | %-20s | %-15s | %-15s |\n", "ID", "Tên Khách Hàng", "Số Điện Thoại", "Trạng thái");
+            System.out.printf("| %-5s | %-20s | %-5s | %-15s | %-15s |\n", "ID", "Tên Khách Hàng", "IDCN","Số Điện Thoại", "Trạng thái");
             System.out.println("===================================================================");    
             while (rs.next()) {
                 int id = rs.getInt("ID_KhachHang");
@@ -110,9 +132,9 @@ public class KhachHangServices {
                 String tenKH = rs.getString("TenKH");
                 String sdt = rs.getString("SDT");
                 KhachHang.TrangThai trangThai = KhachHang.TrangThai.valueOf(rs.getString("TrangThai"));
-                danhSach.add(new KhachHang(id,idUser, tenKH, sdt,trangThai));
+                danhSach.add(new KhachHang(id,idUser,idCN, tenKH, sdt,trangThai));
     
-                System.out.printf("| %-5d | %-20s | %-15s | %-15s |\n", id, tenKH, sdt,trangThai);
+                System.out.printf("| %-5d | %-20s | %-5d | %-15s | %-15s |\n", id, tenKH, idCN, sdt,trangThai);
             }
     
             System.out.println("===================================================================");

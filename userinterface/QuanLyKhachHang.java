@@ -33,13 +33,17 @@ public class QuanLyKhachHang {
                     KhachHangServices.khachHangNhanBan(scanner, currentNV);
                     break;
                 case 2:
-                    KhachHangServices.xemDanhSachKhachHang();
+                    KhachHangServices.xemDanhSachKhachHang(idChiNhanh);
                     break;
                 case 3:
                     NhanVienServices.xemDanhSachUser();
                     break;
                 case 0:                    
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);
+                    if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                        QuanLy.congViec(currentNV, idChiNhanh, scanner);
+                    }else{
+                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
+                    }
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

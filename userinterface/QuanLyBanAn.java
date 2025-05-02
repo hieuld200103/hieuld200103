@@ -14,10 +14,12 @@ public class QuanLyBanAn {
         }
         while (true) {
             System.out.println("\n=== QUẢN LÝ BÀN ĂN ===");
-            System.out.println("1. Thêm bàn ăn");
-            System.out.println("2. Xóa bàn ăn");
-            System.out.println("3. Sửa thông tin bàn ăn");
-            System.out.println("4. Xem danh sách bàn ăn");
+            System.out.println("1. Xem danh sách bàn ăn");
+            if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                System.out.println("2. Thêm bàn ăn");
+                System.out.println("3. Xóa bàn ăn");
+                System.out.println("4. Sửa thông tin bàn ăn");
+            }
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -32,19 +34,24 @@ public class QuanLyBanAn {
 
             switch (choice) {
                 case 1:
-                    BanAnServices.themBanAn(currentNV, scanner);
+                    NhanVienServices.checkBan(currentNV, idChiNhanh, scanner);
                     break;
                 case 2:
-                    BanAnServices.xoaBanAn(currentNV, scanner);
+                    BanAnServices.themBanAn(currentNV,idChiNhanh, scanner);
                     break;
                 case 3:
-                    BanAnServices.suaBanAn(currentNV,scanner);
+                    BanAnServices.xoaBanAn(currentNV,idChiNhanh, scanner);
                     break;
                 case 4:
-                    NhanVienServices.checkBan(currentNV,scanner);
+                    BanAnServices.suaBanAn(currentNV,idChiNhanh,scanner);
                     break;
+              
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);                    
+                    if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                        QuanLy.congViec(currentNV, idChiNhanh, scanner);
+                    }else{
+                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
+                    }                    
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

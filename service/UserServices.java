@@ -2,7 +2,7 @@ package service;
 import java.util.Scanner;
 
 import model.User;
-import model.User.Role;
+import model.User.Roles;
 import userinterface.DichVuKhachHang;
 
 import java.security.MessageDigest;
@@ -52,7 +52,7 @@ public class UserServices {
     //Tác vụ khách hàng
     //Đăng ký
     public static User dangKy(Scanner scanner) {
-        while (true) {        
+        while (true) {
             System.out.println("\n=== Đăng Ký ===");
             System.out.print("Tên khách hàng: ");
             String tenUser = scanner.nextLine();
@@ -60,47 +60,64 @@ public class UserServices {
                 System.out.println("Lỗi: Tên khách hàng không được để trống!");
                 return null;
             }
+    
             System.out.print("Số điện thoại: ");
             String sdt = scanner.nextLine();
-            if (!sdt.matches("\\d{10}")) { 
+            if (!sdt.matches("\\d{10}")) {
                 System.out.println("Lỗi: Số điện thoại không hợp lệ!");
                 return null;
             }
-
+    
             if (kiemTraTonTaiSDT(sdt)) {
                 System.out.println("Số điện thoại đã tồn tại!");
                 System.out.println("1. Nhập số điện thoại khác");
                 System.out.println("2. Quên mật khẩu");
                 System.out.print("Chọn: ");
                 int choice = scanner.nextInt();
-                scanner.nextLine(); 
-
+                scanner.nextLine();
+    
                 if (choice == 2) {
-                    System.out.println("Chức năng đang phát triển...");            
-                    return null; 
+                    System.out.println("Chức năng đang phát triển...");
+                    return null;
                 }
             } else {
                 System.out.print("Email: ");
                 String email = scanner.nextLine();
-                System.out.print("Mật Khẩu: ");
-                String matKhau = scanner.nextLine();
+    
+                // Nhập mật khẩu và xác nhận lại
+                String matKhau;
+                while (true) {
+                    System.out.print("Mật khẩu: ");
+                    matKhau = scanner.nextLine();
+                    System.out.print("Nhập lại mật khẩu: ");
+                    String nhapLai = scanner.nextLine();
+    
+                    if (!matKhau.equals(nhapLai)) {
+                        System.out.println("Mật khẩu không khớp. Vui lòng nhập lại!");
+                    } else if (matKhau.isEmpty()) {
+                        System.out.println("Mật khẩu không được để trống!");
+                    } else {
+                        break;
+                    }
+                }
+    
                 String hashedMatKhau = hashPassword(matKhau);
-                
+    
                 String sql = "INSERT INTO user (TenUser, SDT, Email, MatKhau, Role) VALUES (?, ?, ?, ?, 'SILVER')";
                 try (Connection conn = DatabaseConnection.getConnection();
                     PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    
+    
                     stmt.setString(1, tenUser);
                     stmt.setString(2, sdt);
                     stmt.setString(3, email);
                     stmt.setString(4, hashedMatKhau);
                     stmt.executeUpdate();
-
-                    try(ResultSet rs = stmt.getGeneratedKeys()){
+    
+                    try (ResultSet rs = stmt.getGeneratedKeys()) {
                         if (rs.next()) {
                             int idUser = rs.getInt(1);
                             System.out.println("Đăng ký thành công! ID của bạn là: " + idUser);
-                            return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Role.SILVER); 
+                            return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Roles.SILVER);
                         }
                     }
                 } catch (SQLException e) {
@@ -110,7 +127,7 @@ public class UserServices {
             }
         }
     }
-
+    
     //Đăng nhập
     private static User currentUser = null;
     public static User dangNhap(Scanner scanner) {
@@ -148,7 +165,7 @@ public class UserServices {
                     int idUser = rs.getInt("ID_User");
                     String tenUser = rs.getString("TenUser"); 
                     String email = rs.getString("Email");
-                    Role role = Role.valueOf(rs.getString("Role"));
+                    Roles role = Roles.valueOf(rs.getString("Role"));
 
                     System.out.println(" Đăng nhập thành công! Chào " + tenUser);
                     System.out.println(" Hạng của Quý khách: " + role);

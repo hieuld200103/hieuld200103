@@ -94,13 +94,13 @@ public class DatBanChecker implements Runnable {
                 System.out.println("\n Các bàn bị huỷ: " + inDanhSach(banBiHuy));
             }
 
-            sleep1Minute();
+            sleep3Minute();
         }
     }
 
-    private void sleep1Minute() {
+    private void sleep3Minute() {
         try {
-            Thread.sleep(60*1000);
+            Thread.sleep(180*1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -196,8 +196,6 @@ public class DatBanChecker implements Runnable {
                         int soDon = rs.getInt("soDon");
                         if(soDon>0){
                             System.out.println("\n!!!Có "+soDon+" đơn hàng đang chờ xác nhận!!!");
-                        }else{
-                            System.out.println("Không có đơn đặt bàn nào đang chờ!");
                         }
                     }    
                 }

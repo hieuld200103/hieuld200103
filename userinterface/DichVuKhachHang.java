@@ -65,7 +65,10 @@ public class DichVuKhachHang {
                         }
                         if (donHang != null) {
                             donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_NHA_HANG);
-                            GoiMonServices.goiMon(currentUser, donHang, scanner);
+                            boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner);
+                            if (!daGoiMon) {
+                                xoaDH(donHang.getID_DonHang());
+                            }
                         } else {
                             System.out.println("Không thể tạo hoặc lấy đơn hàng.");
                         }
@@ -82,7 +85,7 @@ public class DichVuKhachHang {
                 if (donHang != null) {
                     boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner);
                     if (!daGoiMon) {
-                        xoaDHMangVe(donHang.getID_DonHang());
+                        xoaDH(donHang.getID_DonHang());
                     }
                 } else {
                     System.out.println("Không thể tạo đơn hàng mang về.");
@@ -207,7 +210,7 @@ public class DichVuKhachHang {
     }
 
     //Xóa đơn mang về nếu k gọi món
-    public static void xoaDHMangVe(int idDH) {
+    public static void xoaDH(int idDH) {
         String sql = "SELECT COUNT(*) FROM chitietdonhang WHERE ID_DonHang = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

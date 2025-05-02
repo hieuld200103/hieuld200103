@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import Main.Main;
 import connection.DatabaseConnection;
 import model.NhanVien;
+import model.NhanVien.Role;
 import model.User;
-import model.User.Role;
-import userinterface.CongViecNhanVien;
+import model.User.Roles;
+
 import userinterface.QuanLyBanAn;
 
 public class NhanVienServices {
@@ -33,6 +33,106 @@ public class NhanVienServices {
             throw new RuntimeException("Lỗi mã hóa mật khẩu!");
         }
     }
+
+    // Hàm kiểm tra số điện thoại đã tồn tại chưa
+    private static boolean kiemTraTonTaiSDT(String sdt) {
+        String sql = "SELECT COUNT(*) FROM nhanvien WHERE SDT = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, sdt);
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return true;
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Lỗi kiểm tra số điện thoại!");
+            e.printStackTrace();
+        }
+        return false;
+    }  
+    
+    //Tác vụ khách hàng
+    //Đăng ký
+    public static NhanVien dangKy(int idChiNhanh, Scanner scanner) {
+        while (true) {
+            System.out.println("\n=== Đăng Ký ===");
+            System.out.print("Tên nhân viên: ");
+            String tenNV = scanner.nextLine();
+            if (tenNV.isEmpty()) {
+                System.out.println("Lỗi: Tên nhân viên không được để trống!");
+                return null;
+            }
+    
+            System.out.print("Số điện thoại: ");
+            String sdt = scanner.nextLine();
+            if (!sdt.matches("\\d{10}")) {
+                System.out.println("Lỗi: Số điện thoại không hợp lệ!");
+                return null;
+            }
+    
+            if (kiemTraTonTaiSDT(sdt)) {
+                System.out.println("Số điện thoại đã tồn tại!");
+                System.out.println("1. Nhập số điện thoại khác");
+                System.out.println("2. Quên mật khẩu");
+                System.out.print("Chọn: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+    
+                if (choice == 2) {
+                    System.out.println("Chức năng đang phát triển...");
+                    return null;
+                }
+            } else {
+                System.out.print("Email: ");
+                String email = scanner.nextLine();
+    
+                // Nhập mật khẩu và xác nhận lại
+                String matKhau;
+                while (true) {
+                    System.out.print("Mật khẩu: ");
+                    matKhau = scanner.nextLine();
+                    System.out.print("Nhập lại mật khẩu: ");
+                    String nhapLai = scanner.nextLine();
+    
+                    if (!matKhau.equals(nhapLai)) {
+                        System.out.println("Mật khẩu không khớp. Vui lòng nhập lại!");
+                    } else if (matKhau.isEmpty()) {
+                        System.out.println("Mật khẩu không được để trống!");
+                    } else {
+                        break;
+                    }
+                }
+    
+                String hashedMatKhau = hashPassword(matKhau);
+    
+                String sql = "INSERT INTO nhanvien (ID_ChiNhanh,TenNV ,ChucVu ,SDT , Email, MatKhau) VALUES (?, ?, 'NHAN_VIEN', ?, ?, ?)";
+                try (Connection conn = DatabaseConnection.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    stmt.setInt(1,idChiNhanh);
+                    stmt.setString(2, tenNV);
+                    stmt.setString(3, sdt);
+                    stmt.setString(4, email);
+                    stmt.setString(5, hashedMatKhau);
+                    stmt.executeUpdate();
+    
+                    try (ResultSet rs = stmt.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            int idNV = rs.getInt(1);
+                            System.out.println("Đăng ký thành công! ID của bạn là: " + idNV);
+                            currentNV =new NhanVien(idNV, idChiNhanh, tenNV, NhanVien.Role.NHAN_VIEN, sdt, email, hashedMatKhau);
+                            return currentNV;
+                        }
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Lỗi khi Đăng Ký!");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
 
     //Đăng nhập
     private static NhanVien currentNV = null;
@@ -68,11 +168,11 @@ public class NhanVienServices {
                     int idChiNhanh = rs.getInt("ID_ChiNhanh");
                     String tenNV = rs.getString("TenNV"); 
                     String email = rs.getString("Email");
-
+                    Role chucVu = Role.valueOf(rs.getString("ChucVu"));
                     System.out.println(" Đăng nhập thành công! Chào " + tenNV);
                     System.out.println(" Nhân viên ở chi nhánh " + idChiNhanh);
                     
-                    currentNV = new NhanVien(idNV, idChiNhanh, tenNV, "NHAN_VIEN", sdt, email, hashedPassword); 
+                    currentNV = new NhanVien(idNV, idChiNhanh, tenNV, chucVu, sdt, email, hashedPassword); 
                     return currentNV;
                 } else {
                     System.out.println("Sai số điện thoại hoặc mật khẩu!");
@@ -101,7 +201,7 @@ public class NhanVienServices {
     }
 
     //Tìm món
-    public static void timMon(NhanVien currentNV, int idChiNhanh,Scanner scanner){
+    public static void timMon(Scanner scanner){
         while (true) {            
             System.out.println("\n=== TÌM MÓN ĂN ===");
             System.out.println("1. Xem menu");
@@ -126,11 +226,7 @@ public class NhanVienServices {
                     MonAnServices.timKiemMonAn(scanner);
                     break;
                
-                case 0: 
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                    
-                    System.out.println("Bạn chưa đăng nhập!");
-                    Main.main(new String [] {});                              
-                    scanner.close();
+                case 0:                            
                     return;
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");
@@ -140,8 +236,7 @@ public class NhanVienServices {
 
 
     //Check bàn
-     public static void checkBan(NhanVien currentNV, Scanner scanner){
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+     public static void checkBan(NhanVien currentNV, int idChiNhanh, Scanner scanner){
         while (true) {
             System.out.println("\n=== CHECK BÀN ===");
             System.out.println("1. Lọc danh sách bàn");
@@ -159,7 +254,7 @@ public class NhanVienServices {
 
             switch (choice) {
                 case 1:
-                    BanAnServices.locBanAn(currentNV, scanner);
+                    BanAnServices.locBanAn(currentNV,idChiNhanh, scanner);
                     break;
                 case 2:
                     BanAnServices.xemBan(idChiNhanh);
@@ -172,6 +267,46 @@ public class NhanVienServices {
             }
         }
     }  
+
+    //Danh sách NhanVien
+    public static List<NhanVien> xemDanhSachNV(int idChiNhanh){
+        List<NhanVien> danhSach = new ArrayList<>();
+        String sql = "SELECT * FROM nhanvien WHERE ID_ChiNhanh = ? AND ChucVu = 'NHAN_VIEN'";
+       
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1,idChiNhanh);
+                try(ResultSet rs = stmt.executeQuery()){
+                    System.out.println("=============================== DANH SÁCH NHÂN VIÊN ================================");
+                    System.out.println("=====================================================================================");
+                    System.out.printf("| %-5s | %-5s | %-20s | %-12s | %-20s | %-10s |\n",
+                                      "ID", "IDCN", "Tên", "SDT", "Email", "Mật khẩu");
+                    System.out.println("=====================================================================================");
+            
+                    while (rs.next()) {
+                        int id = rs.getInt("ID_NhanVien");
+                        String tenNV = rs.getString("TenNV");
+                        String sdt = rs.getString("SDT");
+                        String email = rs.getString("Email");
+            
+                        // Thêm vào danh sách
+                        danhSach.add(new NhanVien(id, idChiNhanh, tenNV, Role.NHAN_VIEN, sdt, email, "******"));
+            
+                        // In ra màn hình
+                        System.out.printf("| %-5d | %-5d | %-20s | %-12s | %-20s | %-10s |\n",
+                                          id, idChiNhanh, tenNV, sdt, email, "******");
+                    }
+            
+                    System.out.println("=====================================================================================");
+                }
+          
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy danh sách nhân viên!");
+            e.printStackTrace();
+        }
+        return danhSach;
+    }
+    
     
     //Danh sách User
     public static List<User> xemDanhSachUser(){
@@ -192,7 +327,7 @@ public class NhanVienServices {
                     String tenUser = rs.getString("TenUser");
                     String sdt = rs.getString("SDT");
                     String email = rs.getString("Email");
-                    Role role = Role.valueOf(rs.getString("Role"));
+                    Roles role = Roles.valueOf(rs.getString("Role"));
         
                     danhSach.add(new User(id, tenUser, sdt, email, "", role));
         
@@ -206,4 +341,21 @@ public class NhanVienServices {
             return danhSach;
     }
 
+
+    // //Kiểm tra Admin
+    public static boolean ktAdmin(int idNV){
+        String sql = "SELECT * FROM nhanvien WHERE ID_NhanVien = ? AND ChucVu = 'QUAN_LY'";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,idNV);
+                try(ResultSet rs = stmt.executeQuery()){
+                    return rs.next();
+                }
+                
+            }catch (SQLException e) {
+                System.out.println("Lỗi kiểm tra Admin!");
+                e.printStackTrace();
+            }
+            return false;
+    }
 }

@@ -141,9 +141,9 @@ public class HoaDonServices {
         return danhSach;
     }
     // XEM DANH SÁCH HÓA ĐƠN - NHÂN VIÊN
-    public static List<HoaDon> xemDanhSachHoaDon(NhanVien currentNV, String tieuDe, String dieuKienWhere) {
+    public static List<HoaDon> xemDanhSachHoaDon(NhanVien currentNV, int idChiNhanh, String tieuDe, String dieuKienWhere) {
         List<HoaDon> danhSach = new ArrayList<>();
-        int idCN = currentNV.getID_ChiNhanh();
+        
         String sql = "SELECT h.* " +
                      "FROM hoadon h " +
                      "JOIN donhang d ON h.ID_DonHang = d.ID_DonHang " +
@@ -155,7 +155,7 @@ public class HoaDonServices {
     
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)){
-            stmt.setInt(1,idCN);
+            stmt.setInt(1,idChiNhanh);
             printDanhSachHD(stmt, danhSach, tieuDe);
             }
         catch (SQLException e) {
@@ -390,10 +390,9 @@ public class HoaDonServices {
 
 
     //===================================================================
-    public static void locDanhSachHoaDon(NhanVien currentNV, Scanner scanner) {
+    public static void locDanhSachHoaDon(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         while (true) {
             List<HoaDon> danhSachHoaDon;
-            int idChiNhanh = currentNV.getID_ChiNhanh();
             System.out.println("\n=== LỌC DANH SÁCH ===");
             System.out.println("1. Chưa thanh toán");
             System.out.println("2. Chờ xác nhận");
@@ -414,7 +413,7 @@ public class HoaDonServices {
     
             switch (choice) {
                 case 1:
-                    danhSachHoaDon = xemDanhSachHoaDon(currentNV, "Danh sách chưa thanh toán", "TrangThaiHD = 'CHUA_THANH_TOAN'");
+                    danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Danh sách chưa thanh toán", "TrangThaiHD = 'CHUA_THANH_TOAN'");
                     System.out.println("===== XÁC NHẬN THANH TOÁN ===== ");
                     System.out.println("1. Xác nhận thanh toán cho hóa đơn ");
                     System.out.println("0. Thoát ");
@@ -434,13 +433,13 @@ public class HoaDonServices {
                             capNhatTrangThai(danhSachHoaDon, scanner, "DA_THANH_TOAN");
                             break;
                         case 0:
-                            locDanhSachHoaDon(currentNV,scanner);
+                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
                             break;
 
                     }
                     break;
                 case 2:
-                    danhSachHoaDon = xemDanhSachHoaDon(currentNV, "Danh sách chờ xác nhận", "TrangThaiHD = 'CHO_XAC_NHAN'");
+                    danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Danh sách chờ xác nhận", "TrangThaiHD = 'CHO_XAC_NHAN'");
                     System.out.println("===== XÁC NHẬN THANH TOÁN ===== ");
                     System.out.println("1. Xác nhận thanh toán cho hóa đơn ");
                     System.out.println("0. Thoát ");
@@ -460,13 +459,13 @@ public class HoaDonServices {
                             capNhatTrangThai(danhSachHoaDon, scanner, "DA_THANH_TOAN");
                             break;
                         case 0:
-                            locDanhSachHoaDon(currentNV,scanner);
+                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
                             break;
 
                     }
                     break;
                 case 3:
-                    danhSachHoaDon = xemDanhSachHoaDon(currentNV,"Danh sách đã thanh toán", "TrangThaiHD = 'DA_THANH_TOAN'");
+                    danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh,"Danh sách đã thanh toán", "TrangThaiHD = 'DA_THANH_TOAN'");
                     System.out.println("====== XUẤT HÓA ĐƠN ======= ");
                     System.out.println("1. Xuất hóa đơn thanh toán ");
                     System.out.println("0. Thoát ");
@@ -485,12 +484,12 @@ public class HoaDonServices {
                             xuatHoaDon(danhSachHoaDon, scanner);
                             break;
                         case 0:
-                            locDanhSachHoaDon(currentNV,scanner);
+                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
                             break;
 
                     }
                 case 4:
-                    danhSachHoaDon = xemDanhSachHoaDon(currentNV, "Toàn bộ danh sách", null);
+                    danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Toàn bộ danh sách", null);
                     break;
                 case 0:
                     QuanLyHoaDon.quanLy(currentNV, idChiNhanh,scanner);

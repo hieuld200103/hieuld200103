@@ -1,7 +1,7 @@
 package model;
 
 public class User {
-    public enum Role{
+    public enum Roles{
         SILVER, GOLD, DIAMOND;
     }
     private int id_User;
@@ -9,10 +9,10 @@ public class User {
     private String sdt;
     private String email;
     private String matKhau;
-    private Role role;
+    private Roles role;
 
    
-    public User(int id_User, String tenUser, String sdt, String email, String matKhau, Role role) {
+    public User(int id_User, String tenUser, String sdt, String email, String matKhau, Roles role) {
         this.id_User = id_User;
         this.tenUser = tenUser;
         this.sdt = sdt;
@@ -21,7 +21,7 @@ public class User {
         this.role = role;
     }
 
-    public User(int id_User, String tenUser, String sdt, String email, Role role) {
+    public User(int id_User, String tenUser, String sdt, String email, Roles role) {
         this.id_User = id_User;
         this.tenUser = tenUser;
         this.sdt = sdt;
@@ -48,7 +48,7 @@ public class User {
     public String getMatKhau() { return matKhau; }
     public void setMatKhau(String matKhau) { this.matKhau = matKhau; }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public Roles getRole() { return role; }
+    public void setRole(Roles role) { this.role = role; }
 
 }

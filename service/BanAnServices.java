@@ -18,8 +18,7 @@ import connection.DatabaseConnection;
 
 public class BanAnServices {
     //Thêm bàn ăn
-    public static BanAn themBanAn(NhanVien currentNV, Scanner scanner){
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+    public static BanAn themBanAn(NhanVien currentNV,int idChiNhanh, Scanner scanner){
         System.out.println("\n==== Thêm bàn mới ====");
         scanner.nextLine();
         System.out.print("Số ghế: ");     
@@ -47,8 +46,7 @@ public class BanAnServices {
     }
 
     //Sửa thông tin bàn
-    public static BanAn suaBanAn(NhanVien currentNV, Scanner scanner){
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+    public static BanAn suaBanAn(NhanVien currentNV,int idChiNhanh, Scanner scanner){
         xemBan(idChiNhanh);
         System.out.println("Nhập ID bàn ăn cần sửa: ");
         if(!scanner.hasNextInt()){
@@ -149,8 +147,7 @@ public class BanAnServices {
     }
 
     //Xóa bàn 
-    public static void xoaBanAn(NhanVien currentNV,Scanner scanner){
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+    public static void xoaBanAn(NhanVien currentNV,int idChiNhanh,Scanner scanner){
         xemBan(idChiNhanh);
         System.out.println("Nhập ID bàn ăn cần xóa: ");
         if(!scanner.hasNextInt()){
@@ -226,8 +223,7 @@ public class BanAnServices {
     }
     
     //LocBanAn
-    public static void locBanAn(NhanVien currentNV, Scanner scanner) {    
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+    public static void locBanAn(NhanVien currentNV, int idChiNhanh, Scanner scanner) {    
         System.out.println("Bàn tại chi nhánh ID: " + idChiNhanh);
         while (true) {
             System.out.println("\n======CHECK======");
@@ -258,7 +254,7 @@ public class BanAnServices {
                 xemDanhSachBan(idChiNhanh, "Bàn đang sử dụng","TrangThai = 'DANG_SU_DUNG'");
                 break;
                 case 0:
-                NhanVienServices.checkBan(currentNV, scanner);
+                NhanVienServices.checkBan(currentNV, idChiNhanh, scanner);
                 return;
                 default:
                 System.out.println("Lựa chọn không hợp lệ, vui lòng nhập lại");

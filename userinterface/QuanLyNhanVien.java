@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import Main.Main;
 import model.NhanVien;
+import model.NhanVien.Role;
 import service.NhanVienServices;
 
 public class QuanLyNhanVien {
@@ -28,13 +29,17 @@ public class QuanLyNhanVien {
                 case 1:
                     currentNV = NhanVienServices.dangNhap(scanner);
                     if (currentNV != null) {
-                        int idChiNhanh = currentNV.getID_ChiNhanh();
-                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
-                        return; 
+                        int idChiNhanh = currentNV.getID_ChiNhanh(); 
+                        if (currentNV.getChucVu() == Role.QUAN_LY) {
+                            QuanLy. chonChiNhanhVaVaoCongViec(currentNV, scanner);
+                        } else {
+                            CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);
+                        }
+                        return;
                     } else {
                         System.out.println("Đăng nhập thất bại, vui lòng thử lại!");
-                    }
-                    break;      
+                    }    
+                    break;
                 case 0:
                     Main.main(new String[] {});
                     return; 

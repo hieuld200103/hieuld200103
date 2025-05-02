@@ -247,9 +247,8 @@ public class DatBanServices {
     
 
     //Danh sách Đặt bàn
-    public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV, String tieuDe, String dieuKienWhere) {
+    public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV, int idCN, String tieuDe, String dieuKienWhere) {
         List<DatBan> danhSach = new ArrayList<>();
-        int idCN = currentNV.getID_ChiNhanh();
         String sql = "SELECT * FROM datban WHERE ID_ChiNhanh = ?";
         
         if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()) {
@@ -291,26 +290,25 @@ public class DatBanServices {
         return danhSach;
     }    
     
-    public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV) {
-        return xemDanhSachDatBan(currentNV, "Danh sách đặt bàn", null);
+    public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV, int idChiNhanh) {
+        return xemDanhSachDatBan(currentNV,idChiNhanh, "Danh sách đặt bàn", null);
     }
     
-    public static List<DatBan> xemDSChoXacNhan(NhanVien currentNV) {
-        return xemDanhSachDatBan(currentNV,"Danh sách chờ xác nhận", "TrangThai = 'CHO_XAC_NHAN'");
+    public static List<DatBan> xemDSChoXacNhan(NhanVien currentNV, int idChiNhanh) {
+        return xemDanhSachDatBan(currentNV,idChiNhanh,"Danh sách chờ xác nhận", "TrangThai = 'CHO_XAC_NHAN'");
     }
 
-    public static List<DatBan> xemDSDaXacNhan(NhanVien currentNV) {
-        return xemDanhSachDatBan(currentNV,"Danh sách chờ xác nhận", "TrangThai = 'DA_XAC_NHAN'");
+    public static List<DatBan> xemDSDaXacNhan(NhanVien currentNV, int idChiNhanh) {
+        return xemDanhSachDatBan(currentNV,idChiNhanh,"Danh sách chờ xác nhận", "TrangThai = 'DA_XAC_NHAN'");
     }
     
-    public static List<DatBan> xemDSCoTheHuy(NhanVien currentNV) {
-        return xemDanhSachDatBan(currentNV, "Danh sách có thể huỷ", "TrangThai ='CHO_XAC_NHAN' OR TrangThai = 'DA_XAC_NHAN'");
+    public static List<DatBan> xemDSCoTheHuy(NhanVien currentNV, int idChiNhanh) {
+        return xemDanhSachDatBan(currentNV,idChiNhanh, "Danh sách có thể huỷ", "TrangThai ='CHO_XAC_NHAN' OR TrangThai = 'DA_XAC_NHAN'");
     }
 
     //Lọc danh sách đặt bàn
-    public static void locDanhSachDatBan(NhanVien currentNV, Scanner scanner) {
+    public static void locDanhSachDatBan(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         while (true) {
-            int idChiNhanh = currentNV.getID_ChiNhanh();
             System.out.println("\n=== LỌC DANH SÁCH ===");
             System.out.println("1. Chờ xác nhận");
             System.out.println("2. Đã xác nhận");
@@ -331,16 +329,16 @@ public class DatBanServices {
     
             switch (choice) {
                 case 1:
-                    xemDanhSachDatBan(currentNV, "Danh sách chờ xác nhận", "TrangThai = 'CHO_XAC_NHAN'");
+                    xemDanhSachDatBan(currentNV,idChiNhanh, "Danh sách chờ xác nhận", "TrangThai = 'CHO_XAC_NHAN'");
                     break;
                 case 2:
-                    xemDanhSachDatBan(currentNV, "Danh sách đã xác nhận", "TrangThai = 'DA_XAC_NHAN'");
+                    xemDanhSachDatBan(currentNV,idChiNhanh, "Danh sách đã xác nhận", "TrangThai = 'DA_XAC_NHAN'");
                     break;
                 case 3:
-                    xemDanhSachDatBan(currentNV,"Danh sách đã hủy", "TrangThai = 'DA_HUY'");
+                    xemDanhSachDatBan(currentNV,idChiNhanh,"Danh sách đã hủy", "TrangThai = 'DA_HUY'");
                     break;
                 case 4:
-                    xemDanhSachDatBan(currentNV, "Toàn bộ danh sách", null);
+                    xemDanhSachDatBan(currentNV,idChiNhanh, "Toàn bộ danh sách", null);
                     break;
                 case 0:
                     QuanLyDatBan.quanLy(currentNV, idChiNhanh, scanner);
@@ -353,7 +351,7 @@ public class DatBanServices {
     }
     
     //Cập nhận trạng thái đặt bàn
-    public static void capNhatTrangThaiDatBan(Scanner scanner, NhanVien currentNV, DatBan.TrangThai trangThaiMoi, Runnable hienThiDS) {
+    public static void capNhatTrangThaiDatBan(Scanner scanner, NhanVien currentNV,int idChiNhanh, DatBan.TrangThai trangThaiMoi, Runnable hienThiDS) {
         while(true){
             hienThiDS.run(); 
 
@@ -389,7 +387,7 @@ public class DatBanServices {
             System.out.println("Không có ID hợp lệ để cập nhật!");
             return;
         }
-        int idChiNhanh = currentNV.getID_ChiNhanh();
+        
         for (int idDatBan : idList) {
             String sql = "SELECT * FROM datban WHERE ID_DatBan = ? AND ID_ChiNhanh = ?";
             try (Connection conn = DatabaseConnection.getConnection();
@@ -432,12 +430,12 @@ public class DatBanServices {
         System.out.println("ID: " + idDatBan +  " | CN: "+ idChiNhanh +" | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
     }
 
-    public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV) {
-        capNhatTrangThaiDatBan(scanner, currentNV, DatBan.TrangThai.DA_XAC_NHAN, () -> DatBanServices.xemDSChoXacNhan(currentNV));
+    public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV, int idChiNhanh) {
+        capNhatTrangThaiDatBan(scanner, currentNV,idChiNhanh, DatBan.TrangThai.DA_XAC_NHAN, () -> DatBanServices.xemDSChoXacNhan(currentNV,idChiNhanh));
     }
 
-    public static void huyDatBan(Scanner scanner, NhanVien currentNV) {
-        capNhatTrangThaiDatBan(scanner, currentNV, DatBan.TrangThai.DA_HUY, () -> DatBanServices.xemDSCoTheHuy(currentNV));
+    public static void huyDatBan(Scanner scanner, NhanVien currentNV, int idChiNhanh) {
+        capNhatTrangThaiDatBan(scanner, currentNV,idChiNhanh, DatBan.TrangThai.DA_HUY, () -> DatBanServices.xemDSCoTheHuy(currentNV, idChiNhanh));
     }
 
     //Lọc ID đặt bàn

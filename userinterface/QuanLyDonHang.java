@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import model.NhanVien;
 import service.DonHangServices;
+import service.NhanVienServices;
 import service.TrangThaiDonHang;
 public class QuanLyDonHang {
      public static void quanLy(NhanVien currentNV, int idChiNhanh,Scanner scanner) {
@@ -39,7 +40,11 @@ public class QuanLyDonHang {
                     TrangThaiDonHang.kiemTraDonHangNV2(scanner, currentNV, idChiNhanh);
                     break;
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                     
+                    if(NhanVienServices.ktAdmin(currentNV.getID_NhanVien())){
+                        QuanLy.congViec(currentNV, idChiNhanh, scanner);
+                    }else{
+                        CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);
+                    }                     
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");
