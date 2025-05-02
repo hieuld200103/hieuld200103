@@ -28,11 +28,11 @@ CREATE TABLE `user` (
   `SDT` varchar(50) NOT NULL,
   `Email` varchar(50) NOT NULL,
   `MatKhau` varchar(255) NOT NULL,
-  `Role` enum('SLIVER','','GOLD','DIAMOND') DEFAULT 'SLIVER',
+  `Role` enum('SILVER','','GOLD','DIAMOND') DEFAULT 'SILVER',
   PRIMARY KEY (`ID_User`),
   UNIQUE KEY `SDT` (`SDT`),
   UNIQUE KEY `Email` (`Email`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (12,'Lưu Đức Hiếu','0976981804','hieuld@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','DIAMOND'),(13,'Lưu Thu An','0976180420','an@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SLIVER'),(14,'Hoàng','0976984315','hung@gmail.com','6c658ee83fb7e812482494f3e416a876f63f418a0b8a1f5e76d47ee4177035cb','SLIVER'),(15,'Hiền','0631356974','hien@gmail.com','e54fc6b51915e222ba6196747a19ebb8dfa651fd2b46a385a0ded647fbfefda0','GOLD'),(16,'Huynh','0986572917','huynh@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','GOLD'),(17,'Hiếu dz','0123456789','hieudz@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SLIVER'),(18,'Nguyễn Hữu Cầm','0976354824','camnh@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SLIVER');
+INSERT INTO `user` VALUES (19,'Lưu Đức Hiếu','0976981804','hieu@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SILVER'),(20,'Lưu Thu An','0969316038','an@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SILVER'),(21,'Nguyễn Thị Thu Hiền','0976180420','hien@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SILVER'),(22,'Lưu Đức Huynh','0986572917','huynh@gmail.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','SILVER');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-02 15:51:32
+-- Dump completed on 2025-05-02 16:26:16

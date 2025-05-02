@@ -34,7 +34,7 @@ CREATE TABLE `donhang` (
   KEY `donhang_ibfk_2` (`ID_BanAn`),
   CONSTRAINT `donhang_ibfk_1` FOREIGN KEY (`ID_User`) REFERENCES `user` (`ID_User`) ON DELETE CASCADE,
   CONSTRAINT `donhang_ibfk_2` FOREIGN KEY (`ID_BanAn`) REFERENCES `banan` (`ID_BanAn`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,6 +43,7 @@ CREATE TABLE `donhang` (
 
 LOCK TABLES `donhang` WRITE;
 /*!40000 ALTER TABLE `donhang` DISABLE KEYS */;
+INSERT INTO `donhang` VALUES (3,1,19,NULL,'DA_HOAN_THANH','MANG_VE');
 /*!40000 ALTER TABLE `donhang` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-02 15:51:32
+-- Dump completed on 2025-05-02 16:26:16
