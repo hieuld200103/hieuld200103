@@ -24,16 +24,17 @@ DROP TABLE IF EXISTS `donhang`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `donhang` (
   `ID_DonHang` int unsigned NOT NULL AUTO_INCREMENT,
+  `ID_ChiNhanh` int unsigned NOT NULL,
   `ID_User` int unsigned NOT NULL,
   `ID_BanAn` int unsigned DEFAULT NULL,
-  `TrangThai` enum('DANG_CHUAN_BI','DA_HOAN_THANH') NOT NULL DEFAULT 'DANG_CHUAN_BI',
+  `TrangThai` enum('DANG_CHUAN_BI','DA_HOAN_THANH','DA_THANH_TOAN') NOT NULL DEFAULT 'DANG_CHUAN_BI',
   `kieudonhang` enum('TAI_NHA_HANG','MANG_VE') NOT NULL,
   PRIMARY KEY (`ID_DonHang`),
   KEY `ID_User` (`ID_User`),
   KEY `donhang_ibfk_2` (`ID_BanAn`),
   CONSTRAINT `donhang_ibfk_1` FOREIGN KEY (`ID_User`) REFERENCES `user` (`ID_User`) ON DELETE CASCADE,
   CONSTRAINT `donhang_ibfk_2` FOREIGN KEY (`ID_BanAn`) REFERENCES `banan` (`ID_BanAn`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +43,6 @@ CREATE TABLE `donhang` (
 
 LOCK TABLES `donhang` WRITE;
 /*!40000 ALTER TABLE `donhang` DISABLE KEYS */;
-INSERT INTO `donhang` VALUES (1,13,3,'DA_HOAN_THANH','TAI_NHA_HANG'),(2,13,NULL,'DA_HOAN_THANH','MANG_VE'),(3,12,NULL,'DA_HOAN_THANH','MANG_VE');
 /*!40000 ALTER TABLE `donhang` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-01 13:43:27
+-- Dump completed on 2025-05-02 15:51:32

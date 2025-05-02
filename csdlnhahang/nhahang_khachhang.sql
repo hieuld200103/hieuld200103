@@ -29,10 +29,9 @@ CREATE TABLE `khachhang` (
   `SDT` varchar(50) NOT NULL,
   `TrangThai` enum('DA_NHAN_BAN','DA_THANH_TOAN') DEFAULT 'DA_NHAN_BAN',
   PRIMARY KEY (`ID_KhachHang`),
-  UNIQUE KEY `SDT` (`SDT`),
   KEY `fk_khachhang_user` (`ID_User`),
   CONSTRAINT `fk_khachhang_user` FOREIGN KEY (`ID_User`) REFERENCES `user` (`ID_User`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +40,6 @@ CREATE TABLE `khachhang` (
 
 LOCK TABLES `khachhang` WRITE;
 /*!40000 ALTER TABLE `khachhang` DISABLE KEYS */;
-INSERT INTO `khachhang` VALUES (1,17,'Hiếu dz','0123456789','DA_NHAN_BAN'),(2,13,'Lưu Thu An','0976180420','DA_NHAN_BAN');
 /*!40000 ALTER TABLE `khachhang` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-01 13:43:26
+-- Dump completed on 2025-05-02 15:51:32

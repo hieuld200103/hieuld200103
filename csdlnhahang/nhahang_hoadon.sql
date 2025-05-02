@@ -27,8 +27,11 @@ CREATE TABLE `hoadon` (
   `ID_DonHang` int unsigned NOT NULL,
   `ID_KhuyenMai` int unsigned DEFAULT NULL,
   `TongTien` int NOT NULL,
-  `PTThanhToan` enum('TIEN_MAT','CHUYEN_KHOAN','VNPAY') NOT NULL,
-  `NgayThanhToan` date DEFAULT NULL,
+  `PTThanhToan` enum('TIEN_MAT','CHUYEN_KHOAN','VNPAY') DEFAULT NULL,
+  `NgayThanhToan` datetime DEFAULT NULL,
+  `NgayTaoHoaDon` datetime DEFAULT NULL,
+  `PhaiTra` int DEFAULT NULL,
+  `TrangThaiHD` enum('DA_THANH_TOAN','CHUA_THANH_TOAN','CHO_XAC_NHAN') DEFAULT 'CHUA_THANH_TOAN',
   PRIMARY KEY (`ID_HoaDon`),
   KEY `ID_DonHang` (`ID_DonHang`),
   KEY `ID_KhuyenMai` (`ID_KhuyenMai`),
@@ -55,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-01 13:43:27
+-- Dump completed on 2025-05-02 15:51:32
