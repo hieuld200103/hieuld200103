@@ -2,7 +2,7 @@ package model;
 
 public class User {
     public enum Role{
-        SLIVER, GOLD, DIAMOND;
+        SILVER, GOLD, DIAMOND;
     }
     private int id_User;
     private String tenUser;

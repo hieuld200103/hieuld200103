@@ -86,7 +86,7 @@ public class UserServices {
                 String matKhau = scanner.nextLine();
                 String hashedMatKhau = hashPassword(matKhau);
                 
-                String sql = "INSERT INTO user (TenUser, SDT, Email, MatKhau, Role) VALUES (?, ?, ?, ?, 'SLIVER')";
+                String sql = "INSERT INTO user (TenUser, SDT, Email, MatKhau, Role) VALUES (?, ?, ?, ?, 'SILVER')";
                 try (Connection conn = DatabaseConnection.getConnection();
                     PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     
@@ -100,7 +100,7 @@ public class UserServices {
                         if (rs.next()) {
                             int idUser = rs.getInt(1);
                             System.out.println("Đăng ký thành công! ID của bạn là: " + idUser);
-                            return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Role.SLIVER); 
+                            return new User(idUser, tenUser, sdt, email, hashedMatKhau, User.Role.SILVER); 
                         }
                     }
                 } catch (SQLException e) {
