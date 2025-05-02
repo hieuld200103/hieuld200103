@@ -94,37 +94,6 @@ public class KhachHangServices {
             return null;
     }
 
-    //Xóa thông tin khách hàng
-    public static void xoaKhachHang(Scanner scanner) {
-        xemDanhSachKhachHang();
-        System.out.print("Nhập ID khách hàng cần xóa: ");
-        if (!scanner.hasNextInt()) {
-            System.out.println(" Lỗi: ID không hợp lệ!");
-            scanner.next(); 
-            return;
-        }
-
-        int idKH = scanner.nextInt();
-        scanner.nextLine(); 
-
-        String sql = "DELETE FROM khachhang WHERE ID_KhachHang = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idKH);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Xóa khách hàng thành công!");
-            } else {
-                System.out.println("Không tìm thấy khách hàng có ID " + idKH);
-            }
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi xóa khách hàng!");
-            e.printStackTrace();
-        }
-    }
-
-  
-
     //Xem danh sách khách hàng
     public static List<KhachHang> xemDanhSachKhachHang() {
         List<KhachHang> danhSach = new ArrayList<>();

@@ -18,6 +18,7 @@ import service.DonHangServices;
 import service.GoiMonServices;
 import service.KhuyenMaiServices;
 import service.MonAnServices;
+import service.ThanhToanHoaDonServices;
 import service.TrangThaiDonHang;
 import model.User;
 import service.UserServices;
@@ -39,6 +40,7 @@ public class DichVuKhachHang {
         System.out.println("5. Sửa thông tin cá nhân");
         System.out.println("6. Kiểm tra trạng thái đơn hàng");
         System.out.println("7. Xem chương trình khuyến mãi");
+        System.out.println("8. Thanh toán hóa đơn");
         System.out.println("0. Đăng xuất");
         System.out.print("Chọn chức năng: ");
 
@@ -107,6 +109,9 @@ public class DichVuKhachHang {
                 break;
             case 7:
                 KhuyenMaiServices.xemKhuyenMai2(currentUser, scanner);
+                break;
+            case 8:
+                ThanhToanHoaDonServices.thanhToan(currentUser);
                 break;
             case 0:
                 UserServices.dangXuat();
@@ -183,7 +188,7 @@ public class DichVuKhachHang {
 
     //Lấy đơn ăn tại nhà hàng
     public static DonHang layDHTaiNhaHang(int idUser) {
-        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND kieudonhang = 'TAI_NHA_HANG'";
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DANG_CHUAN_BI' AND kieudonhang = 'TAI_NHA_HANG' ";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
     

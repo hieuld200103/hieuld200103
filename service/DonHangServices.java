@@ -176,22 +176,32 @@ public class DonHangServices {
     }
     
     //Lấy bàn của khách
-    public static int layBan(int idUser){
-        String sql = "SELECT * FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN' LIMIT 1";
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
-                stmt.setInt(1,idUser);
-                try(ResultSet rs = stmt.executeQuery()){
-                    if(rs.next()){
-                        return rs.getInt("List_BanAn");
-                    }else{
-                        System.out.println("Không tìm thấy bàn!");
+    public static int layBan(int idUser) {
+        String sql = "SELECT List_BanAn FROM datban WHERE ID_User = ? AND TrangThai = 'DA_XAC_NHAN' LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUser);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String listBan = rs.getString("List_BanAn");
+                    if (listBan != null && !listBan.trim().isEmpty()) {
+                        String[] banArr = listBan.split(",");
+                        return Integer.parseInt(banArr[0].trim());
+                    } else {
+                        System.out.println("Danh sách bàn trống!");
                     }
+                } else {
+                    System.out.println("Không tìm thấy bàn!");
                 }
-            }catch (SQLException e) {
+            }
+        } catch (SQLException e) {
             System.out.println("Lỗi khi lấy bàn ăn từ cơ sở dữ liệu");
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.out.println("Lỗi chuyển đổi ID bàn ăn!");
+            e.printStackTrace();
         }
-        return 0; 
+        return 0;
     }
+    
 }

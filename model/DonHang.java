@@ -2,7 +2,7 @@ package model;
 
 public class DonHang {
     public enum TrangThai{
-        DANG_CHUAN_BI, DA_HOAN_THANH;
+        DANG_CHUAN_BI, DA_HOAN_THANH, DA_THANH_TOAN
     }
     public enum KieuDonHang{
         TAI_NHA_HANG, MANG_VE 

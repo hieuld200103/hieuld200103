@@ -1,21 +1,18 @@
 package userinterface;
 
 import java.util.Scanner;
-
 import model.NhanVien;
-import service.DonHangServices;
-import service.TrangThaiDonHang;
-public class QuanLyDonHang {
-     public static void quanLy(NhanVien currentNV, int idChiNhanh,Scanner scanner) {
+import service.HoaDonServices;
+
+public class QuanLyHoaDon {
+     public static void quanLy(NhanVien currentNV, int idChiNhanh, Scanner scanner) {
         if (currentNV == null) {
             System.out.println("Bạn chưa đăng nhập! Vui lòng đăng nhập trước.");
             return;
         }
         while (true) {
-            System.out.println("\n=== QUẢN LÝ ĐƠN HÀNG ===");
-            System.out.println("1. Sửa trạng thái đơn hàng ");
-            System.out.println("2. Kiểm tra đơn hàng theo ID ");
-            System.out.println("3. Xem trạng thái tất cả đơn hàng ");
+            System.out.println("\n=== QUẢN LÝ HÓA ĐƠN ===");
+            System.out.println("1. Lọc danh sách hóa đơn");
             System.out.println("0. Thoát");
             System.out.print("Chọn chức năng: ");
 
@@ -30,16 +27,11 @@ public class QuanLyDonHang {
 
             switch (choice) {
                 case 1:
-                    DonHangServices.suaTrangThai(scanner);
-                    break;
-                case 2:
-                    TrangThaiDonHang.kiemTraDonHangNV(scanner, currentNV, idChiNhanh);
-                    break;
-                case 3:
-                    TrangThaiDonHang.kiemTraDonHangNV2(scanner, currentNV, idChiNhanh);
+                    HoaDonServices.locDanhSachHoaDon(currentNV,scanner);
                     break;
                 case 0:
-                    CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                     
+                    CongViecNhanVien.congViec(currentNV, idChiNhanh,scanner);                    
+                    scanner.close();
                     return; 
                 default:
                     System.out.println(" Lựa chọn không hợp lệ, vui lòng nhập lại!");

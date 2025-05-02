@@ -1,6 +1,8 @@
 package background;
 
 import model.DatBan;
+import model.DonHang;
+import model.KhachHang;
 import model.NhanVien;
 import service.NhanVienServices;
 
@@ -39,25 +41,36 @@ public class DatBanChecker implements Runnable {
                     int id = Integer.parseInt(list.trim());
                     if (datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
                         if (tgDat <= 90 && tgCho <= 30) {
-                            capNhatTrangThai(id, "DA_DAT");
+                            capNhatTrangThaiBanAn(id, "DA_DAT");
                             banDuocXacNhan.add(datBan);
                         } 
                         else if (tgCho > 30 && !daNhanBan(datBan.getID_User())) {
-                            capNhatTrangThai(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
-                            capNhatTrangThai(id, "TRONG");
+                            capNhatTrangThaiDatBan(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
+                            capNhatTrangThaiBanAn(id, "TRONG");
                             banBiHuy.add(datBan);
                         }
                     }
-                }
 
-                // if(daNhanBan(datBan.getID_User())){
-                //     for( String list :idBan){
-                //         int id = Integer.parseInt(list.trim());
-                //         capNhatTrangThai(id, "DANG_SU_DUNG");
-                //     }
-                // }  
+                    if(daNhanBan(datBan.getID_User())){
+                        capNhatTrangThaiBanAn(id, "DANG_SU_DUNG");
+                    }  
+
+                    if(daThanhToan(datBan.getID_User())){
+                        capNhatTrangThaiBanAn(id,"TRONG");
+                        capNhatTrangThaiDatBan(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
+                        banBiHuy.add(datBan);
+                        capNhatTrangThaiKH(datBan.getID_User(), KhachHang.TrangThai.DA_THANH_TOAN);
+                        
+                    }
+                }
                 
+                if(daThanhToan(datBan.getID_User())){
+                    capNhatTrangThaiDonHang(layDH(datBan.getID_User()),DonHang.TrangThai.DA_THANH_TOAN);
+                }
             }
+
+            
+
             boolean coDonChoXacNhan = false;
             List<DatBan> dsChoXacNhan = xemDSChoXacNhan();
             for(DatBan datBan : dsChoXacNhan){
@@ -81,13 +94,13 @@ public class DatBanChecker implements Runnable {
                 System.out.println("\n Các bàn bị huỷ: " + inDanhSach(banBiHuy));
             }
 
-            sleep3Minute();
+            sleep1Minute();
         }
     }
 
-    private void sleep3Minute() {
+    private void sleep1Minute() {
         try {
-            Thread.sleep(180*1000);
+            Thread.sleep(60*1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -104,8 +117,8 @@ public class DatBanChecker implements Runnable {
         return String.join(", ", idSet);
     }
 
-    //Cập nhật theo checker
-    public static void capNhatTrangThai(int idBan, String trangThaiMoi) {
+    //Cập nhật trạng thái Bàn ăn
+    public static void capNhatTrangThaiBanAn(int idBan, String trangThaiMoi) {
         String sql = "UPDATE banan SET TrangThai = ? WHERE ID_BanAn = ?";
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -118,8 +131,8 @@ public class DatBanChecker implements Runnable {
         }
     }
 
-    //Cập nhật theo checker
-    public static void capNhatTrangThai(int idDatBan, DatBan.TrangThai trangThaiMoi) {
+    //Cập nhật trạng thái Đặt bàn
+    public static void capNhatTrangThaiDatBan(int idDatBan, DatBan.TrangThai trangThaiMoi) {
         String sql = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -170,7 +183,7 @@ public class DatBanChecker implements Runnable {
     public static List<DatBan> xemDSDaXacNhan (){
         return xemDanhSachDatBan("TrangThai = 'DA_XAC_NHAN'");
     }
-    
+
     //Thông báo có đơn chờ xác nhận
     public static void thongBao(NhanVien currentNV){
         int idChiNhanh = currentNV.getID_ChiNhanh();
@@ -195,6 +208,54 @@ public class DatBanChecker implements Runnable {
         }    
     }
 
+    //Cập nhật trạng thái khách hàng
+    public static void capNhatTrangThaiKH(int idUser, KhachHang.TrangThai trangThaiMoi) {
+        String sql = "UPDATE khachhang SET TrangThai = ? WHERE ID_User = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, trangThaiMoi.name());
+            stmt.setInt(2, idUser);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi cập nhật trạng thái KH.");
+            e.printStackTrace();
+        }
+    }
+
+    //Cập nhật trạng thái Đơn hàng
+    public static void capNhatTrangThaiDonHang(int idDH, DonHang.TrangThai trangThaiMoi) {
+        String sql = "UPDATE donhang SET TrangThai = ? WHERE ID_DonHang = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, trangThaiMoi.name());
+            stmt.setInt(2, idDH);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi cập nhật trạng thái đặt bàn.");
+            e.printStackTrace();
+        }
+    }
+
+     //Lấy đơn hàng của khách
+     public static int layDH(int idUser){
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DA_HOAN_THANH'";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+                stmt.setInt(1,idUser);
+                try(ResultSet rs = stmt.executeQuery()){
+                    if(rs.next()){
+                        return rs.getInt("ID_DonHang");
+                    }else{
+                        System.out.println("Không tìm thấy đơn hàng!");
+                    }
+                }
+            }catch (SQLException e) {
+            System.out.println("Lỗi khi lấy bàn ăn từ cơ sở dữ liệu");
+            e.printStackTrace();
+        }
+        return 0; 
+    }
+
     //Check khách đã nhận bàn
     public static boolean daNhanBan(int idUser) {
         String sql = "SELECT * FROM khachhang WHERE ID_User = ? AND TrangThai = 'DA_NHAN_BAN'";
@@ -210,4 +271,21 @@ public class DatBanChecker implements Runnable {
         }
         return false;
     }
+
+    //Check khách đã thanh toán chưa
+    public static boolean daThanhToan(int idUser) {
+        String sql = "SELECT * FROM donhang WHERE ID_User = ? AND TrangThai = 'DA_HOAN_THANH'";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUser);
+            try(ResultSet rs = stmt.executeQuery()){
+                return rs.next();
+            }            
+        } catch (SQLException e) {
+            System.out.println("Lỗi kiểm tra trạng thái đơn hàng!");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
