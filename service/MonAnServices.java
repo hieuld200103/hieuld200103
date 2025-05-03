@@ -481,21 +481,22 @@ public class MonAnServices {
             stmt.setString(1, value);
             try (ResultSet rs = stmt.executeQuery()) {
                 int stt =1;
-                System.out.println("\n=============================== DANH SÁCH MÓN ĂN ===============================");
+                System.out.println("\n======================================= DANH SÁCH MÓN ĂN =======================================");
                 System.out.printf("| %-3s | %-5s | %-25s | %-10s | %-40s |\n", "STT","ID", "Tên Món", "Giá", "Mô tả");
-                System.out.println("--------------------------------------------------------------------------------");
-    
+               
                 while (rs.next()) {
                     int id = rs.getInt("ID_MonAn");
                     String tenMon = rs.getString("TenMon");
                     int gia = rs.getInt("Gia");
                     String moTa = rs.getString("Mota");
+                    System.out.println("--------------------------------------------------------------------------------------------------");
+    
                     System.out.printf("| %-3d | %-5d | %-25s | %-10d | %-40s |\n", stt++,id, tenMon.length() > 25 ? tenMon.substring(0, 22)+"...":tenMon, gia, moTa.length() > 40 ? moTa.substring(0, 37) + "..." : moTa);
     
                     MonAn mon = new MonAn(id, tenMon, gia, moTa);
                     danhSach.add(mon);
                 }
-                System.out.println("================================================================================");
+                System.out.println("=================================================================================================");
     
             }
         } catch (SQLException e) {
