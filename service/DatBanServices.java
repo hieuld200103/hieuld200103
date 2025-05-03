@@ -289,9 +289,9 @@ public class DatBanServices {
             stmt.setInt(1,idCN);
             try(ResultSet rs = stmt.executeQuery()){
                 int stt = 1;
-                System.out.println("\n===================================== " + tieuDe.toUpperCase() + " ====================================");
-                System.out.println("=========================================================================================================");
-                System.out.printf("| %-3s | %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "STT","ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Ngày ăn", "Trạng thái");
+                System.out.println("\n============================================== " + tieuDe.toUpperCase() + " =============================================");
+                System.out.println("=================================================================================================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-8s | %-10s | %-20s | %-20s | %-15s |\n", "STT","ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Ngày ăn", "Trạng thái");
                 
                 while (rs.next()) {
                     int id = rs.getInt("ID_DatBan");
@@ -303,13 +303,13 @@ public class DatBanServices {
         
                     DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                     danhSach.add(datBan);
-                    System.out.println("---------------------------------------------------------------------------------------------------------");
+                    System.out.println("-----------------------------------------------------------------------------------------------------------------");
         
-                    System.out.printf("| %-3d | %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
-                            stt++,id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    System.out.printf("| %-3d | %-5d | %-7d | %-8d | %-10s | %-20s | %-20s | %-15s |\n",
+                            stt++,id, idCN, idUser, idBanAn.length()>10 ? idBanAn.substring(0, 7)+"...":idBanAn, ngayDat, ngayAn, trangThai);
                 }
         
-                System.out.println("=========================================================================================================");
+                System.out.println("=================================================================================================================");
             }
 
         } catch (SQLException e) {
