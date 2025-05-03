@@ -31,17 +31,22 @@ public class DichVuKhachHang {
     }
 
     while (true) {
-        System.out.println("\n=== DỊCH VỤ KHÁCH HÀNG ===");
-        System.out.println("1. Gọi món tại nhà hàng");
-        System.out.println("2. Đặt món mang về");
-        System.out.println("3. Đặt bàn");
-        System.out.println("4. Xem thực đơn");
-        System.out.println("5. Sửa thông tin cá nhân");
-        System.out.println("6. Kiểm tra trạng thái đơn hàng");
-        System.out.println("7. Xem chương trình khuyến mãi");
-        System.out.println("8. Thanh toán hóa đơn");
-        System.out.println("0. Đăng xuất");
-        System.out.print("Chọn chức năng: ");
+        String [] menu = {
+            "DỊCH VỤ KHÁCH HÀNG",
+            "1. Gọi món tại nhà hàng",
+            "2. Đặt món mang về",
+            "3. Đặt bàn",
+            "4. Xem thực đơn",
+            "5. Sửa thông tin cá nhân",
+            "6. Kiểm tra trạng thái đơn hàng",
+            "7. Xem chương trình khuyến mãi",
+            "8. Thanh toán hóa đơn",
+            "0. Đăng xuất",
+        };
+        System.out.println("\n=== " + menu[0] + " ===");
+            for (int i = 1; i < menu.length; i++) {
+                System.out.println(menu[i]);
+            }
 
         if (!scanner.hasNextInt()) {
             System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");

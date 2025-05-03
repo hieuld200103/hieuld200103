@@ -19,6 +19,7 @@ import userinterface.QuanLyHoaDon;
 import userinterface.QuanLyThanhToanHoaDon;
 
 public class HoaDonServices {
+    
     private static Scanner sc = new Scanner(System.in);
     public static void taoHoaDon(User currentUser) {
         String getDonHangSQL = """
@@ -83,9 +84,9 @@ public class HoaDonServices {
         try (ResultSet rs = stmt.executeQuery()) {
             int stt = 1;
         System.out.println("\n============================================================ "+ tieuDe+ " ====================================================================");
-                System.out.println("===================================================================================================================================================");
-                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-12s | %-12s | %-15s | %-15s | %-20s | %-20s |\n", 
-                                  "STT","ID HD", "ID Đơn", "ID KM","Tổng tiền", "Phải trả", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
+                System.out.println("=========================================================================================================================================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-15s | %-15s | %-15s | %-15s | %-20s | %-20s |\n", 
+                                  "STT","ID HD", "ID Đơn", "ID KM","Tổng tiền (VND)", "Phải trả (VND)", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
 
                 while (rs.next()) {
                     int idHoaDon = rs.getInt("ID_HoaDon");
@@ -97,16 +98,16 @@ public class HoaDonServices {
                     LocalDateTime ngayThanhToan = rs.getTimestamp("NgayThanhToan")!= null ? rs.getTimestamp("NgayThanhToan").toLocalDateTime(): null;
                     LocalDateTime ngayTaoHD = rs.getTimestamp("NgayTaoHoaDon")!= null ? rs.getTimestamp("NgayTaoHoaDon").toLocalDateTime(): null;
                     int idKhuyenMai = rs.getInt("ID_KhuyenMai");
-                    System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
+                    System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------");
 
                     HoaDon hoaDon = new HoaDon(idHoaDon, idDonHang, tongTien, phaiTra, ptThanhToan, trangThai, idKhuyenMai, ngayTaoHD, ngayThanhToan);
                     danhSach.add(hoaDon);
 
-                    System.out.printf("| %-3d | %-5d | %-7d | %-7d | %-12d | %-12d | %-15s | %-15s | %-20s | %-20s |\n",
-                                      stt++,idHoaDon, idDonHang,idKhuyenMai, tongTien, phaiTra, ptThanhToan, trangThai, ngayTaoHD != null ? ngayTaoHD.toString() : "null",ngayThanhToan != null ? ngayThanhToan.toString() : "null");
+                    System.out.printf("| %-3d | %-5d | %-7d | %-7d | %-,15d | %-,15d | %-15s | %-15s | %-20s | %-20s |\n",
+                                      stt++,idHoaDon, idDonHang,idKhuyenMai, tongTien,phaiTra, ptThanhToan, trangThai, ngayTaoHD != null ? ngayTaoHD.toString() : "null",ngayThanhToan != null ? ngayThanhToan.toString() : "null");
                 }
 
-                System.out.println("===================================================================================================================================================");
+                System.out.println("=========================================================================================================================================================\n");
         }
         catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách hóa đơn!");
@@ -204,7 +205,7 @@ public class HoaDonServices {
 
             case 2:
                 // Truy vấn khuyến mãi đang diễn ra tại ngày tạo hóa đơn
-                List<KhuyenMai> danhSachKM = layKhuyenMaiTrongNgay(hoaDon.getNgayThanhToan());
+                List<KhuyenMai> danhSachKM = layKhuyenMaiTrongNgay(hoaDon.getNgayTaoHD());
                 if (danhSachKM.isEmpty()) {
                     System.out.println("Không có khuyến mãi nào phù hợp!");
                     thanhToan(idHoaDon, null);
@@ -214,7 +215,7 @@ public class HoaDonServices {
                 System.out.println("\n===== Danh sách khuyến mãi khả dụng =====");
                 for (int i = 0; i < danhSachKM.size(); i++) {
                     KhuyenMai km = danhSachKM.get(i);
-                    System.out.printf("%d. %s (%.0f%%)\n", i + 1, km.getTenChuongTrinh(), km.getPhanTramKM() * 100);
+                    System.out.printf("%d. %s (%.0f%%)\n", i + 1, km.getTenChuongTrinh(), km.getPhanTramKM());
                 }
 
                 System.out.print("Chọn khuyến mãi (1-" + danhSachKM.size() + "): ");
@@ -244,17 +245,17 @@ public class HoaDonServices {
             default: phuongThuc = "TIEN_MAT";
         }
 
-        String sql = "UPDATE hoadon SET TongTien = ?, PTThanhToan = ?, TrangThaiHD = ?, ID_KhuyenMai = ?, NgayThanhToan = ? WHERE ID_HoaDon = ?";
+        String sql = "UPDATE hoadon SET PhaiTra = ?, PTThanhToan = ?, TrangThaiHD = ?, ID_KhuyenMai = ?, NgayThanhToan = ? WHERE ID_HoaDon = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // Tính tổng tiền (có khuyến mãi hay không)
-            int phaiTra = getPhaiTraFromDB(idHoaDon);
+            int tongTien = getTongTienFromDB(idHoaDon);
             double phanTram = (khuyenMai != null) ? khuyenMai. getPhanTramKM() : 0;
-            int tongTienSauGiam = (int)(phaiTra * (1 - phanTram));
+            int phaiTra = (int)(tongTien * (100 - phanTram)/100);
             LocalDateTime ngayThanhToan = LocalDateTime.now();
 
-            stmt.setInt(1, tongTienSauGiam);
+            stmt.setInt(1, phaiTra);
             stmt.setString(2, phuongThuc);
             stmt.setString(3, "CHO_XAC_NHAN");
             if (khuyenMai != null) {
@@ -267,7 +268,8 @@ public class HoaDonServices {
 
             int rows = stmt.executeUpdate();
             if (rows > 0) {
-                System.out.println("✅ Vui lòng đợi nhân viên xác nhận thanh toán !");
+                System.out.printf("✅ Số tiền bạn cần thanh toán: %,d VND%n",phaiTra );
+                System.out.println("✅ Vui lòng thanh toán và đợi nhân viên xác nhận !");
             } else {
                 System.out.println("❌ Không tìm thấy hóa đơn để cập nhật.");
             }
@@ -279,20 +281,20 @@ public class HoaDonServices {
     }
 
     // Lấy số tiền phải trả từ bảng hoadon
-    private static int getPhaiTraFromDB(int idHoaDon) {
-        int phaiTra = 0;
-        String sql = "SELECT PhaiTra FROM hoadon WHERE ID_HoaDon = ?";
+    private static int getTongTienFromDB(int idHoaDon) {
+        int tongTien = 0;
+        String sql = "SELECT TongTien FROM hoadon WHERE ID_HoaDon = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idHoaDon);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                phaiTra = rs.getInt("PhaiTra");
+                tongTien = rs.getInt("TongTien");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return phaiTra;
+        return tongTien;
     }
     // ===================================================================
     // Lấy danh sách khuyến mãi đang diễn ra trong ngày
@@ -323,11 +325,13 @@ public class HoaDonServices {
     }
     // ===================================================================
     //Cập nhật theo checker
-    public static void capNhatTrangThai(List<HoaDon> danhSachHoaDon, Scanner scanner, String trangThaiMoi) {
+    public static void capNhatTrangThai(NhanVien currentNV,int idChiNhanh, List<HoaDon> danhSachHoaDon, Scanner scanner, String trangThaiMoi) {
         List<Integer> idHoaDons = new ArrayList<>();
-        System.out.print("\nNhập danh sách ID hóa đơn cần cập nhật trạng thái (ngăn cách bởi dấu phẩy): ");
+        System.out.print("\nNhập danh sách ID hóa đơn cần cập nhật trạng thái (ngăn cách bởi dấu phẩy) hoặc nhập 0 để thoát: ");
         String input = scanner.nextLine();
-
+        if (input.equals("0")){
+            locDanhSachHoaDon(currentNV,idChiNhanh,scanner); // Nếu nhập 0 thì thoát
+        }
         try {
             String[] parts = input.split(",");
             for (String part : parts) {
@@ -416,80 +420,19 @@ public class HoaDonServices {
             switch (choice) {
                 case 1:
                     danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Danh sách chưa thanh toán", "TrangThaiHD = 'CHUA_THANH_TOAN'");
-                    System.out.println("===== XÁC NHẬN THANH TOÁN ===== ");
-                    System.out.println("1. Xác nhận thanh toán cho hóa đơn ");
-                    System.out.println("0. Thoát ");
-                    System.out.println("Mời nhập lựa chọn: ");
-                    
-                    int choice1;
-                    if (scanner.hasNextInt()) {
-                        choice1 = scanner.nextInt();
-                        scanner.nextLine();
-                    } else {
-                        System.out.println("Lỗi: Lựa chọn không hợp lệ!");
-                        scanner.next(); 
-                        continue;
-                    }
-                    switch (choice1){
-                        case 1: 
-                            capNhatTrangThai(danhSachHoaDon, scanner, "DA_THANH_TOAN");
-                            break;
-                        case 0:
-                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
-                            break;
-
-                    }
+                    System.out.println("\n===== XÁC NHẬN THANH TOÁN ===== ");
+                    capNhatTrangThai(currentNV,idChiNhanh, danhSachHoaDon, scanner, "DA_THANH_TOAN");
                     break;
                 case 2:
                     danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Danh sách chờ xác nhận", "TrangThaiHD = 'CHO_XAC_NHAN'");
-                    System.out.println("===== XÁC NHẬN THANH TOÁN ===== ");
-                    System.out.println("1. Xác nhận thanh toán cho hóa đơn ");
-                    System.out.println("0. Thoát ");
-                    System.out.println("Mời nhập lựa chọn: ");
-
-                    int choice2;
-                    if (scanner.hasNextInt()) {
-                        choice2 = scanner.nextInt();
-                        scanner.nextLine();
-                    } else {
-                        System.out.println("Lỗi: Lựa chọn không hợp lệ!");
-                        scanner.next(); 
-                        continue;
-                    }
-                    switch (choice2){
-                        case 1: 
-                            capNhatTrangThai(danhSachHoaDon, scanner, "DA_THANH_TOAN");
-                            break;
-                        case 0:
-                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
-                            break;
-
-                    }
+                    System.out.println("\n===== XÁC NHẬN THANH TOÁN ===== ");
+                    capNhatTrangThai(currentNV,idChiNhanh, danhSachHoaDon, scanner, "DA_THANH_TOAN");
                     break;
                 case 3:
                     danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh,"Danh sách đã thanh toán", "TrangThaiHD = 'DA_THANH_TOAN'");
-                    System.out.println("====== XUẤT HÓA ĐƠN ======= ");
-                    System.out.println("1. Xuất hóa đơn thanh toán ");
-                    System.out.println("0. Thoát ");
-                    System.out.println("Mời nhập lựa chọn: ");
-                    int choice3;
-                    if (scanner.hasNextInt()) {
-                        choice3 = scanner.nextInt();
-                        scanner.nextLine();
-                    } else {
-                        System.out.println("Lỗi: Lựa chọn không hợp lệ!");
-                        scanner.next(); 
-                        continue;
-                    }
-                    switch (choice3){
-                        case 1: 
-                            xuatHoaDon(danhSachHoaDon, scanner);
-                            break;
-                        case 0:
-                            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
-                            break;
-
-                    }
+                    System.out.println("\n====== XUẤT HÓA ĐƠN ======= ");
+                    xuatHoaDon(currentNV,idChiNhanh, danhSachHoaDon, scanner);
+                    break;
                 case 4:
                     danhSachHoaDon = xemDanhSachHoaDon(currentNV,idChiNhanh, "Toàn bộ danh sách", null);
                     break;
@@ -527,6 +470,7 @@ public class HoaDonServices {
             switch (choice) {
                 case 1:
                     danhSachHoaDon = xemHoaDon(idUser, "Danh sách chưa thanh toán", "TrangThaiHD = 'CHUA_THANH_TOAN'");
+                    HoaDonServices.thanhtoanAction(currentUser,danhSachHoaDon);
                     break;
                 case 2:
                     danhSachHoaDon = xemHoaDon(idUser, "Danh sách chờ xác nhận", "TrangThaiHD = 'CHO_XAC_NHAN'");
@@ -549,10 +493,14 @@ public class HoaDonServices {
         
     }
     //==========XUẤT HÓA ĐƠN CHI TIẾT================================================
-    public static void xuatHoaDon(List<HoaDon> danhSachHoaDon, Scanner scanner) {
+    public static void xuatHoaDon(NhanVien currentNV,int idChiNhanh, List<HoaDon> danhSachHoaDon, Scanner scanner) {
         List<Integer> idHoaDons = new ArrayList<>();
-        System.out.print("\nNhập danh sách ID hóa đơn cần xuất hóa đơn (cách nhau bằng dấu phẩy): ");
+        System.out.print("\nNhập danh sách ID hóa đơn cần xuất hóa đơn (cách nhau bằng dấu phẩy) hoặc nhập 0 để thoát: ");
         String input = scanner.nextLine();
+        if (input.equals("0")){
+            locDanhSachHoaDon(currentNV,idChiNhanh,scanner);
+        }
+
         try {
             String[] parts = input.split(",");
             for (String part : parts) {
@@ -594,21 +542,21 @@ public class HoaDonServices {
                     ResultSet rs = stmt.executeQuery();
 
                     System.out.println("\nDanh sách món ăn:");
-                    System.out.printf("%-25s %-10s %-12s %-12s%n", "Tên món", "Số lượng", "Đơn giá", "Thành tiền");
+                    System.out.printf("%-40s %-10s %-12s %-12s%n", "Tên món", "Số lượng", "Đơn giá ", "Thành tiền");
                     while (rs.next()) {
                         String tenMon = rs.getString("TenMon");
                         int soLuong = rs.getInt("SoLuong");
                         int donGia = rs.getInt("dongia");
                         int thanhTien = rs.getInt("thanhtien");
-                        System.out.printf("%-25s %-10d %-12d %-12d%n", tenMon, soLuong, donGia, thanhTien);
+                        System.out.printf("%-40s %-10d %-,12d %-,12d%n", tenMon, soLuong, donGia, thanhTien);
                     }
                 }
             } catch (SQLException e) {
                 System.out.println("Lỗi khi lấy danh sách món ăn cho đơn hàng ID: " + hoaDon.getIdDonHang());
                 e.printStackTrace();
             }
-            System.out.println("\nTỔNG TIỀN                                         " + hoaDon.getTongTien());
-            System.out.println("PHẢI TRẢ                                          " + hoaDon.getPhaiTra() +"\n");
+            System.out.printf("\n%-64s %,d VND", "TỔNG TIỀN",hoaDon.getTongTien());
+            System.out.printf("\n%-64s %,d VND%n", "PHẢI TRẢ",hoaDon.getPhaiTra());
         }
     }
 

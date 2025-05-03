@@ -16,7 +16,7 @@ public class HoaDon {
     public HoaDon() {
     }
 
-    public HoaDon(int id_HoaDon, int id_DonHang, int tongTien, int phaiTra, String ptThanhToan, String trangThai, int id_KhuyenMai, LocalDateTime ngayThanhToan, LocalDateTime ngayTaoHD) {
+    public HoaDon(int id_HoaDon, int id_DonHang, int tongTien, int phaiTra, String ptThanhToan, String trangThai, int id_KhuyenMai, LocalDateTime ngayTaoHD,LocalDateTime ngayThanhToan) {
         this.id_HoaDon = id_HoaDon;
         this.id_DonHang = id_DonHang;
         this.tongTien = tongTien;
@@ -104,7 +104,7 @@ public class HoaDon {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("================= HÓA ĐƠN ====================== \n");
+        sb.append("\n================= HÓA ĐƠN ====================== \n");
         sb.append("ID Hóa đơn         : ").append(id_HoaDon).append("\n");
         sb.append("ID Đơn hàng        : ").append(id_DonHang).append("\n");
         sb.append("PT Thanh toán      : ").append(ptThanhToan).append("\n");

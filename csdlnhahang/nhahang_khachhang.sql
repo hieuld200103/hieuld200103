@@ -32,7 +32,7 @@ CREATE TABLE `khachhang` (
   PRIMARY KEY (`ID_KhachHang`),
   KEY `fk_khachhang_user` (`ID_User`),
   CONSTRAINT `fk_khachhang_user` FOREIGN KEY (`ID_User`) REFERENCES `user` (`ID_User`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `khachhang` (
 
 LOCK TABLES `khachhang` WRITE;
 /*!40000 ALTER TABLE `khachhang` DISABLE KEYS */;
-INSERT INTO `khachhang` VALUES (2,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN'),(3,21,2,'Nguyễn Thị Thu Hiền','0976180420','DA_THANH_TOAN'),(4,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN'),(5,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN');
+INSERT INTO `khachhang` VALUES (2,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN'),(3,21,2,'Nguyễn Thị Thu Hiền','0976180420','DA_THANH_TOAN'),(4,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN'),(5,19,1,'Lưu Đức Hiếu','0976981804','DA_THANH_TOAN'),(6,21,2,'Nguyễn Thị Thu Hiền','0976180420','DA_THANH_TOAN');
 /*!40000 ALTER TABLE `khachhang` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-03 19:39:57
+-- Dump completed on 2025-05-04  1:02:27

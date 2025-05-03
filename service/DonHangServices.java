@@ -114,9 +114,9 @@ public class DonHangServices {
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
                 int stt = 1;
-                System.out.println("=================================================================================");
-                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-7s | %-15s | %-15s | %-25s |\n",
-                                  "STT","ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu");
+                System.out.println("======================================= DANH SÁCH ĐƠN HÀNG ===========================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-7s | %-15s | %-15s | %-20s |\n",
+                                  "STT","ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu", "Ngày đặt");
                 while (rs.next()) {
                     int id = rs.getInt("ID_DonHang");
                     int idUser = rs.getInt("ID_User");
@@ -125,11 +125,11 @@ public class DonHangServices {
                     DonHang.TrangThai trangThai = DonHang.TrangThai.valueOf(rs.getString("TrangThai"));
                     DonHang.KieuDonHang kieuDonHang = DonHang.KieuDonHang.valueOf(rs.getString("kieudonhang"));
                     LocalDateTime ngayDat = rs.getTimestamp("thoigiantaodon").toLocalDateTime();
-                    System.out.println("---------------------------------------------------------------------------------");
+                    System.out.println("-----------------------------------------------------------------------------------------------------");
                     danhSach.add(new DonHang(id, idCN, idUser, idBanAn, trangThai, kieuDonHang, ngayDat));
-                    System.out.printf("| %-3d | %-5d | %-7s | %-7s | %-7s | %-15s | %-15s | %-25s |\n",stt++,id, idCN, idUser, idBanAn , trangThai, kieuDonHang, ngayDat);
+                    System.out.printf("| %-3d | %-5d | %-7s | %-7s | %-7s | %-15s | %-15s | %-20s |\n",stt++,id, idCN, idUser, idBanAn , trangThai, kieuDonHang, ngayDat);
                 }               
-                System.out.println("=================================================================================");
+                System.out.println("======================================================================================================");
         }catch(SQLException e){
             System.out.println("Lỗi khi lấy danh sách đơn hàng!");
             e.printStackTrace();

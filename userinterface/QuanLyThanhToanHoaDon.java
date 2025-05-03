@@ -1,14 +1,10 @@
 package userinterface;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import model.HoaDon;
 import model.User;
 import service.HoaDonServices;
 public class QuanLyThanhToanHoaDon {
     public static void thanhToan(User currentUser) {
-        List<HoaDon> danhSachHoaDon = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
             while (true) {
                 System.out.println("\n=== THANH TOÁN ===");
@@ -27,8 +23,8 @@ public class QuanLyThanhToanHoaDon {
                 switch (choice) {
                     case 1:
                         HoaDonServices.taoHoaDon(currentUser);
-                        danhSachHoaDon = HoaDonServices.locDanhSachHoaDon_KH(currentUser,scanner);
-                        HoaDonServices.thanhtoanAction(currentUser,danhSachHoaDon);
+                        HoaDonServices.locDanhSachHoaDon_KH(currentUser,scanner);
+                
                         break;
                     case 0:
                         DichVuKhachHang.dichVu(currentUser,scanner);

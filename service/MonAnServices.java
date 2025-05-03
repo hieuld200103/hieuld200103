@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import connection.DatabaseConnection;
 import model.MonAn.DanhMucMonAn;
 import model.MonAn.LoaiMonAn;
@@ -128,6 +129,7 @@ public class MonAnServices {
     
     // Xóa thông tin món ăn
     public static void xoaMonAn(Scanner scanner){
+        xemMenu("Danh sách món ăn", null);
         System.out.print("Nhập ID món ăn cần xóa: ");
         if(!scanner.hasNextInt()){
             System.out.println("Lỗi: ID không hợp lệ");
@@ -302,6 +304,7 @@ public class MonAnServices {
             System.out.println("2. Món chính");
             System.out.println("3. Món tráng miệng");
             System.out.println("4. Đồ uống");
+            System.out.println("5. Tất cả menu");
             System.out.println("0. Thoát");
             System.out.print("Chọn: ");
     
@@ -327,6 +330,9 @@ public class MonAnServices {
                 case 4:
                     xemMenu("Danh sách đồ uống", "LoaiMonAn = 'DO_UONG'");
                     break;
+                case 5:
+                    xemMenu("Danh sách toàn bộ menu", null);
+                    break;
                 case 0:
                     return;
                 default:
@@ -350,7 +356,7 @@ public class MonAnServices {
             int stt = 1;
             System.out.println("\n=================================================== " + tieuDe.toUpperCase() + " ===================================================");
             System.out.println("=====================================================================================================================================");
-            System.out.printf("| %-3s | %-5s | %-25s | %-12s | %-40s | %-15s | %-15s |\n", "STT","ID", "Tên Món", "Giá", "Mô tả", "Loại món", "Danh mục");
+            System.out.printf("| %-3s | %-5s | %-25s | %-12s | %-40s | %-15s | %-15s |\n", "STT","ID", "Tên Món", "Giá (VNĐ)", "Mô tả", "Loại món", "Danh mục");
     
             while (rs.next()) {
                 int id = rs.getInt("ID_MonAn");
@@ -364,7 +370,7 @@ public class MonAnServices {
                 danhSach.add(monAn);
     
                 System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
-                System.out.printf("| %-3d | %-5d | %-25s | %-12d | %-40s | %-15s | %-15s |\n",stt++, id, tenMon.length() > 25 ? tenMon.substring(0, 22)+"...":tenMon, gia, moTa.length() > 40 ? moTa.substring(0, 37) + "..." : moTa, loaiMonAn, danhMuc);
+                System.out.printf("| %-3d | %-5d | %-25s | %,12d | %-40s | %-15s | %-15s |\n",stt++, id, tenMon.length() > 25 ? tenMon.substring(0, 22)+"...":tenMon, gia, moTa.length() > 40 ? moTa.substring(0, 37) + "..." : moTa, loaiMonAn, danhMuc);
             }
     
             System.out.println("======================================================================================================================================");
@@ -482,7 +488,7 @@ public class MonAnServices {
             try (ResultSet rs = stmt.executeQuery()) {
                 int stt =1;
                 System.out.println("\n======================================= DANH SÁCH MÓN ĂN =======================================");
-                System.out.printf("| %-3s | %-5s | %-25s | %-10s | %-40s |\n", "STT","ID", "Tên Món", "Giá", "Mô tả");
+                System.out.printf("| %-3s | %-5s | %-25s | %-10s | %-40s |\n", "STT","ID", "Tên Món", "Giá(VNĐ)", "Mô tả");
                
                 while (rs.next()) {
                     int id = rs.getInt("ID_MonAn");
@@ -491,7 +497,7 @@ public class MonAnServices {
                     String moTa = rs.getString("Mota");
                     System.out.println("--------------------------------------------------------------------------------------------------");
     
-                    System.out.printf("| %-3d | %-5d | %-25s | %-10d | %-40s |\n", stt++,id, tenMon.length() > 25 ? tenMon.substring(0, 22)+"...":tenMon, gia, moTa.length() > 40 ? moTa.substring(0, 37) + "..." : moTa);
+                    System.out.printf("| %-3d | %-5d | %-25s | %,10d | %-40s |\n", stt++,id, tenMon.length() > 25 ? tenMon.substring(0, 22)+"...":tenMon, gia, moTa.length() > 40 ? moTa.substring(0, 37) + "..." : moTa);
     
                     MonAn mon = new MonAn(id, tenMon, gia, moTa);
                     danhSach.add(mon);
