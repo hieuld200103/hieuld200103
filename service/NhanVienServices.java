@@ -309,33 +309,57 @@ public class NhanVienServices {
     public static List<User> xemDanhSachUser(){
         List<User> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM user";
-       
+        
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
-                int stt = 1;
-                System.out.println("=================================== DANH SÁCH USER =====================================");
-                System.out.println("========================================================================================");
-                System.out.printf("| %-3s | %-5s | %-20s | %-12s | %-25s | %-10s |\n",
-                                  "STT","ID", "Tên", "SDT", "Email", "Hạng");
-                while (rs.next()) {
-                    int id = rs.getInt("ID_User");
-                    String tenUser = rs.getString("TenUser");
-                    String sdt = rs.getString("SDT");
-                    String email = rs.getString("Email");
-                    Roles role = Roles.valueOf(rs.getString("Role"));
-        
-                    danhSach.add(new User(id, tenUser, sdt, email, "", role));
-                    System.out.println("----------------------------------------------------------------------------------------");
-                    System.out.printf("| %-3d | %-5d | %-20s | %-12s | %-25s | %-10s |\n",stt++,id, tenUser, sdt, email, role);
-                }               
-                System.out.println("=========================================================================================");
-            }catch(SQLException e){
-                System.out.println("Lỗi khi lấy danh sách khách hàng!");
-                e.printStackTrace();
+            
+            int stt = 1;
+            System.out.println("=================================================================================== DANH SÁCH USER ==========================================================================================");
+            System.out.println("============================================================================================================================================================================================");
+
+            System.out.printf("| %-3s | %-5s | %-20s | %-12s | %-25s | %-10s ||| %-3s | %-5s | %-20s | %-12s | %-25s | %-10s |\n",
+                "STT","ID", "Tên", "SDT", "Email", "Hạng",
+                "STT","ID", "Tên", "SDT", "Email", "Hạng");
+    
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+    
+            List<String> rowBuffer = new ArrayList<>();
+    
+            while (rs.next()) {
+                int id = rs.getInt("ID_User");
+                String tenUser = rs.getString("TenUser");
+                String sdt = rs.getString("SDT");
+                String email = rs.getString("Email");
+                Roles role = Roles.valueOf(rs.getString("Role"));
+    
+                danhSach.add(new User(id, tenUser, sdt, email, "", role));
+    
+                String userStr = String.format("| %-3d | %-5d | %-20s | %-12s | %-25s | %-10s |",
+                        stt++, id, tenUser.length() > 20 ? tenUser.substring(0, 17)+"...":tenUser, sdt, email, role);
+                rowBuffer.add(userStr);
+    
+                if (rowBuffer.size() == 2) {
+                    System.out.println(rowBuffer.get(0) + "|" + rowBuffer.get(1));
+                    rowBuffer.clear();
+                }
             }
-            return danhSach;
+    
+            // Nếu còn 1 bản ghi lẻ, in riêng
+            if (!rowBuffer.isEmpty()) {
+                System.out.println(rowBuffer.get(0));
+            }
+    
+            System.out.println("============================================================================================================================================================================================");
+    
+        } catch(SQLException e){
+            System.out.println("Lỗi khi lấy danh sách khách hàng!");
+            e.printStackTrace();
+        }
+    
+        return danhSach;
     }
+    
 
 
     // //Kiểm tra Admin

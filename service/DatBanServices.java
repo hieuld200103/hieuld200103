@@ -206,37 +206,65 @@ public class DatBanServices {
     }
 
     //Danh sách bàn trống trong thời gian khách đặt
-    public static List<BanAn> xemDSBanTrong(int idChiNhanh, LocalDateTime ngayAn){
+    public static List<BanAn> xemDSBanTrong(int idChiNhanh,LocalDateTime ngayAn) {
         List<BanAn> danhSach = new ArrayList<>();
-        
         String sql = "SELECT * FROM banan WHERE ID_ChiNhanh = ?";
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
+      
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, idChiNhanh);
+            int stt = 1;
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                System.out.println("\n=================================== DANH SÁCH BÀN CÓ THỂ ĐẶT ====================================");
+                System.out.println("=================================================================================================");
+                System.out.printf("| %-3s | %-5s | %-6s | %-6s | %-12s ||| %-3s | %-5s | %-6s | %-6s | %-12s |\n",
+                    "STT", "ID", "IDCN", "Ghế", "Trạng thái", 
+                    "STT", "ID", "IDCN", "Ghế", "Trạng thái");
+                System.out.println("-------------------------------------------------------------------------------------------------");
 
-            stmt.setInt(1,idChiNhanh);
-            try(ResultSet rs = stmt.executeQuery()){
-                System.out.println("\n========= DANH SÁCH BÀN CÓ THỂ ĐẶT =========");
-                System.out.println("===========================================");
-                System.out.printf("| %-5s | %-7s | %-7s | %-10s | \n", "ID", "ID CN", "Số ghế", "Trạng thái");
-                System.out.println("===========================================");
+                List<String> rowBuffer = new ArrayList<>();
+                int count = 0;
                 
-                while(rs.next()){
+                while (rs.next()) {
                     int id = rs.getInt("ID_BanAn");
                     int idCN = rs.getInt("ID_ChiNhanh");
                     int soGhe = rs.getInt("Soghe");
-                    TrangThai trangThai = trangThaiBan(id, ngayAn);
-                    BanAn banAn = new BanAn(id, idCN,soGhe, trangThai);
+                    TrangThai trangThai = trangThaiBan(id, ngayAn); 
+                    
+                    BanAn banAn = new BanAn(id, idCN, soGhe, trangThai);
                     danhSach.add(banAn);
-                    System.out.printf("| %-5d | %-7s|  %-7s | %-10s | \n", id, idCN, soGhe,trangThai);
+                    
+
+                    String row = String.format("| %-3d | %-5d | %-6d | %-6d | %-12s |", 
+                            stt++, id, idCN, soGhe, trangThai);
+                    
+                    rowBuffer.add(row);
+                    count++;
+
+                    if (count == 2) {
+                        System.out.println(rowBuffer.get(0) + "|" + rowBuffer.get(1));
+                        rowBuffer.clear();
+                        count = 0;
+                        System.out.println("-------------------------------------------------------------------------------------------------");
+                    }
                 }
-                System.out.println("===========================================");
+
+                if (!rowBuffer.isEmpty()) {
+                    System.out.println(rowBuffer.get(0));
+                }
+
+                System.out.println("=================================================================================================");
             }
-        }catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách món ăn!");
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy danh sách bàn ăn!");
             e.printStackTrace();
         }
+        
         return danhSach;
     }
+    
 
     //Set trạng thái bàn
     public static BanAn.TrangThai trangThaiBan(int idBan, LocalDateTime thoiGianCanXet){

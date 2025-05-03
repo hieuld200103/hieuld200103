@@ -548,7 +548,7 @@ public class HoaDonServices {
                         int soLuong = rs.getInt("SoLuong");
                         int donGia = rs.getInt("dongia");
                         int thanhTien = rs.getInt("thanhtien");
-                        System.out.printf("%-40s %-10d %-,12d %-,12d%n", tenMon, soLuong, donGia, thanhTien);
+                        System.out.printf("%-40s %-10d %-,12d %-,12d%n", tenMon.length() > 40 ? tenMon.substring(0, 37)+"...":tenMon, soLuong, donGia, thanhTien);
                     }
                 }
             } catch (SQLException e) {
