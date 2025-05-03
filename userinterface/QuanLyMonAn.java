@@ -36,7 +36,7 @@ public class QuanLyMonAn {
 
             switch (choice) {
                 case 1:
-                    MonAnServices.xemMenu();
+                    MonAnServices.menuXemMonAn(scanner);
                     break;
                 case 2:
                     MonAnServices.timKiemMonAn(scanner);

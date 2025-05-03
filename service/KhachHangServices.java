@@ -122,10 +122,12 @@ public class KhachHangServices {
         String sql = "SELECT * FROM khachhang";    
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {    
-            System.out.println("========================DANH SÁCH KHÁCH HÀNG=======================");
-            System.out.printf("| %-5s | %-20s | %-5s | %-15s | %-15s |\n", "ID", "Tên Khách Hàng", "IDCN","Số Điện Thoại", "Trạng thái");
-            System.out.println("===================================================================");    
+             ResultSet rs = stmt.executeQuery()) { 
+                int stt = 1;   
+            System.out.println("================================DANH SÁCH KHÁCH HÀNG================================");
+            System.out.println("====================================================================================");
+            System.out.printf("| %-3s | %-5s | %-20s | %-5s | %-15s | %-15s |\n", "STT","ID", "Tên Khách Hàng", "IDCN","Số Điện Thoại", "Trạng thái");
+                
             while (rs.next()) {
                 int id = rs.getInt("ID_KhachHang");
                 int idUser = rs.getInt("ID_User");
@@ -133,11 +135,11 @@ public class KhachHangServices {
                 String sdt = rs.getString("SDT");
                 KhachHang.TrangThai trangThai = KhachHang.TrangThai.valueOf(rs.getString("TrangThai"));
                 danhSach.add(new KhachHang(id,idUser,idCN, tenKH, sdt,trangThai));
-    
-                System.out.printf("| %-5d | %-20s | %-5d | %-15s | %-15s |\n", id, tenKH, idCN, sdt,trangThai);
+                System.out.println("-------------------------------------------------------------------------------------");
+                System.out.printf("| %-3d | %-5d | %-20s | %-5d | %-15s | %-15s |\n", stt++, id, tenKH, idCN, sdt,trangThai);
             }
     
-            System.out.println("===================================================================");
+            System.out.println("=====================================================================================");
         rs.close();
         } catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách khách hàng!");

@@ -189,11 +189,12 @@ public class BanAnServices {
             PreparedStatement stmt = conn.prepareStatement(sql)){
 
             stmt.setInt(1,idChiNhanh);
+            int stt = 1;
             try(ResultSet rs = stmt.executeQuery()){
-                System.out.println("\n======== " +tieuDe.toUpperCase() +" ========");
-                System.out.println("=================================");
-                System.out.printf("| %-5s | %-7s | %-7s | %-10s | \n", "ID", "ID CN", "Số ghế", "Trạng thái");
-                System.out.println("=================================");
+                System.out.println("\n============== " +tieuDe.toUpperCase() +" ==============");
+                System.out.println("==============================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-12s | \n", "STT","ID", "ID CN", "Số ghế", "Trạng thái");
+                System.out.println("==============================================");
                 
                 while(rs.next()){
                     int id = rs.getInt("ID_BanAn");
@@ -202,9 +203,9 @@ public class BanAnServices {
                     TrangThai trangThai = TrangThai.valueOf(rs.getString("TrangThai"));
                     BanAn banAn = new BanAn(id, idCN,soGhe, trangThai);
                     danhSach.add(banAn);
-                    System.out.printf("| %-5d | %-7s|  %-7s | %-10s | \n", id, idCN, soGhe,trangThai);
+                    System.out.printf("| %-3d | %-5d | %-7s|  %-7s | %-12s | \n", stt++,id, idCN, soGhe,trangThai);
                 }
-                System.out.println("=================================");
+                System.out.println("==============================================");
             }
         }catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách món ăn!");
@@ -276,7 +277,7 @@ public class BanAnServices {
                 System.out.println("=====================================");
                 System.out.println("| ID    | Tên chi nhánh             |");
                 System.out.println("=====================================");
-
+                
                 while (rs.next()) {
                     int idChiNhanh = rs.getInt("ID_ChiNhanh");
                     String tenChiNhanh = rs.getString("TenCN");
@@ -284,7 +285,7 @@ public class BanAnServices {
                     danhSachID.add(idChiNhanh);
                 }
 
-                System.out.println("=====================================");
+                System.out.println("======================================");
                 System.out.print("Nhập ID chi nhánh bạn muốn chọn: (0 để thoát): ");
 
                 if (scanner.hasNextInt()) {

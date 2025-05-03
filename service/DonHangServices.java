@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -40,7 +42,8 @@ public class DonHangServices {
 
     //Thêm đơn hàng
     public static DonHang themDH(int idUser, int idChiNhanh, Integer idBanAn, DonHang.KieuDonHang kieuDonHang){
-        String sql = "INSERT INTO donhang (ID_User, ID_ChiNhanh, ID_BanAn, TrangThai, kieudonhang) VALUES (?, ?, ?, 'DANG_CHUAN_BI', ?)";
+        LocalDateTime now = LocalDateTime.now();
+        String sql = "INSERT INTO donhang (ID_User, ID_ChiNhanh, ID_BanAn, TrangThai, kieudonhang, thoigiantaodon) VALUES (?, ?, ?, 'DANG_CHUAN_BI', ?,?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {    
             stmt.setInt(1, idUser);
@@ -52,13 +55,13 @@ public class DonHangServices {
             }
             
             stmt.setString(4, kieuDonHang.name());
-    
+            stmt.setTimestamp(5, Timestamp.valueOf(now));
             int row = stmt.executeUpdate();
             if (row > 0) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int idDH = rs.getInt(1);
-                        DonHang donHang = new DonHang(idDH, idChiNhanh, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang);
+                        DonHang donHang = new DonHang(idDH, idChiNhanh, idUser, idBanAn, DonHang.TrangThai.DANG_CHUAN_BI, kieuDonHang,now);
                         donHang.setKieuDonHang(kieuDonHang);
                         System.out.println("\nTạo đơn hàng thành công! Mã đơn: " + idDH);
                         return donHang;
@@ -106,14 +109,14 @@ public class DonHangServices {
     public static List<DonHang> xemDSDonHang(){
         List<DonHang> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM donhang";
+       
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
-            System.out.println("===============================================================================================");
-                System.out.printf("| %-5s | %-12s | %-12s | %-12s | %-25s | %-20s |\n",
-                                  "ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu");
-                System.out.println("===============================================================================================");
-                
+                int stt = 1;
+                System.out.println("=================================================================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-7s | %-15s | %-15s | %-25s |\n",
+                                  "STT","ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu");
                 while (rs.next()) {
                     int id = rs.getInt("ID_DonHang");
                     int idUser = rs.getInt("ID_User");
@@ -121,11 +124,12 @@ public class DonHangServices {
                     Integer idBanAn = rs.getInt("ID_BanAn");
                     DonHang.TrangThai trangThai = DonHang.TrangThai.valueOf(rs.getString("TrangThai"));
                     DonHang.KieuDonHang kieuDonHang = DonHang.KieuDonHang.valueOf(rs.getString("kieudonhang"));
-                    
-                    danhSach.add(new DonHang(id, idCN, idUser, idBanAn, trangThai, kieuDonHang));
-                    System.out.printf("| %-5d | %-12s | %-12s | %-12s | %-25s | %-20s |\n",id, idCN, idUser, idBanAn , trangThai, kieuDonHang);
+                    LocalDateTime ngayDat = rs.getTimestamp("thoigiantaodon").toLocalDateTime();
+                    System.out.println("---------------------------------------------------------------------------------");
+                    danhSach.add(new DonHang(id, idCN, idUser, idBanAn, trangThai, kieuDonHang, ngayDat));
+                    System.out.printf("| %-3d | %-5d | %-7s | %-7s | %-7s | %-15s | %-15s | %-25s |\n",stt++,id, idCN, idUser, idBanAn , trangThai, kieuDonHang, ngayDat);
                 }               
-                System.out.println("===============================================================================================");
+                System.out.println("=================================================================================");
         }catch(SQLException e){
             System.out.println("Lỗi khi lấy danh sách đơn hàng!");
             e.printStackTrace();

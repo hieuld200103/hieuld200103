@@ -32,19 +32,19 @@ public class DatBanChecker implements Runnable {
             for (DatBan datBan : dsDaXacNhan) {
                 LocalDateTime gioAn = datBan.getNgayAn();
                 if (gioAn == null) continue;
-                long tgDat = Duration.between(now, gioAn).toMinutes();
-                long tgCho = Duration.between(gioAn, now).toMinutes();
+                long tgConLai = Duration.between(now, gioAn).toMinutes();  
+                long tgTre = Duration.between(gioAn, now).toMinutes(); 
                 String listBan =  datBan.getListID_BanAn();
                 String[] idBan = listBan.split(",");
         
                 for (String list : idBan){
                     int id = Integer.parseInt(list.trim());
                     if (datBan.getTrangThai() == DatBan.TrangThai.DA_XAC_NHAN) {
-                        if (tgDat <= 90 && tgCho <= 30) {
+                        if (tgConLai <= 90 && tgTre <= 30) {
                             capNhatTrangThaiBanAn(id, "DA_DAT");
                             banDuocXacNhan.add(datBan);
                         } 
-                        else if (tgCho > 30 && !daNhanBan(datBan.getID_User())) {
+                        else if (tgTre > 30 && !daNhanBan(datBan.getID_User())) {
                             capNhatTrangThaiDatBan(datBan.getID_DatBan(), DatBan.TrangThai.DA_HUY);
                             capNhatTrangThaiBanAn(id, "TRONG");
                             banBiHuy.add(datBan);

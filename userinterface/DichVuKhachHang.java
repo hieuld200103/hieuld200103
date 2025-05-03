@@ -18,7 +18,6 @@ import service.DonHangServices;
 import service.GoiMonServices;
 import service.KhuyenMaiServices;
 import service.MonAnServices;
-import service.ThanhToanHoaDonServices;
 import service.TrangThaiDonHang;
 import model.User;
 import service.UserServices;
@@ -114,7 +113,7 @@ public class DichVuKhachHang {
                 KhuyenMaiServices.xemKhuyenMai2(currentUser, scanner);
                 break;
             case 8:
-                ThanhToanHoaDonServices.thanhToan(currentUser);
+                QuanLyThanhToanHoaDon.thanhToan(currentUser);
                 break;
             case 0:
                 UserServices.dangXuat();
@@ -251,7 +250,7 @@ public class DichVuKhachHang {
 
             switch (choice) {
                 case 1:
-                    MonAnServices.xemMenu();
+                    MonAnServices.menuXemMonAn(scanner);
                     break;
                 case 2:
                     MonAnServices.timKiemMonAn(scanner);

@@ -2,10 +2,10 @@ package model;
 
 public class MonAn {
     public enum LoaiMonAn {
-        DO_AN, DO_UONG;
+        KHAI_VI, MON_CHINH, TRANG_MIENG, DO_UONG;
     }
     public enum DanhMucMonAn {
-        DO_KHO, DO_NUOC, CO_CON, KHONG_CON;
+        SOUP, SALAD, DO_CHIEN, HAI_SAN, MON_BO, MON_GA, BANH_NGOT, KEM, HOA_QUA, RUOU, NUOC_NGOT;
     }
     
     private int id_MonAn;
@@ -22,6 +22,14 @@ public class MonAn {
         this.mota = mota;
         this.loaiMonAn = loaiMonAn;
         this.danhMuc = danhMuc;
+    }
+
+    public MonAn(int id_MonAn, String tenMon, int gia, String mota){
+        this.id_MonAn = id_MonAn;
+        this.tenMon = tenMon;
+        this.gia = gia;
+        this.mota = mota;
+       
     }
 
     public int getID_MonAn() { return id_MonAn; }

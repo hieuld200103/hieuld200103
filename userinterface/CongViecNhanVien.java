@@ -20,9 +20,8 @@ public class CongViecNhanVien {
                 "3. Quản lý đơn hàng",
                 "4. Quản lý menu",
                 "5. Quản lý bàn ăn",
-                "6. Check hóa đơn",
-                "7. Quản lý khuyến mãi",
-                "8. Quản lý hóa đơn",
+                "6. Quản lý khuyến mãi",
+                "7. Quản lý hóa đơn",
                 "0. Đăng xuất"
             };
             
@@ -58,12 +57,9 @@ public class CongViecNhanVien {
                     QuanLyBanAn.quanLy(currentNV, idChiNhanh, scanner);                    
                     break;
                 case 6:
-                    System.out.println("Đang phát triển");
-                    break;
-                case 7:
                     QuanLyKhuyenMai.quanLy(currentNV, idChiNhanh);
                     break;
-                case 8:
+                case 7:
                     QuanLyHoaDon.quanLy(currentNV, idChiNhanh, scanner);
                     break;
                 case 0:

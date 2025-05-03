@@ -16,6 +16,7 @@ import model.NhanVien;
 import model.User;
 import userinterface.DichVuKhachHang;
 import userinterface.QuanLyHoaDon;
+import userinterface.QuanLyThanhToanHoaDon;
 
 public class HoaDonServices {
     private static Scanner sc = new Scanner(System.in);
@@ -80,11 +81,11 @@ public class HoaDonServices {
 
     private static void printDanhSachHD(PreparedStatement stmt,List<HoaDon> danhSach , String tieuDe){
         try (ResultSet rs = stmt.executeQuery()) {
-        System.out.println("\n============================================== "+ tieuDe+ " ======================================================================");
-                System.out.println("=============================================================================================================================================");
-                System.out.printf("| %-8s | %-10s | %-15s | %-10s | %-10s | %-15s | %-13s | %-16s | %-16s |\n", 
-                                  "ID HD", "ID Đơn", "ID Khuyến mãi","Tổng tiền", "Phải trả", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
-                System.out.println("=============================================================================================================================================");
+            int stt = 1;
+        System.out.println("\n============================================================ "+ tieuDe+ " ====================================================================");
+                System.out.println("===================================================================================================================================================");
+                System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-12s | %-12s | %-15s | %-15s | %-20s | %-20s |\n", 
+                                  "STT","ID HD", "ID Đơn", "ID KM","Tổng tiền", "Phải trả", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
 
                 while (rs.next()) {
                     int idHoaDon = rs.getInt("ID_HoaDon");
@@ -96,15 +97,16 @@ public class HoaDonServices {
                     LocalDateTime ngayThanhToan = rs.getTimestamp("NgayThanhToan")!= null ? rs.getTimestamp("NgayThanhToan").toLocalDateTime(): null;
                     LocalDateTime ngayTaoHD = rs.getTimestamp("NgayTaoHoaDon")!= null ? rs.getTimestamp("NgayTaoHoaDon").toLocalDateTime(): null;
                     int idKhuyenMai = rs.getInt("ID_KhuyenMai");
+                    System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------");
 
                     HoaDon hoaDon = new HoaDon(idHoaDon, idDonHang, tongTien, phaiTra, ptThanhToan, trangThai, idKhuyenMai, ngayTaoHD, ngayThanhToan);
                     danhSach.add(hoaDon);
 
-                    System.out.printf("| %-8d | %-10d | %-15d | %-10d | %-10d | %-15s | %-10s | %-12s | %-12s |\n",
-                                      idHoaDon, idDonHang,idKhuyenMai, tongTien, phaiTra, ptThanhToan, trangThai, ngayTaoHD != null ? ngayTaoHD.toString() : "null",ngayThanhToan != null ? ngayThanhToan.toString() : "null");
+                    System.out.printf("| %-3d | %-5d | %-7d | %-7d | %-12d | %-12d | %-15s | %-15s | %-20s | %-20s |\n",
+                                      stt++,idHoaDon, idDonHang,idKhuyenMai, tongTien, phaiTra, ptThanhToan, trangThai, ngayTaoHD != null ? ngayTaoHD.toString() : "null",ngayThanhToan != null ? ngayThanhToan.toString() : "null");
                 }
 
-                System.out.println("=============================================================================================================================================");
+                System.out.println("===================================================================================================================================================");
         }
         catch (SQLException e) {
             System.out.println("Lỗi khi lấy danh sách hóa đơn!");
@@ -176,7 +178,7 @@ public class HoaDonServices {
             System.out.print("Nhập ID hóa đơn muốn thanh toán (0 để thoát): ");
             idHoaDon = Integer.parseInt(sc.nextLine());
             if(idHoaDon == 0){
-                ThanhToanHoaDonServices.thanhToan(currentUser);
+                QuanLyThanhToanHoaDon.thanhToan(currentUser);
             }
 
             for (HoaDon hd : danhSach) {

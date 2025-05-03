@@ -21,9 +21,9 @@ public class QuanLy {
                 "4. Quản lý đơn hàng",
                 "5. Quản lý menu",
                 "6. Quản lý bàn ăn",
-                "7. Check hóa đơn",
+                "7. Quản lý hóa đơn",
                 "8. Quản lý khuyến mãi",
-                "9. Quản lý hóa đơn",
+                "9. Quản lý doanh thu",
                 "0. Thoát"
             };
             
@@ -62,13 +62,13 @@ public class QuanLy {
                     QuanLyBanAn.quanLy(currentQL, idChiNhanh, scanner);                    
                     break;
                 case 7:
-                    System.out.println("Đang phát triển");
+                    QuanLyHoaDon.quanLy(currentQL, idChiNhanh, scanner);
                     break;
                 case 8:
                     QuanLyKhuyenMai.quanLy(currentQL, idChiNhanh);
                     break;
                 case 9:
-                    QuanLyHoaDon.quanLy(currentQL, idChiNhanh, scanner);
+                    QuanLyDoanhThu.quanLy(currentQL, idChiNhanh, scanner);  
                     break;
                 case 0:
                     chonChiNhanhVaVaoCongViec(currentQL, scanner);

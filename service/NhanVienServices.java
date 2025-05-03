@@ -220,7 +220,7 @@ public class NhanVienServices {
 
             switch (choice) {
                 case 1:
-                    MonAnServices.xemMenu();
+                    MonAnServices.menuXemMonAn(scanner);
                     break;
                 case 2:
                     MonAnServices.timKiemMonAn(scanner);
@@ -277,24 +277,21 @@ public class NhanVienServices {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1,idChiNhanh);
                 try(ResultSet rs = stmt.executeQuery()){
+                    int stt = 1;
                     System.out.println("=============================== DANH SÁCH NHÂN VIÊN ================================");
                     System.out.println("=====================================================================================");
-                    System.out.printf("| %-5s | %-5s | %-20s | %-12s | %-20s | %-10s |\n",
-                                      "ID", "IDCN", "Tên", "SDT", "Email", "Mật khẩu");
-                    System.out.println("=====================================================================================");
-            
+                    System.out.printf("| %-3s | %-5s | %-5s | %-20s | %-12s | %-20s | %-10s |\n",
+                                      "STT","ID", "IDCN", "Tên", "SDT", "Email", "Mật khẩu");
                     while (rs.next()) {
                         int id = rs.getInt("ID_NhanVien");
                         String tenNV = rs.getString("TenNV");
                         String sdt = rs.getString("SDT");
                         String email = rs.getString("Email");
-            
-                        // Thêm vào danh sách
+        
                         danhSach.add(new NhanVien(id, idChiNhanh, tenNV, Role.NHAN_VIEN, sdt, email, "******"));
-            
-                        // In ra màn hình
-                        System.out.printf("| %-5d | %-5d | %-20s | %-12s | %-20s | %-10s |\n",
-                                          id, idChiNhanh, tenNV, sdt, email, "******");
+                        System.out.println("-------------------------------------------------------------------------------------");
+                        System.out.printf("| %-3d | %-5d | %-5d | %-20s | %-12s | %-20s | %-10s |\n",
+                                          stt++, id, idChiNhanh, tenNV, sdt, email, "******");
                     }
             
                     System.out.println("=====================================================================================");
@@ -316,12 +313,11 @@ public class NhanVienServices {
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
-                System.out.println("========================= DANH SÁCH USER =========================");
-                System.out.println("=====================================================================================");
-                System.out.printf("| %-5s | %-20s | %-12s | %-25s | %-10s |\n",
-                                  "ID", "Tên", "SDT", "Email", "Hạng");
-                System.out.println("=====================================================================================");
-                
+                int stt = 1;
+                System.out.println("=================================== DANH SÁCH USER =====================================");
+                System.out.println("========================================================================================");
+                System.out.printf("| %-3s | %-5s | %-20s | %-12s | %-25s | %-10s |\n",
+                                  "STT","ID", "Tên", "SDT", "Email", "Hạng");
                 while (rs.next()) {
                     int id = rs.getInt("ID_User");
                     String tenUser = rs.getString("TenUser");
@@ -330,10 +326,10 @@ public class NhanVienServices {
                     Roles role = Roles.valueOf(rs.getString("Role"));
         
                     danhSach.add(new User(id, tenUser, sdt, email, "", role));
-        
-                    System.out.printf("| %-5d | %-20s | %-12s | %-25s | %-10s |\n",id, tenUser, sdt, email, role);
+                    System.out.println("----------------------------------------------------------------------------------------");
+                    System.out.printf("| %-3d | %-5d | %-20s | %-12s | %-25s | %-10s |\n",stt++,id, tenUser, sdt, email, role);
                 }               
-                System.out.println("=====================================================================================");
+                System.out.println("=========================================================================================");
             }catch(SQLException e){
                 System.out.println("Lỗi khi lấy danh sách khách hàng!");
                 e.printStackTrace();

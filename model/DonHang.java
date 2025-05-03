@@ -1,5 +1,7 @@
 package model;
 
+import java.time.LocalDateTime;
+
 public class DonHang {
     public enum TrangThai{
         DANG_CHUAN_BI, DA_HOAN_THANH, DA_THANH_TOAN
@@ -13,14 +15,16 @@ public class DonHang {
     private int id_ChiNhanh;
     private TrangThai trangThai;
     private KieuDonHang kieuDonHang;
+    private LocalDateTime thoiGianTaoDon;
 
-    public DonHang(int id_DonHang, int id_ChiNhanh, int id_User, Integer id_BanAn, TrangThai trangThai, KieuDonHang kieuDonHang){
+    public DonHang(int id_DonHang, int id_ChiNhanh, int id_User, Integer id_BanAn, TrangThai trangThai, KieuDonHang kieuDonHang, LocalDateTime thoiGianTaoDon){
         this.id_DonHang = id_DonHang;
         this.id_User = id_User;
         this.id_ChiNhanh = id_ChiNhanh;
         this.id_BanAn = id_BanAn;  
         this.trangThai = trangThai;
         this.kieuDonHang = kieuDonHang;
+        this.thoiGianTaoDon = thoiGianTaoDon;
     }
 
     public DonHang(int id_DonHang, int id_User, KieuDonHang kieuDonHang){
@@ -46,4 +50,7 @@ public class DonHang {
     
     public KieuDonHang getKieuDonHang(){return kieuDonHang;};
     public void setKieuDonHang( KieuDonHang kieuDonHang){this.kieuDonHang = kieuDonHang;}
+
+    public LocalDateTime getThoiGianTaoDon(){return thoiGianTaoDon;}
+    public void setThoiGianTaoDon(LocalDateTime thoiGianTaoDon){this.thoiGianTaoDon = thoiGianTaoDon;}
 }

@@ -23,6 +23,7 @@ import model.User;
 import userinterface.QuanLyDatBan;
 
 public class DatBanServices {
+    //=======================ĐẶT BÀN===========================//
     //Đặt bàn
     public static DatBan datBan(User currentUser, Scanner scanner){
         if (currentUser == null) {
@@ -245,7 +246,7 @@ public class DatBanServices {
         return TrangThai.valueOf("TRONG");
     }
     
-
+    //================XEM DS ĐẶT BÀN===============//
     //Danh sách Đặt bàn
     public static List<DatBan> xemDanhSachDatBan(NhanVien currentNV, int idCN, String tieuDe, String dieuKienWhere) {
         List<DatBan> danhSach = new ArrayList<>();
@@ -259,11 +260,11 @@ public class DatBanServices {
              PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setInt(1,idCN);
             try(ResultSet rs = stmt.executeQuery()){
+                int stt = 1;
                 System.out.println("\n===================================== " + tieuDe.toUpperCase() + " ====================================");
                 System.out.println("=========================================================================================================");
-                System.out.printf("| %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Ngày ăn", "Trạng thái");
-                System.out.println("=========================================================================================================");
-        
+                System.out.printf("| %-3s | %-5s | %-7s | %-8s | %-7s | %-20s | %-20s | %-15s |\n", "STT","ID", "ID_CN", "ID_User", "ID_Bàn", "Ngày đặt", "Ngày ăn", "Trạng thái");
+                
                 while (rs.next()) {
                     int id = rs.getInt("ID_DatBan");
                     int idUser = rs.getInt("ID_User");
@@ -274,9 +275,10 @@ public class DatBanServices {
         
                     DatBan datBan = new DatBan(id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                     danhSach.add(datBan);
+                    System.out.println("---------------------------------------------------------------------------------------------------------");
         
-                    System.out.printf("| %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
-                            id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    System.out.printf("| %-3d | %-5d | %-7d | %-8d | %-7s | %-20s | %-20s | %-15s |\n",
+                            stt++,id, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                 }
         
                 System.out.println("=========================================================================================================");
@@ -350,6 +352,7 @@ public class DatBanServices {
         }
     }
     
+    //=================CẬP NHẬT=================//
     //Cập nhận trạng thái đặt bàn
     public static void capNhatTrangThaiDatBan(Scanner scanner, NhanVien currentNV,int idChiNhanh, DatBan.TrangThai trangThaiMoi, Runnable hienThiDS) {
         while(true){
@@ -394,6 +397,7 @@ public class DatBanServices {
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, idDatBan);
                 stmt.setInt(2,idChiNhanh);
+                int stt = 1;
                 try(ResultSet rs = stmt.executeQuery()){
                     if (!rs.next()) {
                         System.out.println("Không tìm thấy ID_DatBan: " + idDatBan);
@@ -407,7 +411,7 @@ public class DatBanServices {
                     DatBan.TrangThai trangThai = DatBan.TrangThai.valueOf(rs.getString("TrangThai"));
     
                     System.out.println("\nCập nhật đơn:");
-                    hienThiThongTin(idDatBan, idChiNhanh, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    hienThiThongTin(stt, idDatBan, idChiNhanh, idUser, idBanAn, ngayDat, ngayAn, trangThai);
     
                     String sqlUpdate = "UPDATE datban SET TrangThai = ? WHERE ID_DatBan = ?";
                     try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
@@ -426,8 +430,8 @@ public class DatBanServices {
         }
     }
 
-    private static void hienThiThongTin(int idDatBan, int idChiNhanh, int idUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
-        System.out.println("ID: " + idDatBan +  " | CN: "+ idChiNhanh +" | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
+    private static void hienThiThongTin(int stt, int idDatBan, int idChiNhanh, int idUser, String idBanAn, LocalDateTime ngayDat, LocalDateTime ngayAn, DatBan.TrangThai trangThai) {
+        System.out.println(stt + " | ID: " + idDatBan +  " | CN: "+ idChiNhanh +" | idUser: " + idUser + " | Bàn: " + idBanAn + " | Ngày đặt: " +ngayDat+" | Ngày ăn: "+ ngayAn + " | Trạng thái: " + trangThai);
     }
 
     public static void xacNhanDatBan(Scanner scanner, NhanVien currentNV, int idChiNhanh) {
@@ -449,6 +453,8 @@ public class DatBanServices {
         return dsID;
     }
     
+
+    //============TÌM LỊCH ĐẶT==============
     //Lấy lich từ sdt
     public static List<DatBan> layDatBanTheoSDT(String sdt) {
         List<DatBan> danhSachDatBan = new ArrayList<>();
@@ -458,7 +464,7 @@ public class DatBanServices {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
     
             stmt.setString(1, sdt);
-    
+            int stt = 1;
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int idDB = rs.getInt("ID_DatBan");
@@ -472,7 +478,7 @@ public class DatBanServices {
                     DatBan datBan = new DatBan(idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                     danhSachDatBan.add(datBan);
     
-                    hienThiThongTin(idDB, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
+                    hienThiThongTin(stt++, idDB, idCN, idUser, idBanAn, ngayDat, ngayAn, trangThai);
                 }
             }
         } catch (SQLException e) {

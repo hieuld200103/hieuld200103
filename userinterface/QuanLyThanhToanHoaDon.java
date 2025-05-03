@@ -1,13 +1,12 @@
-package service;
+package userinterface;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import model.HoaDon;
 import model.User;
-import userinterface.DichVuKhachHang;
-public class ThanhToanHoaDonServices {
-
+import service.HoaDonServices;
+public class QuanLyThanhToanHoaDon {
     public static void thanhToan(User currentUser) {
         List<HoaDon> danhSachHoaDon = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);

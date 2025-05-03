@@ -193,7 +193,7 @@ public class KhuyenMaiServices {
             System.out.println("\n============================================ Khuyến mãi ======================================");
             System.out.println("============================================================================================");
             System.out.printf("| %-5s | %-30s | %-10s | %-15s | %-15s |\n", "ID", "Tên CT Khuyến Mãi", "Giảm (%)", "Ngày Bắt Đầu", "Ngày Kết Thúc");
-            System.out.println("============================================================================================");
+            
             while(rs.next()){
                 int id = rs.getInt("ID_KhuyenMai");
                 String tenCT = rs.getString("TenChuongTrinhKM");
@@ -206,8 +206,10 @@ public class KhuyenMaiServices {
                 String ngayKTStr = date.format(ngayKThuc);
             KhuyenMai km = new KhuyenMai(id, tenCT, giamGia, ngayBDau ,ngayKThuc);
             danhSach.add(km);
-            System.out.printf("| %-5d | %-30s | %-10.2f | %-15s | %-15s |\n", id, tenCT,giamGia,ngayBDStr,ngayKTStr);
             System.out.println(" -------------------------------------------------------------------------------------------");
+            System.out.printf("| %-5d | %-30s | %-10.2f | %-15s | %-15s |\n", id, tenCT,giamGia,ngayBDStr,ngayKTStr);
+           
+            System.out.println("============================================================================================");
             QuanLyKhuyenMai.quanLy(currentNV, idChiNhanh);
             }
             
