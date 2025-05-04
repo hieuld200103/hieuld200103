@@ -11,9 +11,13 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         DatBanChecker datBanChecker = new DatBanChecker();
+        HoaDonChecker hoaDonChecker = new HoaDonChecker();
         Thread checker = new Thread(datBanChecker);
+        Thread checker2 = new Thread(hoaDonChecker);
         checker.setDaemon(true);
         checker.start();  
+        checker2.setDaemon(true);
+        checker2.start();
         while (true) {
             System.out.println("\n=== Bạn là Khách Hàng hay Nhân Viên? ===");
             System.out.println("1. Khách hàng");
