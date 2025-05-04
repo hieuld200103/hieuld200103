@@ -29,10 +29,10 @@ public class QuanLyNhanVien {
                 case 1:
                     currentNV = NhanVienServices.dangNhap(scanner);
                     if (currentNV != null) {
-                        int idChiNhanh = currentNV.getID_ChiNhanh(); 
                         if (currentNV.getChucVu() == Role.QUAN_LY) {
                             QuanLy. chonChiNhanhVaVaoCongViec(currentNV, scanner);
                         } else {
+                            int idChiNhanh = currentNV.getID_ChiNhanh(); 
                             CongViecNhanVien.congViec(currentNV, idChiNhanh, scanner);
                         }
                         return;

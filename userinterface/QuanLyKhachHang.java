@@ -30,7 +30,7 @@ public class QuanLyKhachHang {
 
             switch (choice) {
                 case 1:
-                    KhachHangServices.khachHangNhanBan(scanner, currentNV);
+                    KhachHangServices.khachHangNhanBan(scanner, currentNV, idChiNhanh);
                     break;
                 case 2:
                     KhachHangServices.xemDanhSachKhachHang(idChiNhanh);

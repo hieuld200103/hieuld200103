@@ -12,6 +12,7 @@ import Main.Main;
 import background.DatBanChecker;
 import connection.DatabaseConnection;
 import model.DatBan;
+import service.BanAnServices;
 import service.DatBanServices;
 import model.DonHang;
 import service.DonHangServices;
@@ -47,7 +48,7 @@ public class DichVuKhachHang {
             for (int i = 1; i < menu.length; i++) {
                 System.out.println(menu[i]);
             }
-
+        System.out.println("Chọn chức năng: ");
         if (!scanner.hasNextInt()) {
             System.out.println("Lỗi: Vui lòng nhập số hợp lệ!");
             scanner.next();
@@ -69,7 +70,7 @@ public class DichVuKhachHang {
                         }
                         if (donHang != null) {
                             donHang.setKieuDonHang(DonHang.KieuDonHang.TAI_NHA_HANG);
-                            boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner);
+                            boolean daGoiMon = GoiMonServices.goiMon(currentUser,idChiNhanh, donHang, scanner);
                             if (!daGoiMon) {
                                 xoaDH(donHang.getID_DonHang());
                             }
@@ -85,9 +86,13 @@ public class DichVuKhachHang {
                 break;
 
             case 2:
-                DonHang donHang = DonHangServices.themDonHangMangVe(currentUser, DonHang.KieuDonHang.MANG_VE, scanner);
+                int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
+                if (idChiNhanh == 0) {
+                    break; 
+                }
+                DonHang donHang = DonHangServices.themDonHangMangVe(currentUser, idChiNhanh, DonHang.KieuDonHang.MANG_VE, scanner);
                 if (donHang != null) {
-                    boolean daGoiMon = GoiMonServices.goiMon(currentUser, donHang, scanner);
+                    boolean daGoiMon = GoiMonServices.goiMon(currentUser, idChiNhanh, donHang, scanner);
                     if (!daGoiMon) {
                         xoaDH(donHang.getID_DonHang());
                     }

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import background.DatBanChecker;
 import connection.DatabaseConnection;
 import model.BanAn;
 import model.BanAn.TrangThai;
@@ -329,7 +328,7 @@ public class DatBanServices {
     }
 
     public static List<DatBan> xemDSDaXacNhan(NhanVien currentNV, int idChiNhanh) {
-        return xemDanhSachDatBan(currentNV,idChiNhanh,"Danh sách chờ xác nhận", "TrangThai = 'DA_XAC_NHAN'");
+        return xemDanhSachDatBan(currentNV,idChiNhanh,"Danh sách đã xác nhận", "TrangThai = 'DA_XAC_NHAN'");
     }
     
     public static List<DatBan> xemDSCoTheHuy(NhanVien currentNV, int idChiNhanh) {
@@ -401,7 +400,7 @@ public class DatBanServices {
         String[] idStrings = input.split("[,\\s]+"); 
         List<Integer> idList = new ArrayList<>();
         if(input.equals("all")){
-            idList = dsIDChoiXacNhan();
+            idList = dsIDChoiXacNhan(currentNV, idChiNhanh);
         }else{
             for (String idStr : idStrings) {
                 try {
@@ -471,9 +470,9 @@ public class DatBanServices {
     }
 
     //Lọc ID đặt bàn
-    public static List<Integer> dsIDChoiXacNhan(){
+    public static List<Integer> dsIDChoiXacNhan(NhanVien currentNV, int idChiNhanh){
         List<Integer> dsID = new ArrayList<>();
-        List<DatBan> dsDatBan = DatBanChecker.xemDSChoXacNhan();
+        List<DatBan> dsDatBan = xemDSChoXacNhan(currentNV, idChiNhanh);
         for(DatBan datBan : dsDatBan){
             int id = datBan.getID_DatBan();
             dsID.add(id);

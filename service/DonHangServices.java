@@ -28,13 +28,12 @@ public class DonHangServices {
     }
 
     //Thêm đơn hàng mang về
-    public static DonHang themDonHangMangVe(User user, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
+    public static DonHang themDonHangMangVe(User user, int idChiNhanh, DonHang.KieuDonHang kieuDonHang, Scanner scanner) {
         if (user == null || kieuDonHang == null) {
             System.out.println("Thông tin người dùng hoặc kiểu đơn hàng không hợp lệ.");
             return null;
         }
 
-        int idChiNhanh = BanAnServices.chonChiNhanh(scanner);
         return themDH(user.getID_User(),idChiNhanh, null, kieuDonHang);
         
     }

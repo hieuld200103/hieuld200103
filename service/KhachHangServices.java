@@ -2,6 +2,9 @@ package service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import background.DatBanChecker;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,41 +15,51 @@ import model.DatBan;
 import model.KhachHang;
 import model.NhanVien;
 import model.User;
-import userinterface.DichVuKhachHang;
 public class KhachHangServices {
     // Thêm khách hàng
-    public static KhachHang khachHangNhanBan(Scanner scanner, NhanVien currentNV) {
+    public static void khachHangNhanBan(Scanner scanner, NhanVien currentNV, int idChiNhanh) {
         while (true) {
             System.out.println("\n=== XÁC NHẬN NHẬN BÀN ===");    
             System.out.print("Nhập số điện thoại đã dùng để đặt bàn (0 để thoát): ");
             String sdt = scanner.nextLine();
-
-            if (sdt.equals("0")) return null;
+    
+            if (sdt.equals("0")) break;
             if (!sdt.matches("\\d{10}")) {
                 System.out.println("Lỗi: Số điện thoại không hợp lệ!");
                 continue;
             }
-
+    
             User user = timUser(sdt);
             if (user == null) {
                 System.out.println("Không tìm thấy tài khoản với số điện thoại này!");
                 continue;
             }
 
-            DatBan datBan = DichVuKhachHang.daXacNhanDatBan(user.getID_User());
-            if (datBan == null) {
-                System.out.println("Số điện thoại này chưa có đặt bàn trước!");
+            DatBan dadatBan = datBanHopLe(currentNV, user.getID_User(), idChiNhanh);
+            if (dadatBan == null) {
+                System.out.println("Khách hàng không có đặt bàn hợp lệ tại chi nhánh này hoặc đã nhận bàn!");
                 continue;
             }
-
+    
             KhachHang kh = themKH(user.getID_User(), user.getTenUser(), sdt);
             if (kh != null) {
-                return kh;
+                System.out.println("✅ Đã xác nhận khách hàng: " + kh.getTenKH());
             } else {
-                System.out.println("Lỗi khi thêm khách hàng!");
+                System.out.println("❌ Lỗi khi thêm khách hàng!");
             }
-                         
         }
+    }
+    
+    //Kiểm tra lịch đặt của khách có chưa, đúng chi nhánh chưa
+    public static DatBan datBanHopLe(NhanVien currentNV, int idUser, int idChiNhanh) {
+        for (DatBan db : DatBanServices.xemDSDaXacNhan(currentNV, idChiNhanh)) {
+            if (db.getID_User() == idUser 
+                && db.getID_ChiNhanh() == idChiNhanh 
+                && !DatBanChecker.daNhanBan(idUser)) {
+                return db;
+            }
+        }
+        return null;
     }
 
     //Tìm User 

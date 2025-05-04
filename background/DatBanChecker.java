@@ -181,7 +181,7 @@ public class DatBanChecker implements Runnable {
     }
 
     public static List<DatBan> xemDSDaXacNhan (){
-        return xemDanhSachDatBan("TrangThai = 'DA_XAC_NHAN'");
+        return xemDanhSachDatBan("TrangThai IN ('DA_XAC_NHAN', 'CHO_XAC_NHAN')");
     }
 
     //Thông báo có đơn chờ xác nhận

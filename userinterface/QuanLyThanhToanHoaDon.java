@@ -24,7 +24,6 @@ public class QuanLyThanhToanHoaDon {
                     case 1:
                         HoaDonServices.taoHoaDon(currentUser);
                         HoaDonServices.locDanhSachHoaDon_KH(currentUser,scanner);
-                
                         break;
                     case 0:
                         DichVuKhachHang.dichVu(currentUser,scanner);

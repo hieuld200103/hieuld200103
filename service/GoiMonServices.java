@@ -14,7 +14,7 @@ import model.User;
 
 public class GoiMonServices {
     // Gọi món tại quán
-    public static boolean goiMon(User currentUser, DonHang donHang, Scanner scanner) {
+    public static boolean goiMon(User currentUser, int idChiNhanh,DonHang donHang, Scanner scanner) {
         boolean daThemMon = false;
     
         Map<Integer, LoaiMonAn> loaiMonTheoMenu = Map.of(
@@ -77,21 +77,14 @@ public class GoiMonServices {
                         continue;
                     }
     
-                    System.out.print("Nhập số lượng: ");
-                    if (!scanner.hasNextInt()) {
-                        System.out.println("Lỗi: Vui lòng nhập số!");
-                        scanner.next();
-                        continue;
-                    }
-    
-                    int soLuong = scanner.nextInt();
-                    scanner.nextLine();
-    
+                    int soLuong = nhapSoLuong(scanner);
                     int donGia = layGiaMonAn(idMon);
                     String tenMon = layTenMonAn(idMon);
                     int thanhTien = donGia * soLuong;
     
-                    DonHangServices.themChiTietDonHang(donHang.getID_DonHang(), idMon, soLuong, donGia, thanhTien, donHang.getKieuDonHang());
+                    DonHangServices.themChiTietDonHang(
+                        donHang.getID_DonHang(), idMon, soLuong, donGia, thanhTien, donHang.getKieuDonHang());
+    
                     System.out.println("✔ Đã thêm món '" + tenMon + "' (ID: " + idMon + "), số lượng " + soLuong + " vào đơn hàng.");
                     daThemMon = true;
                 }
@@ -115,24 +108,18 @@ public class GoiMonServices {
                         continue;
                     }
     
-                    System.out.print("Nhập số lượng: ");
-                    if (!scanner.hasNextInt()) {
-                        System.out.println("Lỗi: Vui lòng nhập số!");
-                        scanner.next();
-                        continue;
-                    }
-    
-                    int soLuong = scanner.nextInt();
-                    scanner.nextLine();
-    
+                    int soLuong = nhapSoLuong(scanner);
                     int donGia = layGiaMonAn(idMon);
                     String tenMon = layTenMonAn(idMon);
                     int thanhTien = donGia * soLuong;
     
-                    DonHangServices.themChiTietDonHang(donHang.getID_DonHang(), idMon, soLuong, donGia, thanhTien, donHang.getKieuDonHang());
+                    DonHangServices.themChiTietDonHang(
+                        donHang.getID_DonHang(), idMon, soLuong, donGia, thanhTien, donHang.getKieuDonHang());
+    
                     System.out.println("✔ Đã thêm món '" + tenMon + "' (ID: " + idMon + "), số lượng " + soLuong + " vào đơn hàng.");
                     daThemMon = true;
                 }
+    
             } else {
                 System.out.println("Lựa chọn không hợp lệ! Vui lòng chọn lại.");
             }
@@ -141,9 +128,27 @@ public class GoiMonServices {
         return daThemMon;
     }
     
+
+    public static int nhapSoLuong(Scanner scanner) {
+        while (true) {
+            System.out.print("Nhập số lượng: ");
+            if (!scanner.hasNextInt()) {
+                System.out.println("Lỗi: Vui lòng nhập số!");
+                scanner.next();
+                continue;
+            }
     
+            int sl = scanner.nextInt();
+            scanner.nextLine();
+            if (sl <= 0) {
+                System.out.println("⚠ Số phải lớn hơn 0. Vui lòng nhập lại!");
+                continue;
+            }
     
-    
+            return sl;
+        }
+    }
+  
     //Kiểm tra món có tồn tại k
     public static boolean kiemTraMonAnTonTai(int idMonAn) {
         try (Connection conn = DatabaseConnection.getConnection()) {

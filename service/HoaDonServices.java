@@ -86,7 +86,7 @@ public class HoaDonServices {
         System.out.println("\n============================================================ "+ tieuDe+ " ====================================================================");
                 System.out.println("=========================================================================================================================================================");
                 System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-15s | %-15s | %-15s | %-15s | %-20s | %-20s |\n", 
-                                  "STT","ID HD", "ID Đơn", "ID KM","Tổng tiền (VND)", "Phải trả (VND)", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
+                                  "STT","ID HĐ", "ID ĐH", "ID KM","Tổng tiền (VND)", "Phải trả (VND)", "PT Thanh toán", "Trạng thái", "Ngày tạo HD ", "Ngày TT");
 
                 while (rs.next()) {
                     int idHoaDon = rs.getInt("ID_HoaDon");
@@ -193,18 +193,36 @@ public class HoaDonServices {
         }
 
         // Bước 2: Hiển thị lựa chọn
-        System.out.println("1. Thanh toán ngay");
-        System.out.println("2. Áp dụng khuyến mãi");
-        System.out.print("Lựa chọn của bạn: ");
-        int choice = Integer.parseInt(sc.nextLine());
+        int choice = -1;
+        while (true) {
+            System.out.println("1. Thanh toán ngay");
+            System.out.println("2. Áp dụng khuyến mãi");
+            System.out.print("Lựa chọn của bạn: ");
+            String input = sc.nextLine().trim();
 
+            if (input.isEmpty()) {
+                System.out.println("Không được để trống!");
+                continue;
+            }
+
+            try {
+                choice = Integer.parseInt(input);
+                if (choice == 1 || choice == 2) {
+                    break;
+                } else {
+                    System.out.println("Lựa chọn không hợp lệ. Vui lòng chọn 1 hoặc 2.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Vui lòng nhập một số nguyên hợp lệ.");
+            }
+        }
         switch (choice) {
             case 1:
                 thanhToan(idHoaDon, null);  // không áp khuyến mãi
                 break;
 
             case 2:
-                // Truy vấn khuyến mãi đang diễn ra tại ngày tạo hóa đơn
+               // Truy vấn khuyến mãi đang diễn ra tại ngày tạo hóa đơn
                 List<KhuyenMai> danhSachKM = layKhuyenMaiTrongNgay(hoaDon.getNgayTaoHD());
                 if (danhSachKM.isEmpty()) {
                     System.out.println("Không có khuyến mãi nào phù hợp!");
@@ -218,43 +236,62 @@ public class HoaDonServices {
                     System.out.printf("%d. %s (%.0f%%)\n", i + 1, km.getTenChuongTrinh(), km.getPhanTramKM());
                 }
 
-                System.out.print("Chọn khuyến mãi (1-" + danhSachKM.size() + "): ");
-                int kmChoice = Integer.parseInt(sc.nextLine());
-                KhuyenMai khuyenMaiChon = danhSachKM.get(kmChoice - 1);
+                KhuyenMai khuyenMaiChon = null;
+                while (true) {
+                    System.out.print("Chọn khuyến mãi (1-" + danhSachKM.size() + "): ");
+                    try {
+                        int kmChoice = Integer.parseInt(sc.nextLine());
+                        if (kmChoice >= 1 && kmChoice <= danhSachKM.size()) {
+                            khuyenMaiChon = danhSachKM.get(kmChoice - 1);
+                            break;
+                        } else {
+                            System.out.println("Lựa chọn không hợp lệ! Vui lòng chọn từ 1 đến " + danhSachKM.size() + ".");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Vui lòng nhập một số nguyên hợp lệ!");
+                    }
+                }
 
                 thanhToan(idHoaDon, khuyenMaiChon);
                 break;
-        }
-    }
+                        }
+                    }
 
     // ===================================================================
 
     public static void thanhToan(int idHoaDon, KhuyenMai khuyenMai) {
-        System.out.println("VUI LÒNG CHỌN PHƯƠNG THỨC THANH TOÁN:");
-        System.out.println("1. Tiền mặt");
-        System.out.println("2. Chuyển khoản ngân hàng");
-        System.out.println("3. VNPAY");
-        System.out.print("Lựa chọn: ");
-        int pt = Integer.parseInt(sc.nextLine());
-        String phuongThuc;
-
-        switch (pt) {
-            case 1: phuongThuc = "TIEN_MAT"; break;
-            case 2: phuongThuc = "CHUYEN_KHOAN"; break;
-            case 3: phuongThuc = "VNPAY"; break;
-            default: phuongThuc = "TIEN_MAT";
+        int pt;
+        while (true) {
+            System.out.println("VUI LÒNG CHỌN PHƯƠNG THỨC THANH TOÁN:");
+            System.out.println("1. Tiền mặt");
+            System.out.println("2. Chuyển khoản ngân hàng");
+            System.out.println("3. VNPAY");
+            System.out.print("Lựa chọn: ");
+            try {
+                pt = Integer.parseInt(sc.nextLine());
+                if (pt >= 1 && pt <= 3) break;
+                else System.out.println("❌ Vui lòng chọn số từ 1 đến 3.");
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Nhập không hợp lệ. Vui lòng nhập số nguyên.");
+            }
         }
-
+    
+        String phuongThuc = switch (pt) {
+            case 1 -> "TIEN_MAT";
+            case 2 -> "CHUYEN_KHOAN";
+            case 3 -> "VNPAY";
+            default -> "TIEN_MAT"; 
+        };
+    
         String sql = "UPDATE hoadon SET PhaiTra = ?, PTThanhToan = ?, TrangThaiHD = ?, ID_KhuyenMai = ?, NgayThanhToan = ? WHERE ID_HoaDon = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Tính tổng tiền (có khuyến mãi hay không)
+    
             int tongTien = getTongTienFromDB(idHoaDon);
-            double phanTram = (khuyenMai != null) ? khuyenMai. getPhanTramKM() : 0;
-            int phaiTra = (int)(tongTien * (100 - phanTram)/100);
+            double phanTram = (khuyenMai != null) ? khuyenMai.getPhanTramKM() : 0;
+            int phaiTra = (int)(tongTien * (100 - phanTram) / 100);
             LocalDateTime ngayThanhToan = LocalDateTime.now();
-
+    
             stmt.setInt(1, phaiTra);
             stmt.setString(2, phuongThuc);
             stmt.setString(3, "CHO_XAC_NHAN");
@@ -265,20 +302,21 @@ public class HoaDonServices {
             }
             stmt.setTimestamp(5, Timestamp.valueOf(ngayThanhToan));
             stmt.setInt(6, idHoaDon);
-
+    
             int rows = stmt.executeUpdate();
             if (rows > 0) {
-                System.out.printf("✅ Số tiền bạn cần thanh toán: %,d VND%n",phaiTra );
-                System.out.println("✅ Vui lòng thanh toán và đợi nhân viên xác nhận !");
+                System.out.printf("✅ Số tiền bạn cần thanh toán: %,d VND%n", phaiTra);
+                System.out.println("✅ Vui lòng thanh toán và đợi nhân viên xác nhận!");
             } else {
                 System.out.println("❌ Không tìm thấy hóa đơn để cập nhật.");
             }
-
+    
         } catch (SQLException e) {
             System.out.println("Lỗi khi cập nhật hóa đơn!");
             e.printStackTrace();
         }
     }
+    
 
     // Lấy số tiền phải trả từ bảng hoadon
     private static int getTongTienFromDB(int idHoaDon) {
