@@ -22,7 +22,6 @@ public class QuanLyThanhToanHoaDon {
         
                 switch (choice) {
                     case 1:
-                        HoaDonServices.taoHoaDon(currentUser);
                         HoaDonServices.locDanhSachHoaDon_KH(currentUser,scanner);
                         break;
                     case 0:
