@@ -118,20 +118,38 @@ public class HoaDonServices {
         // Bước 1: Nhập ID hóa đơn hợp lệ
         while (true) {
             System.out.print("Nhập ID hóa đơn muốn thanh toán (0 để thoát): ");
-            idHoaDon = Integer.parseInt(sc.nextLine());
-            if(idHoaDon == 0){
-                QuanLyThanhToanHoaDon.thanhToan(currentUser);
+            String input = sc.nextLine().trim();
+        
+            if (input.isEmpty()) {
+                System.out.println("Bạn chưa nhập gì. Vui lòng thử lại.");
+                continue;
             }
-
+        
+            try {
+                idHoaDon = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("ID không hợp lệ. Vui lòng nhập số nguyên.");
+                continue;
+            }
+        
+            if (idHoaDon == 0) {
+                QuanLyThanhToanHoaDon.thanhToan(currentUser);
+                return; 
+            }
+        
+            hoaDon = null; // reset lại trước khi tìm
             for (HoaDon hd : danhSach) {
                 if (hd.getIdHoaDon() == idHoaDon) {
                     hoaDon = hd;
                     break;
                 }
             }
+        
             if (hoaDon != null) break;
+        
             System.out.println("ID không hợp lệ. Vui lòng nhập lại!");
         }
+        
 
         // Bước 2: Hiển thị lựa chọn
         int choice = -1;
