@@ -21,65 +21,6 @@ import userinterface.QuanLyThanhToanHoaDon;
 public class HoaDonServices {
     
     private static Scanner sc = new Scanner(System.in);
-    public static void taoHoaDon(User currentUser) {
-        String getDonHangSQL = """
-            SELECT dh.ID_DonHang
-            FROM donhang dh
-            WHERE dh.ID_User = ?
-            AND dh.ID_DonHang NOT IN (SELECT ID_DonHang FROM hoadon)
-        """;
-
-        String getTongTienSQL = """
-            SELECT SUM(thanhtien) AS TongTien
-            FROM chitietdonhang
-            WHERE ID_DonHang = ?
-        """;
-
-        String insertHoaDonSQL = """
-            INSERT INTO hoadon (ID_DonHang, TongTien, PTThanhToan, TrangThaiHD, NgayTaoHoaDon, PhaiTra)
-            VALUES (?, ?, NULL, 'CHUA_THANH_TOAN', ?, ?)
-        """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmtDonHang = conn.prepareStatement(getDonHangSQL);
-            PreparedStatement stmtTongTien = conn.prepareStatement(getTongTienSQL);
-            PreparedStatement stmtInsert = conn.prepareStatement(insertHoaDonSQL)) {
-
-            stmtDonHang.setInt(1, currentUser.getID_User());
-            ResultSet rs = stmtDonHang.executeQuery();
-
-            while (rs.next()) {
-                int idDonHang = rs.getInt("ID_DonHang");
-
-                // Tính tổng tiền
-                stmtTongTien.setInt(1, idDonHang);
-                ResultSet rsTien = stmtTongTien.executeQuery();
-                int tongTien = 0;
-                if (rsTien.next()) {
-                    tongTien = rsTien.getInt("TongTien");
-                }
-
-                // Chèn hóa đơn
-                LocalDateTime ngayTaoHoaDon = LocalDateTime.now(); 
-                stmtInsert.setInt(1, idDonHang);
-                stmtInsert.setInt(2, tongTien);
-                stmtInsert.setTimestamp(3, Timestamp.valueOf(ngayTaoHoaDon)); // NgayTaoHoaDon
-                stmtInsert.setInt(4, tongTien); // PhaiTra = tổng tiền khi chưa có khuyến mãi
-
-                int rows = stmtInsert.executeUpdate();
-                if (rows > 0) {
-                    System.out.println("✅ Đã tạo hóa đơn cho đơn hàng ID: " + idDonHang);
-                } else {
-                    System.out.println("❌ Tạo hóa đơn thất bại cho đơn hàng ID: " + idDonHang);
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi tạo hóa đơn!");
-            e.printStackTrace();
-        }
-    }
-
     private static void printDanhSachHD(PreparedStatement stmt,List<HoaDon> danhSach , String tieuDe){
         try (ResultSet rs = stmt.executeQuery()) {
             int stt = 1;
