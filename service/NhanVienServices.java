@@ -342,6 +342,7 @@ public class NhanVienServices {
                 if (rowBuffer.size() == 2) {
                     System.out.println(rowBuffer.get(0) + "|" + rowBuffer.get(1));
                     rowBuffer.clear();
+                    System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
                 }
             }
     

@@ -105,28 +105,30 @@ public class DonHangServices {
     }
 
     //Danh sách đơn hàng
-    public static List<DonHang> xemDSDonHang(){
+    public static List<DonHang> xemDSDonHang(int idChiNhanh, String tieuDe, String dieuKienWhere){
         List<DonHang> danhSach = new ArrayList<>();
         String sql = "SELECT * FROM donhang";
-       
+        
+        if (dieuKienWhere != null && !dieuKienWhere.trim().isEmpty()) {
+            sql += " WHERE " + dieuKienWhere;
+        }
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery()){
                 int stt = 1;
-                System.out.println("======================================= DANH SÁCH ĐƠN HÀNG ===========================================");
+                System.out.println("======================================= " + tieuDe.toUpperCase() + " ===========================================");
                 System.out.printf("| %-3s | %-5s | %-7s | %-7s | %-7s | %-15s | %-15s | %-20s |\n",
                                   "STT","ID", "IDCN","IDUser", "IDBanAn", "Trạng Thái", "Kiểu", "Ngày đặt");
                 while (rs.next()) {
                     int id = rs.getInt("ID_DonHang");
                     int idUser = rs.getInt("ID_User");
-                    int idCN = rs.getInt("ID_ChiNhanh");
                     Integer idBanAn = rs.getInt("ID_BanAn");
                     DonHang.TrangThai trangThai = DonHang.TrangThai.valueOf(rs.getString("TrangThai"));
                     DonHang.KieuDonHang kieuDonHang = DonHang.KieuDonHang.valueOf(rs.getString("kieudonhang"));
                     LocalDateTime ngayDat = rs.getTimestamp("thoigiantaodon").toLocalDateTime();
                     System.out.println("-----------------------------------------------------------------------------------------------------");
-                    danhSach.add(new DonHang(id, idCN, idUser, idBanAn, trangThai, kieuDonHang, ngayDat));
-                    System.out.printf("| %-3d | %-5d | %-7s | %-7s | %-7s | %-15s | %-15s | %-20s |\n",stt++,id, idCN, idUser, idBanAn , trangThai, kieuDonHang, ngayDat);
+                    danhSach.add(new DonHang(id, idChiNhanh, idUser, idBanAn, trangThai, kieuDonHang, ngayDat));
+                    System.out.printf("| %-3d | %-5d | %-7s | %-7s | %-7s | %-15s | %-15s | %-20s |\n",stt++,id, idChiNhanh, idUser, idBanAn , trangThai, kieuDonHang, ngayDat);
                 }               
                 System.out.println("======================================================================================================");
         }catch(SQLException e){
@@ -136,9 +138,17 @@ public class DonHangServices {
         return danhSach;
     }
 
+    public static List<DonHang> xemDSDangChuanBi(int idChiNhanh){
+        return xemDSDonHang(idChiNhanh, "Đơn đang chuẩn bị", "TrangThai = 'DANG_CHUAN_BI'");
+    }
+
+    public static List<DonHang> xemDSDayDu(int idChiNhanh){
+        return xemDSDonHang(idChiNhanh, "Tất cả đơn hàng", null);
+    }
+
     // Sửa trạng thái đơn
-    public static DonHang suaTrangThai(Scanner scanner){
-        xemDSDonHang();
+    public static DonHang suaTrangThai(Scanner scanner, int idChiNhanh){
+        xemDSDangChuanBi(idChiNhanh);
         System.out.println("Nhập ID đơn hàng cần sửa(0 để thoát): ");
         String input = scanner.nextLine().trim();
     

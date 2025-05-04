@@ -68,7 +68,7 @@ public class TrangThaiDonHang {
     }
     
     public static void kiemTraDonHangNV(Scanner scanner, NhanVien currentNV, int idChiNhanh) {
-        DonHangServices.xemDSDonHang();
+        DonHangServices.xemDSDayDu(idChiNhanh);
         System.out.print("Nhập ID đơn hàng cần kiểm tra: ");
          int idDonHang = scanner.nextInt();
          String sql = "SELECT dh.id_DonHang, dh.id_User, dh.id_ChiNhanh, dh.id_BanAn, dh.thoigiantaodon, dh.TrangThai, dh.kieudonhang AS kieuDH, " +

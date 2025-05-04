@@ -208,11 +208,11 @@ public class BanAnServices {
             try (ResultSet rs = stmt.executeQuery()) {
                 System.out.println("\n========================================= " + tieuDe.toUpperCase() + " =========================================");
                 System.out.println("=================================================================================================");
-    
+                
                 System.out.printf("| %-3s | %-5s | %-6s | %-6s | %-12s ||| %-3s | %-5s | %-6s | %-6s | %-12s |\n",
                     "STT", "ID", "IDCN", "Ghế", "Trạng thái", 
                     "STT", "ID", "IDCN", "Ghế", "Trạng thái");
-    
+                System.out.println("-------------------------------------------------------------------------------------------------");
                 List<String> rowBuffer = new ArrayList<>();
                 int count = 0;
     
@@ -224,7 +224,7 @@ public class BanAnServices {
     
                     BanAn banAn = new BanAn(id, idCN, soGhe, trangThai);
                     danhSach.add(banAn);
-                    System.out.println("-------------------------------------------------------------------------------------------------");
+                    
                     String row = String.format("| %-3d | %-5d | %-6d | %-6d | %-12s |", 
                             stt++, id, idCN, soGhe, trangThai);
     
@@ -235,6 +235,7 @@ public class BanAnServices {
                         System.out.println(rowBuffer.get(0) + "|" + rowBuffer.get(1));
                         rowBuffer.clear();
                         count = 0;
+                        System.out.println("-------------------------------------------------------------------------------------------------");
                     }
                 }
 

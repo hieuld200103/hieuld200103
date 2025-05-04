@@ -31,7 +31,7 @@ public class QuanLyDonHang {
 
             switch (choice) {
                 case 1:
-                    DonHangServices.suaTrangThai(scanner);
+                    DonHangServices.suaTrangThai(scanner, idChiNhanh);
                     break;
                 case 2:
                     TrangThaiDonHang.kiemTraDonHangNV(scanner, currentNV, idChiNhanh);
